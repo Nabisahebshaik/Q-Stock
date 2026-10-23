@@ -91,3 +91,15 @@ Read this first when resuming (a new Claude session or you).
   - Static snapshot for hosting without R: `scripts/25_export_snapshot.R` → `web/public/data`, then `npm run build:snapshot` → `web/dist-snapshot`. `web/vercel.json` deploys it.
 - **Doc corrections in this pass:** Spark timing (4.8 s, re-run), the MSE p-value bound for the MLP, README p-value pairing.
 - **Next:** git push (the user signs in) and the Vercel deployment of the snapshot UI.
+
+## Live deployment (2026-10-23, evening)
+
+- **Public site:** https://q-stock-pink.vercel.app (Vercel, built from GitHub `main`, live mode via `web/.env.production`).
+- **R API:** https://q-stock-api.onrender.com (Render free Docker web service from `render.yaml`; endpoints listed at `/__docs__/`).
+- If the API sleeps (15 min idle) or is unreachable, the site shows the bundled snapshot with a notice and switches back to live data automatically.
+- Hugging Face Docker Spaces were not used: they need a paid plan since mid-2026.
+- **Free-tier findings, fixed:**
+  - The HTTP health check restarted the single-threaded R server during long computations (removed).
+  - OpenBLAS started 8 threads on a 0.1-CPU container; a 20-node QSW walk took 39 s. With `OPENBLAS_NUM_THREADS=1` it takes 2.0 s.
+  - The dial is cached and precomputed for the latest date; the exact limits at ω = 0 and 1 are used.
+- **Measured on Render:** live quotes about 11 s (fetch plus parse at 0.1 CPU), live graph about 6 s, forecast about 5 s, dial 0.1–4 s. Memory about 230 MB of 512 MB.
