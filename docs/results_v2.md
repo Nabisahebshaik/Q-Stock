@@ -116,4 +116,4 @@ The statistically significant NASDAQ forecast gain **does not translate into eco
 2. Yahoo is an unofficial source with back-adjusted prices.
 3. One graph construction (60-day correlation, k = 4) was pre-registered. Sensitivity to these choices is exploratory work.
 4. Effect sizes are small. Economic value was evaluated only with a simple inverse-volatility portfolio; volatility-targeting and risk-budgeting uses are not evaluated.
-5. Sentiment (RQ5) depends on the GDELT download, which is rate-limited (17/40 tickers on 2026-10-23). It will be reported as not evaluated if the download stays incomplete.
+5. Sentiment (RQ5) was not evaluated: the GDELT download stopped at 21/40 tickers because of HTTP 429 rate-limiting (deadline 2026-10-23 12:06). Partial data were not used.

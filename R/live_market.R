@@ -256,6 +256,24 @@ bars_to_ticks <- function(bars) {
 
 # ---- live analytics ----
 
+local_day <- function(ts, mk) as.Date(format(ts, "%Y-%m-%d", tz = LIVE$sessions[[mk]]$tz))
+# Bars of the latest session with at least `min_bars` bars (else the one before it).
+pick_session <- function(bars, mk, min_bars = 1) {
+  d <- local_day(bars$bucket, mk); days <- sort(unique(d), decreasing = TRUE)
+  n <- vapply(days, function(x) length(unique(bars$bucket[d == x])), 0)
+  day <- if (any(n >= min_bars)) days[which(n >= min_bars)[1]] else days[1]
+  bars[d == day, ]
+}
+# Change of the last price vs the previous session's close.
+day_change <- function(bars, meta, mk) {
+  cur <- pick_session(bars, mk); d <- local_day(bars$bucket, mk); prev <- bars[d < max(d), ]
+  sapply(split(cur, cur$ticker), function(x) {
+    tk <- x$ticker[1]; p <- prev[prev$ticker == tk, ]
+    pc <- if (nrow(p)) p$close[which.max(p$bucket)] else meta[[tk]]$prev_close
+    tail(x$close[order(x$bucket)], 1) / pc - 1 })
+}
+
+
 # Wide matrix of intraday log returns (rows = buckets, columns = tickers), last n buckets.
 intraday_returns_wide <- function(bars, last_n = NULL) {
   bars <- bars[order(bars$ticker, bars$bucket), ]
@@ -327,7 +345,10 @@ ghar_live_forecast <- function(daily, model, market, now = Sys.time()) {
   gf <- ghar_features_market(daily); vt <- build_vol_targets(daily)
   d <- merge(vt[, c("ticker", "date", HAR_COLS)], gf, by = c("ticker", "date"))
   d <- d[stats::complete.cases(d[, GHAR_COLS]), ]
-  d <- d[d$date == max(d$date), ]
+  # Each stock's own latest complete session (a missing bar for one stock must not drop it),
+  # provided it is recent (within 7 days of the newest session).
+  last <- ave(as.numeric(d$date), d$ticker, FUN = max)
+  d <- d[as.numeric(d$date) == last & d$date >= max(d$date) - 7, ]
   pred <- as.numeric(cbind(1, as.matrix(d[, GHAR_COLS])) %*% model$coef)
   data.frame(ticker = d$ticker, as_of = d$date, pred_lrv5 = pred, vol5_ann = sqrt(exp(pred) * 252))
 }

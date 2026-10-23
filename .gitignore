@@ -28,3 +28,9 @@ results/gpu_benchmark_resume.stamp
 # Live market store and dashboard run log (local, regenerated)
 data/live/
 results/dashboard_run.log
+
+# Web UI build outputs and dependencies
+web/node_modules/
+web/dist/
+web/dist-snapshot/
+results/api_run.log

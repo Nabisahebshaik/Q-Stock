@@ -80,3 +80,14 @@ Read this first when resuming (a new Claude session or you).
   - VWAP starting at 0 on the zero-volume opening bar;
   - an uninformative "centrality" measure, replaced by q_self/q_ent/q_volspill.
 - Tests: 42 blocks, 187 expectations, all pass, plus dashboard tests with mocked fetchers.
+
+## Close-out (2026-10-23, midday)
+
+- **GPU MLP: closed.** Finished 11:51 (164 min). `scripts/23_mlp_vs_linear.R` compares it on identical rows: it ties linear GHAR on NASDAQ QLIKE (p = 0.78), is worse on NSE (Holm p = 0.001), and is far worse on MSE (upward bias of about 0.8 log points). See results.md §3b.
+- **GDELT / RQ5: closed as not evaluated.** 21/40 tickers at the 12:06 deadline (HTTP 429); sentiment steps skipped by design. See results.md §5.
+- **New web UI:**
+  - `web/` (React + three.js + TradingView charts), served by the R API in `api/` (plumber).
+  - Tests: `tests/test_api.R`, 20 end-to-end checks, offline.
+  - Static snapshot for hosting without R: `scripts/25_export_snapshot.R` → `web/public/data`, then `npm run build:snapshot` → `web/dist-snapshot`. `web/vercel.json` deploys it.
+- **Doc corrections in this pass:** Spark timing (4.8 s, re-run), the MSE p-value bound for the MLP, README p-value pairing.
+- **Next:** git push (the user signs in) and the Vercel deployment of the snapshot UI.

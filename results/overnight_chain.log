@@ -40,3 +40,16 @@ gdelt AAPL: ("Apple Inc" OR "Apple shares" OR "Apple stock") sourcelang:english
 gdelt MSFT: "Microsoft" sourcelang:english
 2026-10-23 11:12:10 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
 2026-10-23 11:12:10 cached tickers: 21/40
+gdelt MSFT: "Microsoft" sourcelang:english
+2026-10-23 12:03:55 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 12:03:55 cached tickers: 21/40
+sentiment download incomplete at deadline
+=== 2026-10-23 12:23:56 GDELT download incomplete: sentiment steps skipped
+=== 2026-10-23 12:23:56 figures
+wrote fig1_auc_by_feature_set.png
+wrote fig2_equity_curves.png
+wrote fig3_ablation_hyperparameters.png
+wrote fig4_scalability.png
+wrote fig5_spark_vs_r.png
+wrote fig6_walk_distributions.png
+=== 2026-10-23 12:24:06 done

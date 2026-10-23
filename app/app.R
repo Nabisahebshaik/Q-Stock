@@ -38,22 +38,6 @@ live_con <- candle_store_open(getOption("qstock.live_db", P(LIVE$db_path)))
 onStop(function() DBI::dbDisconnect(live_con))
 setwd(root); GHAR_LIVE <- lapply(c(NSE = "NSE", NASDAQ = "NASDAQ"), ghar_live_model); setwd(old)
 UP <- "#1baf7a"; DOWN <- "#d64545"; FLAT <- "#c9c8c3"
-local_day <- function(ts, mk) as.Date(format(ts, "%Y-%m-%d", tz = LIVE$sessions[[mk]]$tz))
-# Bars of the latest session with at least `min_bars` bars (else the one before it).
-pick_session <- function(bars, mk, min_bars = 1) {
-  d <- local_day(bars$bucket, mk); days <- sort(unique(d), decreasing = TRUE)
-  n <- vapply(days, function(x) length(unique(bars$bucket[d == x])), 0)
-  day <- if (any(n >= min_bars)) days[which(n >= min_bars)[1]] else days[1]
-  bars[d == day, ]
-}
-# Change of the last price vs the previous session's close.
-day_change <- function(bars, meta, mk) {
-  cur <- pick_session(bars, mk); d <- local_day(bars$bucket, mk); prev <- bars[d < max(d), ]
-  sapply(split(cur, cur$ticker), function(x) {
-    tk <- x$ticker[1]; p <- prev[prev$ticker == tk, ]
-    pc <- if (nrow(p)) p$close[which.max(p$bucket)] else meta[[tk]]$prev_close
-    tail(x$close[order(x$bucket)], 1) / pc - 1 })
-}
 pct <- function(x, d = 1) sprintf(paste0("%.", d, "f%%"), 100 * x)
 
 # ---- UI ----

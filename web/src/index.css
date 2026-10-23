@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens (RGB triplets so Tailwind can apply alpha). Dark is the default theme. */
+:root,
+:root[data-theme="dark"] {
+  --bg: 6 9 18;
+  --surface: 12 18 32;
+  --raised: 18 26 44;
+  --line: 34 46 72;
+  --ink: 232 237 247;
+  --muted: 140 153 178;
+  --accent: 76 201 240;
+  --quantum: 139 92 246;
+  --up: 34 197 140;
+  --down: 240 82 92;
+  --warn: 245 179 66;
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: 245 247 251;
+  --surface: 255 255 255;
+  --raised: 240 243 249;
+  --line: 222 227 237;
+  --ink: 16 22 38;
+  --muted: 92 104 128;
+  --accent: 2 132 199;
+  --quantum: 109 40 217;
+  --up: 5 150 105;
+  --down: 220 38 38;
+  --warn: 180 110 0;
+  color-scheme: light;
+}
+
+html, body, #root { height: 100%; }
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+  background-image:
+    radial-gradient(1200px 600px at 85% -10%, rgb(var(--quantum) / 0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgb(var(--accent) / 0.08), transparent 60%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-line/70 bg-surface/70 backdrop-blur-xl;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 20px 50px -30px rgb(0 0 0 / 0.6);
+  }
+  .card-title { @apply text-[13px] font-medium uppercase tracking-[0.08em] text-muted; }
+  .num { font-variant-numeric: tabular-nums; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-raised/70 px-2.5 py-1 text-xs text-muted; }
+  .btn { @apply inline-flex items-center gap-2 rounded-xl border border-line bg-raised/80 px-3 py-1.5 text-sm text-ink transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60; }
+  .seg { @apply rounded-lg px-3 py-1.5 text-sm transition; }
+  .seg-on { @apply bg-accent/15 text-accent; }
+  .seg-off { @apply text-muted hover:text-ink; }
+}
+
+/* Range input styled to the theme */
+input[type="range"].dial { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px;
+  background: linear-gradient(90deg, rgb(var(--quantum)), rgb(var(--accent))); outline: none; }
+input[type="range"].dial::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
+  background: rgb(var(--ink)); border: 3px solid rgb(var(--bg)); box-shadow: 0 0 0 2px rgb(var(--accent)), 0 0 16px rgb(var(--accent) / 0.6); cursor: pointer; }
+input[type="range"].dial::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: rgb(var(--ink));
+  border: 3px solid rgb(var(--bg)); box-shadow: 0 0 0 2px rgb(var(--accent)); cursor: pointer; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 10px; border: 2px solid rgb(var(--bg)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none !important; }
+}

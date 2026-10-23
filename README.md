@@ -37,7 +37,21 @@ results/      tables/ (csv + md), figures/ (png), logs, predictions
 data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
 ```
 
-## Live market tab
+## Web interface (React + three.js) and R API
+
+- **Live mode:** `Rscript api/run_api.R` serves the R API and the built UI at `http://127.0.0.1:8000`. To build the UI once: `cd web && npm ci && npm run build`.
+- **Pages:**
+  - Live market: 3D quantum market graph, candlesticks, risk table.
+  - Quantum dial: historical QSW, sweeping ω.
+  - Research: every headline result, read from `results/tables`.
+  - Pipeline.
+- **Static snapshot (for Vercel, which cannot run R):** `Rscript scripts/25_export_snapshot.R`, then `cd web && npm run build:snapshot`. `web/vercel.json` builds and serves `web/dist-snapshot`. Every page is labelled with the snapshot time.
+- **Computation stays in R.** The UI only renders API responses.
+- **Tests:**
+  - `Rscript tests/test_api.R`: 20 end-to-end checks with a mocked feed.
+  - `cd web && npx tsc -b`: type check.
+
+## Live market tab (Shiny)
 
 `Rscript -e "shiny::runApp('app', port = 8050, launch.browser = TRUE)"`, then open **Live market** (or go to `http://127.0.0.1:8050/?tab=Live%20market`).
 - **Data:** 1-minute bars for the 20 stocks of the selected market, polled every 60 s from the Yahoo chart API (curl multi, about 1–3 s for 20 stocks). It is free and unofficial; NSE bars were observed within seconds of real time, without guarantee.

@@ -13,7 +13,7 @@ All quantum walks are **classical simulations**.
 | Unit tests | 32 test blocks, 145 expectations, all pass. They cover unitarity, Hermiticity, the QSW limits, feature-leakage perturbation tests and the embargo | `tests/` |
 | Hadoop MapReduce (Java, combiner, YARN) | 5,680 ticker-month groups (data to 2026-10-21, reloaded 2026-10-23); matches an independent R computation exactly (count difference 0, max error 1.8×10⁻¹⁵) | `results/stage3_hadoop_hive_log.txt` |
 | Hive | External tables, window-function queries; the MR-vs-raw consistency query returns 0 mismatches (re-checked 2026-10-23) | `results/tables/hive_*.tsv` |
-| Spark 3.5 (sparklyr) | Rolling features and point-in-time sentiment join; agree with R to 10⁻¹⁵ (features) and 6.5×10⁻⁷ (sentiment decay); 7.5 M rows in 5.7 s | `results/stage3_spark_log.txt` |
+| Spark 3.5 (sparklyr) | Rolling features and point-in-time sentiment join; agree with R to 10⁻¹⁵ (features) and 6.5×10⁻⁷ (sentiment decay); 7.49 M rows in 4.8 s (re-run 2026-10-23 on data to 2026-10-21) | `results/tables/spark_scaling.csv` |
 | Power analysis | 0% false positives; ≥ 80% detection at return correlation ≈ 0.035 (NASDAQ) / 0.05 (NSE) | `power_analysis_summary.csv` |
 
 ## 2. Next-day direction (v1; `05_experiments.R`, `05b_naive_baseline.R`)
@@ -72,11 +72,28 @@ All hyper-parameters are chosen on the **last 6 months of each training window**
   - NASDAQ OOS R² 0.329 vs 0.348 (MSE p = 8.6e-9)
   - NSE OOS R² 0.144 vs 0.175 (p = 2.2e-3)
   - Adding QSW features inside LightGBM changes nothing (MSE p = 0.69 NASDAQ, 0.43 NSE) and is worse under QLIKE on NASDAQ (p = 0.016).
-* **Conclusion of the tuning study:** across linear, regularised and tree models, **linear GHAR (NASDAQ) or a simple combination (NSE) is the best achievable out-of-sample forecast**. Quantum-walk features add no value in any model class.
-* **GPU MLP trained with QLIKE: pending at the time of writing (2026-10-23 09:47).**
-  - The full walk-forward run started at 09:06; 1 of 6 market × input configurations was done.
-  - The 2-fold smoke test only confirms the code runs on CUDA; its numbers are not evidence and are not reported.
-  - This section will be replaced with the final `v2_mlp_qlike_gpu.csv` results.
+* **GPU MLP trained with QLIKE** (`18_mlp_qlike_gpu.R`, compared in `23_mlp_vs_linear.R`):
+  - Setup: 2×32 ReLU network, 3-seed ensemble, Adam, early stopping on the last 10% of each training window, trained on the RTX 4060 (164 min).
+  - The comparison uses identical rows to the linear models: 48,400 NASDAQ and 47,500 NSE forecasts, same folds.
+
+  | Market | Model | QLIKE | MSE | OOS R² | Mean bias (log) |
+  |---|---|---|---|---|---|
+  | NASDAQ | Linear GHAR | **0.7771** | **1.0363** | **0.348** | −0.03 |
+  | NASDAQ | MLP, GHAR inputs | 0.7885 | 2.6325 | −0.655 | +0.80 |
+  | NASDAQ | MLP, GHAR + QSW ω = 0.25 | 0.9555 | 3.6722 | −1.309 | +0.99 |
+  | NSE | Linear GHAR | 0.6234 | 0.9455 | 0.175 | +0.00 |
+  | NSE | MLP, GHAR inputs | 0.7929 | 3.1687 | −1.766 | +0.82 |
+  | NSE | MLP, GHAR + QSW ω = 0.25 | 0.7988 | 3.0832 | −1.691 | +0.81 |
+
+  - **QLIKE** (the MLP's own training loss, so the fair comparison):
+    - NASDAQ: the MLP with GHAR inputs is statistically indistinguishable from linear GHAR (Δ = +0.012, 95% CI [−0.12, 0.18], p = 0.78).
+    - NSE: it is significantly worse (Δ = +0.170, Holm p = 0.001).
+  - **MSE:** the MLP is far worse in both markets (Holm p ≤ 1.1×10⁻⁹). Most of the gap is a systematic upward bias of about 0.8 log points. QLIKE's optimum is log E[RV] rather than E[log RV], so some upward bias on the log scale is expected; the observed bias is larger than that alone would explain.
+  - **QSW inside the MLP:**
+    - Adding ω = 0.25 features is worse on NASDAQ (QLIKE Holm p = 2×10⁻¹²) and makes no difference on NSE (p = 0.81).
+    - ω = 0.25 beats ω = 1 inside the MLP in both markets (QLIKE Holm p ≤ 6×10⁻⁴), the same direction as the pre-registered H2. Neither beats linear GHAR.
+  - **Limitation:** one fixed architecture was trained, without a hyper-parameter search. These results show that this nonlinear model adds nothing; they do not show that no network could.
+* **Conclusion of the tuning study:** across linear, regularised, tree and neural-network models, **linear GHAR (NASDAQ) or a simple combination (NSE) is the best achievable out-of-sample forecast**. Quantum-walk features add no value in any model class.
 
 ## 3c. GPU acceleration of the quantum-walk simulations (`13_gpu_benchmark.R`, fig8)
 
@@ -108,12 +125,12 @@ But **no quantum-walk feature set improves on simple classical baselines**:
 
 The evaluation could detect weak signals (power analysis), so this is an informative negative result about practical quantum advantage, not a failure to look.
 
-## 5. Pending
+## 5. Research question 5 (sentiment): not evaluated
 
-- Done: overnight pipeline (every step OK, 2026-10-23 00:26) and the GPU benchmark (09:03).
-Status at the time of writing (2026-10-23 09:47):
-- **GPU MLP with QLIKE:** pending. The full run started at 09:06; results go into §3b when it finishes.
-- **Sentiment (RQ5): pending, likely not evaluable.**
-  - The GDELT download has **19/40** tickers cached. The server keeps rejecting requests with HTTP 429 (rate limit).
-  - The retry window closes around midday on 2026-10-23.
-  - Under the precondition in `docs/research_questions.md`, RQ5 is dropped (reported as *not evaluated*) unless all 40 tickers are available. Partial data will not be used.
+- **RQ5 is not evaluated.** The GDELT DOC 2.0 download ended at its deadline (2026-10-23 12:06) with **21 of 40** tickers. The server rejected requests with HTTP 429 (rate limit), and 7 tickers each failed all 8 retries with back-off.
+- Under the precondition in `docs/research_questions.md`, partial sentiment data are not used. The chain therefore skipped the sentiment experiment (`results/overnight_chain.log`, 12:23:56).
+- The point-in-time sentiment join itself is implemented and validated in Spark against R (agreement 6.5×10⁻⁷ on the decay features, §1). Only the data collection is incomplete.
+
+## 6. Status
+
+All planned experiments are complete. The overnight pipeline, GPU benchmark, GPU MLP (11:51) and Hive reload (09:45) all finished OK on 2026-10-23.

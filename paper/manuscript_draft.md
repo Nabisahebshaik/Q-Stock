@@ -46,7 +46,7 @@ We conclude that partial coherence can help, depending on the market, while a ge
 - 4.1 Market-state graph: 60-day correlations, symmetrised kNN (k = 4), weights max(ρ, 0.01).
 - 4.2 QSW: Lindblad equation (`docs/preregistration_v2.md`). Limits ω = 0 (CTQW) and ω = 1 (classical CTRW) are verified to 10⁻⁶ by unit tests. RK4 integration with h = 0.02, time-averaged over τ ∈ {0.2, …, 2}.
 - 4.3 Node features: self, mom, ent, volspill.
-- 4.4 Models: HAR-RV OLS (T1), logistic regression (T2), rank IC (T3).
+- 4.4 Models: HAR-RV OLS (T1), logistic regression (T2), rank IC (T3). Exploratory baselines: graph-HAR (GHAR), elastic net, LightGBM and a QLIKE-trained MLP (GPU), all with nested walk-forward validation.
 - 4.5 Evaluation: monthly walk-forward; DM with Newey–West variance; stationary bootstrap (mean block 20, 1000 reps); Holm within each pre-registered family.
 
 ## 5 Results
@@ -56,13 +56,18 @@ We conclude that partial coherence can help, depending on the market, while a ge
 - Table 3: robustness by sub-period and ticker (`v2_robustness_*.csv`; exploratory).
 - Table 4: direction results and the naive baseline (`experiment_results.md`, `naive_baseline.csv`).
 - Figure 2: SHAP attributions by regime (`fig9_explainability_shap.png`).
+- Table 5 (exploratory): strongest classical baselines vs QSW, with nested validation (`v3_tuned_models.csv`, `v3_lightgbm.csv`, `v3_mlp_vs_linear.csv`).
+  - Linear GHAR is best on NASDAQ (OOS R² 0.348); a simple combination is best on NSE (0.178).
+  - Adaptive-ω QSW, elastic net and LightGBM never beat it significantly.
+  - A QLIKE-trained GPU MLP is no better on NASDAQ (QLIKE p = 0.78) and significantly worse on NSE (Holm p = 0.001). Its MSE is far worse because of a systematic upward bias (about +0.8 log points). One fixed architecture was trained, without a hyper-parameter search.
+  - Adding QSW features never improves any model class.
 
 ## 6 Big Data system and scalability
-- Architecture: HDFS (WebHDFS), Java MapReduce with combiner (validated to 1.7×10⁻¹⁵), Hive tables and window queries, sparklyr on Spark 3.5 (7.5 M rows in 5.7 s).
+- Architecture: HDFS (WebHDFS), Java MapReduce with combiner (5,680 ticker-month groups; matches R to 1.8×10⁻¹⁵), Hive tables and window queries, sparklyr on Spark 3.5 (7.49 M rows in 4.8 s).
 - Simulation cost vs N (`qw_scalability.csv`); GPU vs CPU (`gpu_benchmark.csv`, fig8).
 
 ## 7 Discussion and limitations
-Survivorship bias, unofficial data, a single pre-registered graph construction, small effect sizes, economic evaluation limited to a simple inverse-volatility portfolio, sentiment pending (GDELT rate-limited; 19/40 tickers at the time of writing; reported as not evaluated if incomplete), and classical simulation only.
+Survivorship bias, unofficial data, a single pre-registered graph construction, small effect sizes, economic evaluation limited to a simple inverse-volatility portfolio, sentiment not evaluated (the GDELT download stopped at 21/40 tickers under HTTP 429 rate-limiting; partial data were not used), and classical simulation only.
 
 ## 8 Reproducibility
 `docs/runbook.md`; all scripts, unit tests, the pre-registration and the logs are in the repository.
