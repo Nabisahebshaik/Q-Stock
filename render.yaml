@@ -1,0 +1,15 @@
+# Render Blueprint: the Q-Stock R API as a free Docker web service.
+# Render dashboard -> New -> Blueprint -> select this repository.
+services:
+  - type: web
+    name: q-stock-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./deploy/render/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/status
+    autoDeploy: true
+    envVars:
+      - key: QSTOCK_HOST
+        value: 0.0.0.0

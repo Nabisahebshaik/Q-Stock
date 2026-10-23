@@ -1,0 +1,20 @@
+# Docker build context for deploy/render/Dockerfile: only R/, api/ and results/tables/ are used.
+.git
+web
+data
+app
+paper
+docs
+hadoop
+hive
+spark
+tests
+build
+deploy/hf-space
+results/predictions
+results/predictions_v2
+results/figures
+results/screenshots
+results/*.log
+results/*.txt
+metastore_db
