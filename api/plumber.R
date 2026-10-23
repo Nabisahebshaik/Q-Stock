@@ -177,9 +177,33 @@ function(market = "NASDAQ", date = "", omega = 0.25) {
   rho <- suppressWarnings(cor(win[, ok], use = "pairwise.complete.obs"))
   g <- c(knn_graph(rho, QS$knn_k), list(tick = colnames(R)[ok], rho = rho))
   omega <- min(max(as.numeric(omega), 0), 1)
-  Pn <- function(om) { P <- pmax(qsw_distributions(g$w, om, TAUS), 0); round(unname(P / rowSums(P)), 5) }
-  c(list(market = mk, date = format(dts[t]), omega = omega, min_date = format(dts[QS$corr_window + 1]), max_date = format(max(dts))),
-    graph_payload(g, Pn(omega)), list(P_quantum = Pn(0), P_classical = Pn(1)))
+  key <- sprintf("dial_%s_%s_%.2f", mk, format(dts[t]), omega)
+  if (!is.null(CACHE[[key]])) return(CACHE[[key]])
+  # Precomputed by the same R code (scripts/25_export_snapshot.R) for the latest date: served as is.
+  pre <- file.path(ROOT, "api", "precomputed", sprintf("dial_%s_%03d.json", mk, round(omega * 100)))
+  if (file.exists(pre)) {
+    j <- jsonlite::fromJSON(pre, simplifyVector = FALSE)
+    if (identical(j$date, format(dts[t]))) { CACHE[[key]] <- j; return(j) }
+  }
+  lim <- paste0("lim_", mk, "_", format(dts[t]))           # the two limits never change for a date
+  Pn <- function(om) { P <- pmax(qsw_distributions(g$w, om, TAUS, exact_limits = TRUE), 0); round(unname(P / rowSums(P)), 5) }
+  if (is.null(CACHE[[lim]])) CACHE[[lim]] <- list(q = Pn(0), c = Pn(1))
+  out <- c(list(market = mk, date = format(dts[t]), omega = omega, min_date = format(dts[QS$corr_window + 1]), max_date = format(max(dts))),
+           graph_payload(g, Pn(omega)), list(P_quantum = CACHE[[lim]]$q, P_classical = CACHE[[lim]]$c))
+  CACHE[[key]] <- out
+  out
+}
+
+#* Compute-speed check of this host (one 20-node QSW walk at omega = 0.25 and at the exact limits)
+#* @get /api/bench
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function() {
+  set.seed(1); r <- matrix(runif(400), 20); W <- knn_graph((r + t(r)) / 2, 4)$w
+  tm <- function(expr) as.numeric(system.time(expr)[["elapsed"]])
+  list(qsw_rk4_omega_025 = tm(qsw_distributions(W, 0.25, TAUS)),
+       qsw_exact_omega_0 = tm(qsw_distributions(W, 0, TAUS, exact_limits = TRUE)),
+       qsw_exact_omega_1 = tm(qsw_distributions(W, 1, TAUS, exact_limits = TRUE)),
+       r_loop_1e6 = tm({ s <- 0; for (i in 1:1e6) s <- s + i }), cores = parallel::detectCores())
 }
 
 #* Research results for the UI (read from results/tables; nothing is recomputed)
@@ -202,6 +226,11 @@ function() {
 
 #* @plumber
 function(pr) {
+  # Server-Timing header: compute time of every request (visible in browser dev tools / curl -I).
+  pr <- plumber::pr_hooks(pr, list(
+    preroute = function(req) req$qs_t0 <- Sys.time(),
+    postroute = function(req, res) if (!is.null(req$qs_t0))
+      res$setHeader("Server-Timing", sprintf("r;dur=%.0f", 1000 * as.numeric(difftime(Sys.time(), req$qs_t0, units = "secs"))))))
   pr <- plumber::pr_set_error(pr, function(req, res, err) {
     res$status <- if (inherits(err, "qs_bad_request")) 400 else 500
     list(error = conditionMessage(err))

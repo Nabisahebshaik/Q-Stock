@@ -301,7 +301,7 @@ live_graph <- function(R, k = QS$knn_k, min_obs = 0.8) {
 # (Column means of P are not reported: on a symmetric graph P is doubly stochastic,
 # so they equal 1/N for every stock and carry no information.)
 live_walk <- function(g, omega, rv = NULL, taus = QS$walk_time * seq_len(10) / 10) {
-  P <- qsw_distributions(g$w, omega, taus)
+  P <- qsw_distributions(g$w, omega, taus, exact_limits = TRUE)
   P <- pmax(P, 0); P <- P / rowSums(P)
   out <- data.frame(ticker = g$tick, q_self = diag(P), q_ent = -rowSums(ifelse(P > 0, P * log(P), 0)))
   if (!is.null(rv)) {

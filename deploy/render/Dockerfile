@@ -11,6 +11,7 @@ WORKDIR /app
 COPY R ./R
 COPY api/plumber.R api/run_api.R ./api/
 COPY api/model ./api/model
+COPY api/precomputed ./api/precomputed
 COPY results/tables ./results/tables
 
 # Daily price history downloaded once at build time (faster start); falls back to start-up.

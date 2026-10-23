@@ -10,6 +10,7 @@ test_that("QSW at omega = 0 equals the closed CTQW", {
   L <- diag(rowSums(W)) - W
   exact <- Reduce(`+`, lapply(taus, function(t) Mod(ctqw_propagator(L, t))^2)) / length(taus)
   expect_equal(qsw_distributions(W, 0, taus), exact, tolerance = 1e-6, ignore_attr = TRUE)
+  expect_equal(qsw_distributions(W, 0, taus, exact_limits = TRUE), exact, tolerance = 1e-12, ignore_attr = TRUE)
 })
 
 test_that("QSW at omega = 1 equals the classical heat kernel", {
@@ -17,6 +18,7 @@ test_that("QSW at omega = 1 equals the classical heat kernel", {
   L <- diag(rowSums(W)) - W; e <- eigen(L, symmetric = TRUE)
   exact <- Reduce(`+`, lapply(taus, function(t) e$vectors %*% (exp(-t * e$values) * t(e$vectors)))) / length(taus)
   expect_equal(qsw_distributions(W, 1, taus), exact, tolerance = 1e-6, ignore_attr = TRUE)
+  expect_equal(qsw_distributions(W, 1, taus, exact_limits = TRUE), exact, tolerance = 1e-12, ignore_attr = TRUE)
 })
 
 test_that("QSW rows are probability distributions for intermediate omega", {

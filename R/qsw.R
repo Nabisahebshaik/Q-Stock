@@ -33,9 +33,19 @@ qsw_rhs <- function(R, H, W, d, omega) {
 
 # Time-averaged node distributions for walks started at every node.
 # Returns an N x N matrix, row i = start node i, averaged over taus.
-qsw_distributions <- function(W, omega, taus = seq(0.2, 2, by = 0.2), h = 0.02) {
+# exact_limits = TRUE uses the closed forms at the two ends of the dial (omega = 0: closed CTQW,
+# |exp(-iHt)|^2; omega = 1: classical heat kernel exp(-Lt)) instead of integrating. The unit tests
+# check that the integrator reproduces both to 1e-6. Research scripts keep the default (integrator)
+# so published results are reproduced exactly; the live API uses the closed forms for speed.
+qsw_distributions <- function(W, omega, taus = seq(0.2, 2, by = 0.2), h = 0.02, exact_limits = FALSE) {
   stopifnot(isSymmetric(unname(W)), all(W >= 0), omega >= 0, omega <= 1)
   n <- nrow(W); d <- rowSums(W); H <- diag(d) - W
+  if (exact_limits && omega %in% c(0, 1)) {
+    e <- eigen(H, symmetric = TRUE); V <- e$vectors
+    one <- if (omega == 0) function(t) Mod(V %*% (exp(-1i * t * e$values) * t(V)))^2
+           else function(t) V %*% (exp(-t * e$values) * t(V))
+    return(Reduce(`+`, lapply(taus, one)) / length(taus))
+  }
   R <- array(0 + 0i, c(n, n, n))
   for (s in seq_len(n)) R[s, s, s] <- 1
   idx <- cbind(rep(seq_len(n), n), rep(seq_len(n), n), rep(seq_len(n), each = n))

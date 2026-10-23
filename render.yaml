@@ -8,7 +8,6 @@ services:
     region: singapore
     dockerfilePath: ./deploy/render/Dockerfile
     dockerContext: .
-    healthCheckPath: /api/status
     autoDeploy: true
     envVars:
       - key: QSTOCK_HOST
