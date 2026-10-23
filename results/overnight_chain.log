@@ -36,3 +36,7 @@ gdelt ULTRACEMCO.NS: "UltraTech Cement" sourcelang:english
 2026-10-23 10:06:35 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
 2026-10-23 10:06:35 cached tickers: 19/40
 gdelt ULTRACEMCO.NS: "UltraTech Cement" sourcelang:english
+gdelt AAPL: ("Apple Inc" OR "Apple shares" OR "Apple stock") sourcelang:english
+gdelt MSFT: "Microsoft" sourcelang:english
+2026-10-23 11:12:10 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 11:12:10 cached tickers: 21/40

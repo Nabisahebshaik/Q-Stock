@@ -24,3 +24,7 @@ hadoop/*.jar
 results/system_monitor.csv
 results/thermal_guard*.log
 results/gpu_benchmark_resume.stamp
+
+# Live market store and dashboard run log (local, regenerated)
+data/live/
+results/dashboard_run.log

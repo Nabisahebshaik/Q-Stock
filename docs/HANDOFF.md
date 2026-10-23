@@ -58,3 +58,25 @@ Read this first when resuming (a new Claude session or you).
 - Tests: 145/145 pass; the dashboard server tests pass.
 - Hadoop VM resumed from the saved state; Hive reload finished OK at 09:45: 5,680 MR groups match R (max error 1.8e-15); the Hive consistency query has 0 mismatches (`results/hive_reload_20261023.log`).
 - Remaining: the MLP results go into results.md; RQ5 depends on GDELT (17/40). Next feature after that, agreed with the user: a **Live market tab** in the dashboard (delayed Yahoo intraday data, candlesticks, live correlation graph, live QSW dial).
+
+## Live market tab (2026-10-23, late morning)
+
+- Built in R, the user's choice of "best version". It was chosen over a Python/Redis/PostgreSQL/Docker design because it fits the R-only course rule, needs no paid tick feed and no Docker, and keeps memory headroom next to the Hadoop VM.
+- `R/live_market.R`:
+  - exchange sessions (DST-aware);
+  - Yahoo 1-minute polling via curl multi;
+  - hot/cold candle store: in-memory active candle plus SQLite with an idempotent upsert (PostgreSQL-compatible SQL);
+  - event-time tick aggregator (watermark, duplicates, late corrections);
+  - live graph, QSW features and a graph-HAR forecast from completed sessions.
+- `app/app.R`: new "Live market" tab; `?tab=` URL selection. `scripts/22_dashboard_screenshot.R` (chromote + Edge).
+- Verified on real NSE data at 11:16–11:24 IST:
+  - 20/20 stocks in 0.6–3 s; newest bar 2–19 s old;
+  - 2,560 candles stored, 0 rejected; replay idempotent;
+  - screenshot `results/screenshots/live_market_tab.png`.
+- Bugs found and fixed during the build:
+  - flush/prune ordering in the aggregator;
+  - all-rejected upsert;
+  - a node render before the stock input existed;
+  - VWAP starting at 0 on the zero-volume opening bar;
+  - an uninformative "centrality" measure, replaced by q_self/q_ent/q_volspill.
+- Tests: 42 blocks, 187 expectations, all pass, plus dashboard tests with mocked fetchers.

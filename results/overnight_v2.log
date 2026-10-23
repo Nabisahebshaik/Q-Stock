@@ -1144,5 +1144,6 @@ total 2.8 min on cuda
 device: cuda
 09:27:45 NSE GHAR done
 09:53:55 NSE GHAR+QSW w=0.25 done
-p_hive (reload refreshed results)
-=== 2026-10-23 09:45:56 OK    hadoop_hive reload (rc=0)
+10:30:28 NSE GHAR+QSW w=1 done
+10:51:32 NASDAQ GHAR done
+11:15:50 NASDAQ GHAR+QSW w=0.25 done

@@ -14,7 +14,12 @@ fetch_yahoo_daily <- function(symbol, from, to, market) {
   h <- curl::new_handle(useragent = "Mozilla/5.0")
   resp <- curl::curl_fetch_memory(url, handle = h)
   if (resp$status_code != 200) stop(sprintf("%s: HTTP %d", symbol, resp$status_code))
-  js <- jsonlite::fromJSON(rawToChar(resp$content), simplifyVector = TRUE)
+  parse_yahoo_daily(rawToChar(resp$content), symbol, market)
+}
+
+# Parse a Yahoo chart-API daily JSON response (shared with the live module).
+parse_yahoo_daily <- function(json_text, symbol, market) {
+  js <- jsonlite::fromJSON(json_text, simplifyVector = TRUE)
   res <- js$chart$result
   if (is.null(res)) stop(sprintf("%s: empty result", symbol))
   q <- res$indicators$quote[[1]]
