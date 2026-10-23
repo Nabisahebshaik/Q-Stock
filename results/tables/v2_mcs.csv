@@ -1,0 +1,25 @@
+"market","loss","model","in_mcs_90"
+"NSE","mse","HAR",TRUE
+"NSE","mse","GHAR",TRUE
+"NSE","mse","HAR+QSW w=0.25",TRUE
+"NSE","mse","HAR+QSW w=1",TRUE
+"NSE","mse","GHAR+QSW w=0.25",TRUE
+"NSE","mse","GHAR+QSW w=1",TRUE
+"NSE","qlike","HAR",TRUE
+"NSE","qlike","GHAR",TRUE
+"NSE","qlike","HAR+QSW w=0.25",TRUE
+"NSE","qlike","HAR+QSW w=1",TRUE
+"NSE","qlike","GHAR+QSW w=0.25",TRUE
+"NSE","qlike","GHAR+QSW w=1",TRUE
+"NASDAQ","mse","HAR",TRUE
+"NASDAQ","mse","GHAR",TRUE
+"NASDAQ","mse","HAR+QSW w=0.25",TRUE
+"NASDAQ","mse","HAR+QSW w=1",TRUE
+"NASDAQ","mse","GHAR+QSW w=0.25",TRUE
+"NASDAQ","mse","GHAR+QSW w=1",TRUE
+"NASDAQ","qlike","HAR",TRUE
+"NASDAQ","qlike","GHAR",TRUE
+"NASDAQ","qlike","HAR+QSW w=0.25",TRUE
+"NASDAQ","qlike","HAR+QSW w=1",TRUE
+"NASDAQ","qlike","GHAR+QSW w=0.25",TRUE
+"NASDAQ","qlike","GHAR+QSW w=1",TRUE

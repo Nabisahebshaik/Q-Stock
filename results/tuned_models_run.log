@@ -1,0 +1,67 @@
+23:57:32 NSE done
+23:57:42 NASDAQ done
+   market             model     n    mse  qlike oos_r2
+1     NSE               HAR 47500 0.9695 0.6489 0.1538
+2     NSE              GHAR 47500 0.9455 0.6234 0.1748
+3     NSE GHAR+QSW adaptive 47500 0.9437 0.6226 0.1763
+4     NSE          ENet-all 47500 0.9495 0.6292 0.1713
+5     NSE             Combo 47500 0.9422 0.6215 0.1777
+6  NASDAQ               HAR 48400 1.0524 0.7971 0.3383
+7  NASDAQ              GHAR 48400 1.0363 0.7771 0.3484
+8  NASDAQ GHAR+QSW adaptive 48400 1.0404 0.7900 0.3459
+9  NASDAQ          ENet-all 48400 1.0460 0.7911 0.3424
+10 NASDAQ             Combo 48400 1.0379 0.7833 0.3475
+   market  loss             model   vs mean_diff     ci_lo    ci_hi  p_value
+1     NSE   mse GHAR+QSW adaptive GHAR -0.001729 -0.005634  0.00231 3.65e-01
+2     NSE   mse GHAR+QSW adaptive  HAR -0.025756 -0.042175 -0.01261 2.27e-05
+3     NSE   mse          ENet-all GHAR  0.004075 -0.006857  0.01829 3.62e-01
+4     NSE   mse          ENet-all  HAR -0.019952 -0.035126 -0.00548 3.33e-04
+5     NSE   mse             Combo GHAR -0.003269 -0.007314  0.00126 5.77e-02
+6     NSE   mse             Combo  HAR -0.027296 -0.042002 -0.01553 4.84e-07
+7     NSE qlike GHAR+QSW adaptive GHAR -0.000835 -0.006208  0.00462 6.96e-01
+8     NSE qlike GHAR+QSW adaptive  HAR -0.026260 -0.064603 -0.00118 2.51e-02
+9     NSE qlike          ENet-all GHAR  0.005751 -0.007592  0.02629 4.34e-01
+10    NSE qlike          ENet-all  HAR -0.019675 -0.040732 -0.00202 2.66e-03
+11    NSE qlike             Combo GHAR -0.001908 -0.007031  0.00437 4.02e-01
+12    NSE qlike             Combo  HAR -0.027334 -0.060901 -0.00463 7.39e-03
+13 NASDAQ   mse GHAR+QSW adaptive GHAR  0.004079  0.000122  0.00821 4.45e-02
+14 NASDAQ   mse GHAR+QSW adaptive  HAR -0.011988 -0.024421 -0.00125 1.60e-02
+15 NASDAQ   mse          ENet-all GHAR  0.009648  0.003579  0.01658 2.22e-03
+16 NASDAQ   mse          ENet-all  HAR -0.006419 -0.018280  0.00454 1.89e-01
+17 NASDAQ   mse             Combo GHAR  0.001549 -0.001348  0.00447 2.98e-01
+18 NASDAQ   mse             Combo  HAR -0.014517 -0.026567 -0.00463 1.51e-03
+19 NASDAQ qlike GHAR+QSW adaptive GHAR  0.012969  0.004824  0.02209 6.22e-05
+20 NASDAQ qlike GHAR+QSW adaptive  HAR -0.007012 -0.031373  0.01176 3.96e-01
+21 NASDAQ qlike          ENet-all GHAR  0.013994  0.003235  0.02595 1.33e-03
+22 NASDAQ qlike          ENet-all  HAR -0.005987 -0.028458  0.01254 4.44e-01
+23 NASDAQ qlike             Combo GHAR  0.006207  0.000580  0.01247 5.44e-03
+24 NASDAQ qlike             Combo  HAR -0.013774 -0.036265  0.00417 7.20e-02
+     p_holm
+1  7.25e-01
+2  4.54e-05
+3  7.25e-01
+4  3.33e-04
+5  1.73e-01
+6  1.45e-06
+7  1.00e+00
+8  2.51e-02
+9  1.00e+00
+10 7.97e-03
+11 1.00e+00
+12 1.48e-02
+13 8.90e-02
+14 3.19e-02
+15 6.66e-03
+16 1.89e-01
+17 2.98e-01
+18 4.53e-03
+19 1.87e-04
+20 7.91e-01
+21 2.67e-03
+22 7.91e-01
+23 5.44e-03
+24 2.16e-01
+        
+          0 0.1 0.25 0.5 0.75 0.9  1
+  NASDAQ 38  21   24  11    5   1 16
+  NSE    27   7    8   9    9   3 53

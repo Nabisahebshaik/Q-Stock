@@ -1,0 +1,21 @@
+trying URL 'https://mlverse.r-universe.dev/bin/windows/contrib/4.6/cuda12.8_1.0.9.zip?sha256=9fd709c8d0005e79dc905ff46b79a554e48adfa794ed9e2bafa8f348ea1f1580&file=/cuda12.8_1.0.9.zip'
+Content type 'application/zip' length 12851 bytes (12 KB)
+==================================================
+downloaded 12 KB
+
+package 'cuda12.8' successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\shaik\AppData\Local\Temp\RtmpQLuNrV\downloaded_packages
+trying URL 'https://download.pytorch.org/libtorch/cu128/libtorch-win-shared-with-deps-2.8.0%2Bcu128.zip'
+Content type 'unknown' length 3389321603 bytes (3232.3 MB)
+==================================================
+downloaded 3232.3 MB
+
+trying URL 'https://torch-cdn.mlverse.org/binaries/refs/heads/cran/v0.17.0/latest/lantern-0.17.0+cu128-win64.zip'
+Content type 'application/x-zip-compressed' length 2456009 bytes (2.3 MB)
+==================================================
+downloaded 2.3 MB
+
+Error: Lantern is not loaded. Please use `install_torch()` to install additional dependencies.
+Execution halted

@@ -1,0 +1,19 @@
+Warning message:
+In value[[3L]](cond) :
+  Unable to retrieve Spark UI URL through SparkContext, will boldly assume it's 'http://localhost:4040'
+Spark version: 3.5.9 
+Spark rolling features: 117040 rows in 3.06 s
+sentiment tickers available for the Spark join: 4 
+Spark PIT sentiment join: 117040 rows in 2.09 s
+   ret_5   ret_20   vol_20 
+1.78e-15 1.78e-15 8.93e-16 
+  sent_tone_3   sent_tone_7  sent_decay_3  sent_decay_7 sent_logvol_7 
+     0.00e+00      0.00e+00      6.47e-07      4.09e-07      8.88e-16 
+  replication   rows spark_seconds base_r_seconds
+1           1 117040      1.130249      0.3646851
+  replication   rows spark_seconds base_r_seconds
+1           4 468160     0.8378818       2.175228
+  replication    rows spark_seconds base_r_seconds
+1          16 1872640      1.337912       20.47281
+  replication    rows spark_seconds base_r_seconds
+1          64 7490560      4.609609             NA

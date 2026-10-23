@@ -1,0 +1,234 @@
+     param   value market      feature_set    auc dm_p_vs_classical
+1  default default    NSE        classical 0.5031                NA
+2  default default    NSE     classical_rw 0.5058           0.50122
+3  default default    NSE   classical_heat 0.5038           0.31480
+4  default default    NSE   classical_dtqw 0.5046           0.09918
+5  default default    NSE   classical_ctqw 0.5024           0.05013
+6  default default    NSE classical_fusion 0.5043           0.01185
+7  default default NASDAQ        classical 0.5108                NA
+8  default default NASDAQ     classical_rw 0.5092           0.01969
+9  default default NASDAQ   classical_heat 0.5104           0.06414
+10 default default NASDAQ   classical_dtqw 0.5100           0.03567
+11 default default NASDAQ   classical_ctqw 0.5125           0.79962
+12 default default NASDAQ classical_fusion 0.5117           0.07400
+ablation steps = 3
+graph features: NASDAQ
+graph features: NSE
+  features built in 37 s
+   param value market      feature_set    auc dm_p_vs_classical
+1  steps     3    NSE        classical 0.5031                NA
+2  steps     3    NSE     classical_rw 0.5055          0.768104
+3  steps     3    NSE   classical_heat 0.5038          0.314799
+4  steps     3    NSE   classical_dtqw 0.5035          0.117508
+5  steps     3    NSE   classical_ctqw 0.5024          0.050128
+6  steps     3    NSE classical_fusion 0.5028          0.008313
+7  steps     3 NASDAQ        classical 0.5108                NA
+8  steps     3 NASDAQ     classical_rw 0.5098          0.012631
+9  steps     3 NASDAQ   classical_heat 0.5104          0.064142
+10 steps     3 NASDAQ   classical_dtqw 0.5103          0.022264
+11 steps     3 NASDAQ   classical_ctqw 0.5125          0.799624
+12 steps     3 NASDAQ classical_fusion 0.5126          0.084199
+ablation steps = 5
+graph features: NASDAQ
+graph features: NSE
+  features built in 52 s
+   param value market      feature_set    auc dm_p_vs_classical
+1  steps     5    NSE        classical 0.5031                NA
+2  steps     5    NSE     classical_rw 0.5058          0.802024
+3  steps     5    NSE   classical_heat 0.5038          0.314799
+4  steps     5    NSE   classical_dtqw 0.5042          0.181025
+5  steps     5    NSE   classical_ctqw 0.5024          0.050128
+6  steps     5    NSE classical_fusion 0.5041          0.020477
+7  steps     5 NASDAQ        classical 0.5108                NA
+8  steps     5 NASDAQ     classical_rw 0.5095          0.010716
+9  steps     5 NASDAQ   classical_heat 0.5104          0.064142
+10 steps     5 NASDAQ   classical_dtqw 0.5091          0.004287
+11 steps     5 NASDAQ   classical_ctqw 0.5125          0.799624
+12 steps     5 NASDAQ classical_fusion 0.5116          0.065113
+ablation steps = 20
+graph features: NASDAQ
+graph features: NSE
+  features built in 133 s
+   param value market      feature_set    auc dm_p_vs_classical
+1  steps    20    NSE        classical 0.5031                NA
+2  steps    20    NSE     classical_rw 0.5052           0.14479
+3  steps    20    NSE   classical_heat 0.5038           0.31480
+4  steps    20    NSE   classical_dtqw 0.5051           0.08922
+5  steps    20    NSE   classical_ctqw 0.5024           0.05013
+6  steps    20    NSE classical_fusion 0.5044           0.01018
+7  steps    20 NASDAQ        classical 0.5108                NA
+8  steps    20 NASDAQ     classical_rw 0.5104           0.04549
+9  steps    20 NASDAQ   classical_heat 0.5104           0.06414
+10 steps    20 NASDAQ   classical_dtqw 0.5088           0.00894
+11 steps    20 NASDAQ   classical_ctqw 0.5125           0.79962
+12 steps    20 NASDAQ classical_fusion 0.5110           0.03236
+ablation tau_max = 0.5
+graph features: NASDAQ
+graph features: NSE
+  features built in 93 s
+     param value market      feature_set    auc dm_p_vs_classical
+1  tau_max   0.5    NSE        classical 0.5031                NA
+2  tau_max   0.5    NSE     classical_rw 0.5058           0.50122
+3  tau_max   0.5    NSE   classical_heat 0.5042           0.33518
+4  tau_max   0.5    NSE   classical_dtqw 0.5046           0.09918
+5  tau_max   0.5    NSE   classical_ctqw 0.5043           0.30662
+6  tau_max   0.5    NSE classical_fusion 0.5044           0.01684
+7  tau_max   0.5 NASDAQ        classical 0.5108                NA
+8  tau_max   0.5 NASDAQ     classical_rw 0.5092           0.01969
+9  tau_max   0.5 NASDAQ   classical_heat 0.5103           0.09590
+10 tau_max   0.5 NASDAQ   classical_dtqw 0.5100           0.03567
+11 tau_max   0.5 NASDAQ   classical_ctqw 0.5104           0.32483
+12 tau_max   0.5 NASDAQ classical_fusion 0.5099           0.02411
+ablation tau_max = 1
+graph features: NASDAQ
+graph features: NSE
+  features built in 99 s
+     param value market      feature_set    auc dm_p_vs_classical
+1  tau_max     1    NSE        classical 0.5031                NA
+2  tau_max     1    NSE     classical_rw 0.5058           0.50122
+3  tau_max     1    NSE   classical_heat 0.5041           0.33567
+4  tau_max     1    NSE   classical_dtqw 0.5046           0.09918
+5  tau_max     1    NSE   classical_ctqw 0.5037           0.34295
+6  tau_max     1    NSE classical_fusion 0.5052           0.03919
+7  tau_max     1 NASDAQ        classical 0.5108                NA
+8  tau_max     1 NASDAQ     classical_rw 0.5092           0.01969
+9  tau_max     1 NASDAQ   classical_heat 0.5104           0.08790
+10 tau_max     1 NASDAQ   classical_dtqw 0.5100           0.03567
+11 tau_max     1 NASDAQ   classical_ctqw 0.5113           0.37590
+12 tau_max     1 NASDAQ classical_fusion 0.5104           0.01869
+ablation tau_max = 4
+graph features: NASDAQ
+graph features: NSE
+  features built in 72 s
+     param value market      feature_set    auc dm_p_vs_classical
+1  tau_max     4    NSE        classical 0.5031                NA
+2  tau_max     4    NSE     classical_rw 0.5058          0.501222
+3  tau_max     4    NSE   classical_heat 0.5037          0.333089
+4  tau_max     4    NSE   classical_dtqw 0.5046          0.099177
+5  tau_max     4    NSE   classical_ctqw 0.5027          0.018356
+6  tau_max     4    NSE classical_fusion 0.5034          0.003356
+7  tau_max     4 NASDAQ        classical 0.5108                NA
+8  tau_max     4 NASDAQ     classical_rw 0.5092          0.019692
+9  tau_max     4 NASDAQ   classical_heat 0.5103          0.030932
+10 tau_max     4 NASDAQ   classical_dtqw 0.5100          0.035674
+11 tau_max     4 NASDAQ   classical_ctqw 0.5115          0.280450
+12 tau_max     4 NASDAQ classical_fusion 0.5108          0.035247
+ablation k = 3
+graph features: NASDAQ
+graph features: NSE
+  features built in 66 s
+   param value market      feature_set    auc dm_p_vs_classical
+1      k     3    NSE        classical 0.5031                NA
+2      k     3    NSE     classical_rw 0.5077           0.86949
+3      k     3    NSE   classical_heat 0.5048           0.50766
+4      k     3    NSE   classical_dtqw 0.5058           0.41578
+5      k     3    NSE   classical_ctqw 0.5018           0.05057
+6      k     3    NSE classical_fusion 0.5063           0.08699
+7      k     3 NASDAQ        classical 0.5108                NA
+8      k     3 NASDAQ     classical_rw 0.5088           0.02402
+9      k     3 NASDAQ   classical_heat 0.5101           0.10132
+10     k     3 NASDAQ   classical_dtqw 0.5098           0.04693
+11     k     3 NASDAQ   classical_ctqw 0.5123           0.75819
+12     k     3 NASDAQ classical_fusion 0.5123           0.08413
+ablation k = 6
+graph features: NASDAQ
+graph features: NSE
+  features built in 94 s
+   param value market      feature_set    auc dm_p_vs_classical
+1      k     6    NSE        classical 0.5031                NA
+2      k     6    NSE     classical_rw 0.5023         0.0444724
+3      k     6    NSE   classical_heat 0.5025         0.1515384
+4      k     6    NSE   classical_dtqw 0.5032         0.0697955
+5      k     6    NSE   classical_ctqw 0.5011         0.0384039
+6      k     6    NSE classical_fusion 0.5011         0.0015582
+7      k     6 NASDAQ        classical 0.5108                NA
+8      k     6 NASDAQ     classical_rw 0.5094         0.0222234
+9      k     6 NASDAQ   classical_heat 0.5112         0.0550291
+10     k     6 NASDAQ   classical_dtqw 0.5081         0.0003052
+11     k     6 NASDAQ   classical_ctqw 0.5129         0.5223458
+12     k     6 NASDAQ classical_fusion 0.5102         0.0072237
+ablation corr_window = 40
+graph features: NASDAQ
+graph features: NSE
+  features built in 80 s
+         param value market      feature_set    auc dm_p_vs_classical
+1  corr_window    40    NSE        classical 0.5030                NA
+2  corr_window    40    NSE     classical_rw 0.5049           0.30821
+3  corr_window    40    NSE   classical_heat 0.5061           0.90034
+4  corr_window    40    NSE   classical_dtqw 0.5041           0.24516
+5  corr_window    40    NSE   classical_ctqw 0.5015           0.01458
+6  corr_window    40    NSE classical_fusion 0.5021           0.00937
+7  corr_window    40 NASDAQ        classical 0.5108                NA
+8  corr_window    40 NASDAQ     classical_rw 0.5084           0.01424
+9  corr_window    40 NASDAQ   classical_heat 0.5125           0.58252
+10 corr_window    40 NASDAQ   classical_dtqw 0.5093           0.02457
+11 corr_window    40 NASDAQ   classical_ctqw 0.5128           0.97486
+12 corr_window    40 NASDAQ classical_fusion 0.5122           0.14495
+ablation corr_window = 120
+graph features: NASDAQ
+graph features: NSE
+  features built in 81 s
+         param value market      feature_set    auc dm_p_vs_classical
+1  corr_window   120    NSE        classical 0.5025                NA
+2  corr_window   120    NSE     classical_rw 0.5030           0.09672
+3  corr_window   120    NSE   classical_heat 0.5017           0.05497
+4  corr_window   120    NSE   classical_dtqw 0.5029           0.11274
+5  corr_window   120    NSE   classical_ctqw 0.5018           0.03420
+6  corr_window   120    NSE classical_fusion 0.5014           0.00433
+7  corr_window   120 NASDAQ        classical 0.5106                NA
+8  corr_window   120 NASDAQ     classical_rw 0.5125           0.11489
+9  corr_window   120 NASDAQ   classical_heat 0.5121           0.32412
+10 corr_window   120 NASDAQ   classical_dtqw 0.5114           0.48259
+11 corr_window   120 NASDAQ   classical_ctqw 0.5095           0.00321
+12 corr_window   120 NASDAQ classical_fusion 0.5098           0.02127
+random-graph control
+graph features: NASDAQ
+graph features: NSE
+   param  value market      feature_set    auc dm_p_vs_classical
+1  graph random    NSE        classical 0.5031                NA
+2  graph random    NSE     classical_rw 0.4998          0.000492
+3  graph random    NSE   classical_heat 0.5050          0.128515
+4  graph random    NSE   classical_dtqw 0.5025          0.073877
+5  graph random    NSE   classical_ctqw 0.5030          0.087726
+6  graph random    NSE classical_fusion 0.5028          0.014655
+7  graph random NASDAQ        classical 0.5108                NA
+8  graph random NASDAQ     classical_rw 0.5143          0.840165
+9  graph random NASDAQ   classical_heat 0.5124          0.526740
+10 graph random NASDAQ   classical_dtqw 0.5130          0.908944
+11 graph random NASDAQ   classical_ctqw 0.5094          0.001208
+12 graph random NASDAQ classical_fusion 0.5121          0.350289
+drop-one feature ablation
+     param           value market            feature_set    auc
+1  dropped see feature_set    NSE              classical 0.5031
+2  dropped see feature_set    NSE       classical_fusion 0.5043
+3  dropped see feature_set    NSE fusion_minus_dtqw_self 0.5038
+4  dropped see feature_set    NSE  fusion_minus_dtqw_mom 0.5030
+5  dropped see feature_set    NSE  fusion_minus_dtqw_ent 0.5041
+6  dropped see feature_set    NSE fusion_minus_ctqw_self 0.5037
+7  dropped see feature_set    NSE  fusion_minus_ctqw_mom 0.5045
+8  dropped see feature_set    NSE  fusion_minus_ctqw_ent 0.5039
+9  dropped see feature_set NASDAQ              classical 0.5108
+10 dropped see feature_set NASDAQ       classical_fusion 0.5117
+11 dropped see feature_set NASDAQ fusion_minus_dtqw_self 0.5109
+12 dropped see feature_set NASDAQ  fusion_minus_dtqw_mom 0.5127
+13 dropped see feature_set NASDAQ  fusion_minus_dtqw_ent 0.5113
+14 dropped see feature_set NASDAQ fusion_minus_ctqw_self 0.5112
+15 dropped see feature_set NASDAQ  fusion_minus_ctqw_mom 0.5125
+16 dropped see feature_set NASDAQ  fusion_minus_ctqw_ent 0.5103
+   dm_p_vs_classical
+1                 NA
+2           0.011855
+3           0.024213
+4           0.005194
+5           0.067604
+6           0.019135
+7           0.020282
+8           0.025334
+9                 NA
+10          0.074003
+11          0.049394
+12          0.336115
+13          0.117225
+14          0.056072
+15          0.296045
+16          0.016127

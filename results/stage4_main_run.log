@@ -1,0 +1,99 @@
+sentiment available: FALSE 
+[21:23:14] main NSE logit ...  classical 
+[21:23:17] main NSE logit ...  classical_rw 
+[21:23:21] main NSE logit ...  classical_heat 
+[21:23:25] main NSE logit ...  classical_ppr 
+[21:23:29] main NSE logit ...  classical_dtqw 
+[21:23:32] main NSE logit ...  classical_ctqw 
+[21:23:36] main NSE logit ...  classical_fusion 
+[21:23:40] main NSE logit ...  classical_adaptive 
+[21:23:45] main NSE rf ...  classical 
+[21:25:25] main NSE rf ...  classical_rw 
+[21:27:55] main NSE rf ...  classical_heat 
+[21:30:31] main NSE rf ...  classical_ppr 
+[21:33:07] main NSE rf ...  classical_dtqw 
+[21:36:04] main NSE rf ...  classical_ctqw 
+[21:38:26] main NSE rf ...  classical_fusion 
+[21:40:43] main NSE rf ...  classical_adaptive 
+[21:42:46] main NASDAQ logit ...  classical 
+[21:42:50] main NASDAQ logit ...  classical_rw 
+[21:42:54] main NASDAQ logit ...  classical_heat 
+[21:42:59] main NASDAQ logit ...  classical_ppr 
+[21:43:05] main NASDAQ logit ...  classical_dtqw 
+[21:43:10] main NASDAQ logit ...  classical_ctqw 
+[21:43:15] main NASDAQ logit ...  classical_fusion 
+[21:43:21] main NASDAQ logit ...  classical_adaptive 
+[21:43:28] main NASDAQ rf ...  classical 
+[21:45:34] main NASDAQ rf ...  classical_rw 
+[21:47:57] main NASDAQ rf ...  classical_heat 
+[21:50:16] main NASDAQ rf ...  classical_ppr 
+[21:52:26] main NASDAQ rf ...  classical_dtqw 
+[21:54:32] main NASDAQ rf ...  classical_ctqw 
+[21:56:40] main NASDAQ rf ...  classical_fusion 
+[21:58:51] main NASDAQ rf ...  classical_adaptive 
+   experiment market model        feature_set    auc     f1 sharpe_net
+1        main    NSE logit          classical 0.5031 0.6070    0.45864
+2        main    NSE logit       classical_rw 0.5058 0.5821    0.47438
+3        main    NSE logit     classical_heat 0.5038 0.5897    0.43571
+4        main    NSE logit      classical_ppr 0.5057 0.5841    0.46141
+5        main    NSE logit     classical_dtqw 0.5046 0.5921    0.44086
+6        main    NSE logit     classical_ctqw 0.5024 0.5980    0.40642
+7        main    NSE logit   classical_fusion 0.5043 0.5885    0.36682
+8        main    NSE logit classical_adaptive 0.5034 0.5623    0.29657
+9        main    NSE    rf          classical 0.5062 0.5415   -0.04169
+10       main    NSE    rf       classical_rw 0.5058 0.5411   -0.06545
+11       main    NSE    rf     classical_heat 0.5068 0.5458    0.11340
+12       main    NSE    rf      classical_ppr 0.5067 0.5400   -0.14187
+13       main    NSE    rf     classical_dtqw 0.5058 0.5439   -0.02781
+14       main    NSE    rf     classical_ctqw 0.5029 0.5392   -0.02023
+15       main    NSE    rf   classical_fusion 0.5022 0.5428   -0.03325
+16       main    NSE    rf classical_adaptive 0.5021 0.5292   -0.16770
+17       main NASDAQ logit          classical 0.5108 0.6519    0.97678
+18       main NASDAQ logit       classical_rw 0.5092 0.6459    0.99475
+19       main NASDAQ logit     classical_heat 0.5104 0.6352    0.90492
+20       main NASDAQ logit      classical_ppr 0.5090 0.6465    0.97294
+21       main NASDAQ logit     classical_dtqw 0.5100 0.6486    0.98088
+22       main NASDAQ logit     classical_ctqw 0.5125 0.6399    0.98704
+23       main NASDAQ logit   classical_fusion 0.5117 0.6389    0.99667
+24       main NASDAQ logit classical_adaptive 0.5067 0.6308    0.83673
+25       main NASDAQ    rf          classical 0.5037 0.5781    0.45468
+26       main NASDAQ    rf       classical_rw 0.5024 0.5819    0.45518
+27       main NASDAQ    rf     classical_heat 0.5054 0.5809    0.54967
+28       main NASDAQ    rf      classical_ppr 0.5014 0.5799    0.46053
+29       main NASDAQ    rf     classical_dtqw 0.5053 0.5844    0.56990
+30       main NASDAQ    rf     classical_ctqw 0.5083 0.5846    0.55199
+31       main NASDAQ    rf   classical_fusion 0.5097 0.5905    0.59552
+32       main NASDAQ    rf classical_adaptive 0.5069 0.5884    0.63170
+   dm_p_vs_classical
+1                 NA
+2          5.012e-01
+3          3.148e-01
+4          5.681e-01
+5          9.918e-02
+6          5.013e-02
+7          1.185e-02
+8          6.700e-04
+9                 NA
+10         1.400e-01
+11         3.988e-02
+12         8.497e-02
+13         1.392e-02
+14         9.471e-02
+15         2.841e-03
+16         1.463e-01
+17                NA
+18         1.969e-02
+19         6.414e-02
+20         1.665e-02
+21         3.567e-02
+22         7.996e-01
+23         7.400e-02
+24         3.111e-05
+25                NA
+26         7.069e-01
+27         9.724e-03
+28         5.968e-01
+29         5.005e-04
+30         1.529e-05
+31         1.359e-09
+32         1.374e-04

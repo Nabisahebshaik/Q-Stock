@@ -1,0 +1,73 @@
+NSE b=0 seed=1 auc=0.5032 p=0.343
+NSE b=0 seed=2 auc=0.5026 p=0.00582
+NSE b=0 seed=3 auc=0.5021 p=0.00486
+NSE b=0 seed=4 auc=0.5033 p=0.239
+NSE b=0 seed=5 auc=0.5034 p=0.134
+NSE b=0.01 seed=1 auc=0.5042 p=0.993
+NSE b=0.01 seed=2 auc=0.5035 p=0.146
+NSE b=0.01 seed=3 auc=0.5026 p=0.0326
+NSE b=0.01 seed=4 auc=0.504 p=0.212
+NSE b=0.01 seed=5 auc=0.5043 p=0.657
+NSE b=0.02 seed=1 auc=0.5063 p=0.298
+NSE b=0.02 seed=2 auc=0.5056 p=0.997
+NSE b=0.02 seed=3 auc=0.5045 p=0.492
+NSE b=0.02 seed=4 auc=0.5056 p=0.55
+NSE b=0.02 seed=5 auc=0.5064 p=0.474
+NSE b=0.03 seed=1 auc=0.5092 p=0.0471
+NSE b=0.03 seed=2 auc=0.5084 p=0.269
+NSE b=0.03 seed=3 auc=0.5074 p=0.551
+NSE b=0.03 seed=4 auc=0.5078 p=0.821
+NSE b=0.03 seed=5 auc=0.5093 p=0.0854
+NSE b=0.05 seed=1 auc=0.5161 p=0.000205
+NSE b=0.05 seed=2 auc=0.5152 p=0.00375
+NSE b=0.05 seed=3 auc=0.5145 p=0.00826
+NSE b=0.05 seed=4 auc=0.5136 p=0.0612
+NSE b=0.05 seed=5 auc=0.5165 p=0.000586
+NSE b=0.1 seed=1 auc=0.5358 p=4.87e-14
+NSE b=0.1 seed=2 auc=0.5343 p=3.76e-11
+NSE b=0.1 seed=3 auc=0.5341 p=4.22e-11
+NSE b=0.1 seed=4 auc=0.5316 p=1.77e-08
+NSE b=0.1 seed=5 auc=0.536 p=1.95e-12
+NASDAQ b=0 seed=1 auc=0.5105 p=0.229
+NASDAQ b=0 seed=2 auc=0.5119 p=0.391
+NASDAQ b=0 seed=3 auc=0.5104 p=0.291
+NASDAQ b=0 seed=4 auc=0.5105 p=0.365
+NASDAQ b=0 seed=5 auc=0.51 p=0.251
+NASDAQ b=0.01 seed=1 auc=0.5103 p=0.281
+NASDAQ b=0.01 seed=2 auc=0.5133 p=0.079
+NASDAQ b=0.01 seed=3 auc=0.5117 p=0.861
+NASDAQ b=0.01 seed=4 auc=0.5109 p=0.966
+NASDAQ b=0.01 seed=5 auc=0.5111 p=0.916
+NASDAQ b=0.02 seed=1 auc=0.5108 p=0.988
+NASDAQ b=0.02 seed=2 auc=0.5153 p=0.00953
+NASDAQ b=0.02 seed=3 auc=0.5136 p=0.217
+NASDAQ b=0.02 seed=4 auc=0.5121 p=0.288
+NASDAQ b=0.02 seed=5 auc=0.5127 p=0.202
+NASDAQ b=0.03 seed=1 auc=0.512 p=0.298
+NASDAQ b=0.03 seed=2 auc=0.5177 p=0.000708
+NASDAQ b=0.03 seed=3 auc=0.516 p=0.0287
+NASDAQ b=0.03 seed=4 auc=0.5139 p=0.0457
+NASDAQ b=0.03 seed=5 auc=0.5149 p=0.0211
+NASDAQ b=0.05 seed=1 auc=0.5162 p=0.00415
+NASDAQ b=0.05 seed=2 auc=0.5234 p=1e-06
+NASDAQ b=0.05 seed=3 auc=0.5218 p=8.6e-05
+NASDAQ b=0.05 seed=4 auc=0.5189 p=0.000273
+NASDAQ b=0.05 seed=5 auc=0.5203 p=3.79e-05
+NASDAQ b=0.1 seed=1 auc=0.5319 p=2.35e-11
+NASDAQ b=0.1 seed=2 auc=0.5405 p=1.03e-16
+NASDAQ b=0.1 seed=3 auc=0.5389 p=7.16e-15
+NASDAQ b=0.1 seed=4 auc=0.5353 p=4.5e-13
+NASDAQ b=0.1 seed=5 auc=0.5374 p=1.1e-15
+   market strength signal_corr_with_return   auc detection_rate
+1  NASDAQ     0.00                 0.00531 0.511            0.0
+2     NSE     0.00                -0.00183 0.503            0.0
+3  NASDAQ     0.01                 0.01527 0.511            0.0
+4     NSE     0.01                 0.00814 0.504            0.0
+5  NASDAQ     0.02                 0.02523 0.513            0.2
+6     NSE     0.02                 0.01810 0.506            0.0
+7  NASDAQ     0.03                 0.03519 0.515            0.8
+8     NSE     0.03                 0.02806 0.508            0.2
+9  NASDAQ     0.05                 0.05506 0.520            1.0
+10    NSE     0.05                 0.04795 0.515            0.8
+11 NASDAQ     0.10                 0.10440 0.537            1.0
+12    NSE     0.10                 0.09738 0.534            1.0

@@ -1,0 +1,65 @@
+"market","task","regime","feature","mean_abs_shap","group","share_within_task"
+"NSE","T1_volatility","low-vol","har_d",0.017328871039347,"HAR-RV",0.0362798939083092
+"NSE","T1_volatility","low-vol","har_w",0.0375704928100311,"HAR-RV",0.0786579512384773
+"NSE","T1_volatility","low-vol","har_m",0.151965889650467,"HAR-RV",0.318157273008854
+"NSE","T1_volatility","low-vol","q_volspill",0.108092503041862,"QSW (omega = 0.25)",0.226303521662662
+"NSE","T1_volatility","low-vol","q_self",0.0768082866764806,"QSW (omega = 0.25)",0.160806580277183
+"NSE","T1_volatility","low-vol","q_ent",0.0858778849350363,"QSW (omega = 0.25)",0.179794779904514
+"NSE","T1_volatility","high-vol","har_d",0.0190977583635527,"HAR-RV",0.034961675463003
+"NSE","T1_volatility","high-vol","har_w",0.0470289918909287,"HAR-RV",0.0860945206522647
+"NSE","T1_volatility","high-vol","har_m",0.16604292388062,"HAR-RV",0.303969644349529
+"NSE","T1_volatility","high-vol","q_volspill",0.121534712436078,"QSW (omega = 0.25)",0.222489838482233
+"NSE","T1_volatility","high-vol","q_self",0.0917063281988589,"QSW (omega = 0.25)",0.167883938175229
+"NSE","T1_volatility","high-vol","q_ent",0.100837658931681,"QSW (omega = 0.25)",0.184600382877742
+"NSE","T2_direction","low-vol","ret_1",0.0227798510448365,"classical",0.0835572573260501
+"NSE","T2_direction","low-vol","ret_5",0.0154203903134579,"classical",0.0565625086377286
+"NSE","T2_direction","low-vol","ret_20",0.0119307980920988,"classical",0.0437625673813445
+"NSE","T2_direction","low-vol","vol_10",0.0244467471433061,"classical",0.0896714880978612
+"NSE","T2_direction","low-vol","vol_20",0.0192412279158791,"classical",0.0705774690568363
+"NSE","T2_direction","low-vol","range",0.0170079594549306,"classical",0.062385765471842
+"NSE","T2_direction","low-vol","log_vol_z",0.0183887754982482,"classical",0.0674506450105331
+"NSE","T2_direction","low-vol","q_self",0.0678797652583056,"QSW (omega = 0.25)",0.248985254633864
+"NSE","T2_direction","low-vol","q_mom",0.0111426812681464,"QSW (omega = 0.25)",0.0408717284495022
+"NSE","T2_direction","low-vol","q_ent",0.064387447477604,"QSW (omega = 0.25)",0.236175315934438
+"NSE","T2_direction","high-vol","ret_1",0.036294690630678,"classical",0.0973448312971796
+"NSE","T2_direction","high-vol","ret_5",0.0218349549709601,"classical",0.0585628358058803
+"NSE","T2_direction","high-vol","ret_20",0.0188211947035158,"classical",0.0504797255848903
+"NSE","T2_direction","high-vol","vol_10",0.0293410723609371,"classical",0.0786947536794696
+"NSE","T2_direction","high-vol","vol_20",0.0307326484352773,"classical",0.0824270554525376
+"NSE","T2_direction","high-vol","range",0.0191824507927532,"classical",0.0514486390113674
+"NSE","T2_direction","high-vol","log_vol_z",0.0221344867703676,"classical",0.0593662004847026
+"NSE","T2_direction","high-vol","q_self",0.0880648373411552,"QSW (omega = 0.25)",0.23619588940489
+"NSE","T2_direction","high-vol","q_mom",0.0140904796820498,"QSW (omega = 0.25)",0.0377916258194003
+"NSE","T2_direction","high-vol","q_ent",0.0923497971938426,"QSW (omega = 0.25)",0.247688443459682
+"NASDAQ","T1_volatility","low-vol","har_d",0.0366786769379963,"HAR-RV",0.0492326459785249
+"NASDAQ","T1_volatility","low-vol","har_w",0.105990483625172,"HAR-RV",0.142267725911484
+"NASDAQ","T1_volatility","low-vol","har_m",0.35888433861128,"HAR-RV",0.481719273024885
+"NASDAQ","T1_volatility","low-vol","q_volspill",0.0830966097978138,"QSW (omega = 0.25)",0.111537991926676
+"NASDAQ","T1_volatility","low-vol","q_self",0.0763042276261939,"QSW (omega = 0.25)",0.102420788834222
+"NASDAQ","T1_volatility","low-vol","q_ent",0.0840528879572876,"QSW (omega = 0.25)",0.112821574324208
+"NASDAQ","T1_volatility","high-vol","har_d",0.0436443526836251,"HAR-RV",0.049902975857993
+"NASDAQ","T1_volatility","high-vol","har_w",0.119786628689791,"HAR-RV",0.136964094368612
+"NASDAQ","T1_volatility","high-vol","har_m",0.412826925028841,"HAR-RV",0.47202652362795
+"NASDAQ","T1_volatility","high-vol","q_volspill",0.116494352393622,"QSW (omega = 0.25)",0.133199703916621
+"NASDAQ","T1_volatility","high-vol","q_self",0.0969410652489366,"QSW (omega = 0.25)",0.11084246509127
+"NASDAQ","T1_volatility","high-vol","q_ent",0.0848908452003639,"QSW (omega = 0.25)",0.0970642371375529
+"NASDAQ","T2_direction","low-vol","ret_1",0.0430306215316921,"classical",0.134144425093753
+"NASDAQ","T2_direction","low-vol","ret_5",0.0199228146203152,"classical",0.0621077367316964
+"NASDAQ","T2_direction","low-vol","ret_20",0.0124529412072181,"classical",0.0388210204618647
+"NASDAQ","T2_direction","low-vol","vol_10",0.0431794307761263,"classical",0.134608325679724
+"NASDAQ","T2_direction","low-vol","vol_20",0.0606736329167601,"classical",0.189145062661338
+"NASDAQ","T2_direction","low-vol","range",0.0188536843134844,"classical",0.058774810892954
+"NASDAQ","T2_direction","low-vol","log_vol_z",0.0302403501368574,"classical",0.0942718055037819
+"NASDAQ","T2_direction","low-vol","q_self",0.0395058267885621,"QSW (omega = 0.25)",0.123156167254102
+"NASDAQ","T2_direction","low-vol","q_mom",0.0106838004368238,"QSW (omega = 0.25)",0.0333058695505614
+"NASDAQ","T2_direction","low-vol","q_ent",0.0422352039488498,"QSW (omega = 0.25)",0.131664776170224
+"NASDAQ","T2_direction","high-vol","ret_1",0.0591245305200526,"classical",0.152685952054527
+"NASDAQ","T2_direction","high-vol","ret_5",0.0211846977096295,"classical",0.054708353881729
+"NASDAQ","T2_direction","high-vol","ret_20",0.013934045245917,"classical",0.0359839299463379
+"NASDAQ","T2_direction","high-vol","vol_10",0.0582118645512854,"classical",0.150329040783972
+"NASDAQ","T2_direction","high-vol","vol_20",0.078663113882146,"classical",0.203143303279094
+"NASDAQ","T2_direction","high-vol","range",0.0183746234982645,"classical",0.0474514868498528
+"NASDAQ","T2_direction","high-vol","log_vol_z",0.0306275012734606,"classical",0.0790938913147651
+"NASDAQ","T2_direction","high-vol","q_self",0.0472895653586685,"QSW (omega = 0.25)",0.122122784663536
+"NASDAQ","T2_direction","high-vol","q_mom",0.00993939563520914,"QSW (omega = 0.25)",0.0256679600169308
+"NASDAQ","T2_direction","high-vol","q_ent",0.0498803303103969,"QSW (omega = 0.25)",0.128813297209255

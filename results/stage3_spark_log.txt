@@ -1,0 +1,6 @@
+Spark version: 3.5.9
+Java: openjdk version "17.0.20.1" 2026-08-18
+Rolling features: 117040 rows, 2.87 s
+PIT sentiment join: 117040 rows, 2.39 s
+Spark vs R max |diff| (rows with full windows, n=116180): ret_5=1.45e-06, ret_20=1.33e-06, vol_20=2.93e-07
+Spark vs R sentiment max |diff| (n=117040): sent_tone_3=0, sent_tone_7=0, sent_decay_3=8.14e-07, sent_decay_7=8.06e-07, sent_logvol_7=8.88e-16

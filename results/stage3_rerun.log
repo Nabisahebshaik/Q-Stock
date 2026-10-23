@@ -1,0 +1,166 @@
+               name type    size replication block_size
+1 prices_NASDAQ.csv FILE 7056261           1  134217728
+2    prices_NSE.csv FILE 7076817           1  134217728
+HDFS curated prices: 2 files, 14133078 bytes, replication 1, block size 128 MB
+MapReduce wall time (incl. compile): 48.8 s
+26/10/22 09:42:10 INFO mapreduce.Job: Job job_1792685456748_0013 running in uber mode : false
+26/10/22 09:42:34 INFO mapreduce.Job: Job job_1792685456748_0013 completed successfully
+Launched map tasks=2
+Launched reduce tasks=2
+Map input records=117042
+Map output records=117000
+Combine input records=117000
+Combine output records=5640
+Reduce input records=5640
+Reduce output records=5640
+mapped_rows=117000
+skipped_rows=40
+MR rows: 5640; R reference rows: 5640; matched: 5640
+max |n diff| = 0; max |sum diff| = 1.22e-15; max |vol diff| = 1.67e-15
+ [1] " " ""  ""  ""  ""  ""  ""  ""  " " ""  ""  ""  ""  ""  ""  ""  ""  ""  "" 
+[20] ""  ""  ""  ""  " " ""  ""  ""  ""  ""  ""  ""  "" 
+Hive market tables + 5 queries: 316 s
+
+
+
+ 
+
+
+q	market	n_rows	n_tickers	first_day	last_day
+Q1	NASDAQ	59060	20	2015-01-02	2026-09-30
+Q1	NSE	57980	20	2015-01-01	2026-09-30
+
+ 
+
+ 
+
+
+
+q	market	yr	avg_vol_ann	ticker_months
+Q2	NASDAQ	2015	0.2844	240
+Q2	NASDAQ	2016	0.2679	240
+Q2	NASDAQ	2017	0.2136	240
+Q2	NASDAQ	2018	0.3273	240
+Q2	NASDAQ	2019	0.2648	240
+Q2	NASDAQ	2020	0.4163	240
+Q2	NASDAQ	2021	0.2745	240
+Q2	NASDAQ	2022	0.4242	240
+Q2	NASDAQ	2023	0.297	240
+Q2	NASDAQ	2024	0.3192	240
+Q2	NASDAQ	2025	0.3488	240
+Q2	NASDAQ	2026	0.4036	180
+Q2	NSE	2015	0.2761	240
+Q2	NSE	2016	0.2605	240
+Q2	NSE	2017	0.2253	240
+Q2	NSE	2018	0.2576	240
+Q2	NSE	2019	0.2506	240
+Q2	NSE	2020	0.3915	240
+Q2	NSE	2021	0.2563	240
+Q2	NSE	2022	0.2531	240
+Q2	NSE	2023	0.1772	240
+Q2	NSE	2024	0.2245	240
+Q2	NSE	2025	0.1988	240
+Q2	NSE	2026	0.2476	180
+
+
+ 
+
+ 
+
+
+
+q	market	ticker	month	vol_ann	rk
+Q3	NASDAQ	AMD	2016-04	1.6382	1
+Q3	NASDAQ	NFLX	2022-04	1.5664	2
+Q3	NASDAQ	TSLA	2020-03	1.4906	3
+Q3	NASDAQ	AVGO	2020-03	1.4315	4
+Q3	NASDAQ	INTC	2020-03	1.3387	5
+Q3	NSE	AXISBANK.NS	2020-03	1.3755	1
+Q3	NSE	BAJFINANCE.NS	2020-03	1.3388	2
+Q3	NSE	AXISBANK.NS	2020-04	1.1276	3
+Q3	NSE	RELIANCE.NS	2020-03	1.1226	4
+Q3	NSE	ICICIBANK.NS	2020-03	1.0424	5
+
+
+
+
+
+
+
+q	p.ticker	rows_in_prices	days_in_mr
+
+
+
+ 
+
+q	ticker	articles	days_with_news
+
+
+
+
+ 
+ 
+ 
+ 
+
+
+q	market	model	feature_set	auc	f1	sharpe_net	dm_p	rk
+
+
+
+ 
+
+
+
+
+
+q	market	model	yr	accuracy	n
+R2	NASDAQ	logit	2017	0.5387	4240
+R2	NASDAQ	logit	2018	0.5261	5020
+R2	NASDAQ	logit	2019	0.5383	5040
+R2	NASDAQ	logit	2020	0.5538	5060
+R2	NASDAQ	logit	2021	0.5345	5040
+R2	NASDAQ	logit	2022	0.4894	5020
+R2	NASDAQ	logit	2023	0.5098	5000
+R2	NASDAQ	logit	2024	0.5107	5040
+R2	NASDAQ	logit	2025	0.5216	5000
+R2	NASDAQ	logit	2026	0.5073	3720
+R2	NASDAQ	rf	2017	0.5292	4240
+R2	NASDAQ	rf	2018	0.5163	5020
+R2	NASDAQ	rf	2019	0.5179	5040
+R2	NASDAQ	rf	2020	0.5472	5060
+R2	NASDAQ	rf	2021	0.5258	5040
+R2	NASDAQ	rf	2022	0.4918	5020
+R2	NASDAQ	rf	2023	0.504	5000
+R2	NASDAQ	rf	2024	0.5026	5040
+R2	NASDAQ	rf	2025	0.5226	5000
+R2	NASDAQ	rf	2026	0.4949	3720
+R2	NSE	logit	2017	0.512	4160
+R2	NSE	logit	2018	0.5154	4920
+R2	NSE	logit	2019	0.5126	4860
+R2	NSE	logit	2020	0.5223	5020
+R2	NSE	logit	2021	0.5056	4960
+R2	NSE	logit	2022	0.4883	4960
+R2	NSE	logit	2023	0.5098	4900
+R2	NSE	logit	2024	0.5028	4920
+R2	NSE	logit	2025	0.4837	4960
+R2	NSE	logit	2026	0.5052	3660
+R2	NSE	rf	2017	0.5031	4160
+R2	NSE	rf	2018	0.5112	4920
+R2	NSE	rf	2019	0.5128	4860
+R2	NSE	rf	2020	0.5181	5020
+R2	NSE	rf	2021	0.5069	4960
+R2	NSE	rf	2022	0.4958	4960
+R2	NSE	rf	2023	0.5106	4900
+R2	NSE	rf	2024	0.489	4920
+R2	NSE	rf	2025	0.4893	4960
+R2	NSE	rf	2026	0.5008	3660
+
+
+
+
+q	experiment	model	n_predictions
+R3	main	logit	382000
+R3	main	rf	382000
+
+

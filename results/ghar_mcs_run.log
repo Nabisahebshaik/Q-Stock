@@ -1,0 +1,84 @@
+NSE HAR mse=0.9695
+NSE GHAR mse=0.9455
+NSE HAR+QSW w=0.25 mse=0.9461
+NSE HAR+QSW w=1 mse=0.9436
+NSE GHAR+QSW w=0.25 mse=0.9432
+NSE GHAR+QSW w=1 mse=0.9421
+NASDAQ HAR mse=1.0524
+NASDAQ GHAR mse=1.0363
+NASDAQ HAR+QSW w=0.25 mse=1.0382
+NASDAQ HAR+QSW w=1 mse=1.0419
+NASDAQ GHAR+QSW w=0.25 mse=1.0379
+NASDAQ GHAR+QSW w=1 mse=1.0403
+   market           model     n    mse  qlike oos_r2
+1     NSE             HAR 47500 0.9695 0.6489 0.1538
+2     NSE            GHAR 47500 0.9455 0.6234 0.1748
+3     NSE  HAR+QSW w=0.25 47500 0.9461 0.6202 0.1743
+4     NSE     HAR+QSW w=1 47500 0.9436 0.6183 0.1764
+5     NSE GHAR+QSW w=0.25 47500 0.9432 0.6208 0.1768
+6     NSE    GHAR+QSW w=1 47500 0.9421 0.6209 0.1778
+7  NASDAQ             HAR 48400 1.0524 0.7971 0.3383
+8  NASDAQ            GHAR 48400 1.0363 0.7771 0.3484
+9  NASDAQ  HAR+QSW w=0.25 48400 1.0382 0.7833 0.3473
+10 NASDAQ     HAR+QSW w=1 48400 1.0419 0.7869 0.3449
+11 NASDAQ GHAR+QSW w=0.25 48400 1.0379 0.7864 0.3474
+12 NASDAQ    GHAR+QSW w=1 48400 1.0403 0.7884 0.3459
+   market  loss           model in_mcs_90
+1     NSE   mse             HAR      TRUE
+2     NSE   mse            GHAR      TRUE
+3     NSE   mse  HAR+QSW w=0.25      TRUE
+4     NSE   mse     HAR+QSW w=1      TRUE
+5     NSE   mse GHAR+QSW w=0.25      TRUE
+6     NSE   mse    GHAR+QSW w=1      TRUE
+7     NSE qlike             HAR      TRUE
+8     NSE qlike            GHAR      TRUE
+9     NSE qlike  HAR+QSW w=0.25      TRUE
+10    NSE qlike     HAR+QSW w=1      TRUE
+11    NSE qlike GHAR+QSW w=0.25      TRUE
+12    NSE qlike    GHAR+QSW w=1      TRUE
+13 NASDAQ   mse             HAR      TRUE
+14 NASDAQ   mse            GHAR      TRUE
+15 NASDAQ   mse  HAR+QSW w=0.25      TRUE
+16 NASDAQ   mse     HAR+QSW w=1      TRUE
+17 NASDAQ   mse GHAR+QSW w=0.25      TRUE
+18 NASDAQ   mse    GHAR+QSW w=1      TRUE
+19 NASDAQ qlike             HAR      TRUE
+20 NASDAQ qlike            GHAR      TRUE
+21 NASDAQ qlike  HAR+QSW w=0.25      TRUE
+22 NASDAQ qlike     HAR+QSW w=1      TRUE
+23 NASDAQ qlike GHAR+QSW w=0.25      TRUE
+24 NASDAQ qlike    GHAR+QSW w=1      TRUE
+   market  loss               a            b mean_diff        lo        hi
+1     NSE   mse  HAR+QSW w=0.25         GHAR  0.000625 -0.004138  0.005127
+2     NSE   mse GHAR+QSW w=0.25         GHAR -0.002267 -0.005617  0.001180
+3     NSE   mse GHAR+QSW w=0.25 GHAR+QSW w=1  0.001146 -0.000613  0.002849
+4     NSE   mse            GHAR          HAR -0.024027 -0.040491 -0.010933
+5     NSE qlike  HAR+QSW w=0.25         GHAR -0.003193 -0.009457  0.002980
+6     NSE qlike GHAR+QSW w=0.25         GHAR -0.002686 -0.007110  0.002061
+7     NSE qlike GHAR+QSW w=0.25 GHAR+QSW w=1 -0.000157 -0.002725  0.002289
+8     NSE qlike            GHAR          HAR -0.025426 -0.063214 -0.001806
+9  NASDAQ   mse  HAR+QSW w=0.25         GHAR  0.001874 -0.002532  0.006359
+10 NASDAQ   mse GHAR+QSW w=0.25         GHAR  0.001599 -0.002020  0.005451
+11 NASDAQ   mse GHAR+QSW w=0.25 GHAR+QSW w=1 -0.002381 -0.004394 -0.000317
+12 NASDAQ   mse            GHAR          HAR -0.016067 -0.028097 -0.006021
+13 NASDAQ qlike  HAR+QSW w=0.25         GHAR  0.006218 -0.002003  0.015293
+14 NASDAQ qlike GHAR+QSW w=0.25         GHAR  0.009351  0.001079  0.018332
+15 NASDAQ qlike GHAR+QSW w=0.25 GHAR+QSW w=1 -0.001992 -0.005667  0.001689
+16 NASDAQ qlike            GHAR          HAR -0.019981 -0.041927 -0.001529
+   dm_stat  p_value
+1    0.260 7.95e-01
+2   -1.301 1.93e-01
+3    1.459 1.44e-01
+4   -4.163 3.14e-05
+5   -1.187 2.35e-01
+6   -1.397 1.62e-01
+7   -0.168 8.67e-01
+8   -2.181 2.92e-02
+9    0.869 3.85e-01
+10   0.822 4.11e-01
+11  -2.529 1.14e-02
+12  -3.456 5.48e-04
+13   1.856 6.35e-02
+14   2.891 3.84e-03
+15  -1.380 1.68e-01
+16  -2.572 1.01e-02

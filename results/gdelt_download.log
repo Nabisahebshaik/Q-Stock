@@ -1,0 +1,6 @@
+gdelt TCS.NS: "Tata Consultancy Services" sourcelang:english
+gdelt HDFCBANK.NS: "HDFC Bank" sourcelang:english
+Error in gdelt_timeline(q, "timelinevolraw", start, QS$end_date) : 
+  GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail.com for larger queries. All high-traffic us
+Calls: load_sentiment -> gdelt_timeline
+Execution halted

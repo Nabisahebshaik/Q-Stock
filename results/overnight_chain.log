@@ -1,0 +1,38 @@
+=== 2026-10-22 22:05:57 GDELT download
+gdelt HDFCBANK.NS: "HDFC Bank" sourcelang:english
+gdelt INFY.NS: "Infosys" sourcelang:english
+gdelt ICICIBANK.NS: "ICICI Bank" sourcelang:english
+gdelt HINDUNILVR.NS: "Hindustan Unilever" sourcelang:english
+gdelt ITC.NS: ("ITC Ltd" OR "ITC shares" OR "ITC Limited") sourcelang:english
+gdelt SBIN.NS: "State Bank of India" sourcelang:english
+gdelt BHARTIARTL.NS: "Bharti Airtel" sourcelang:english
+2026-10-23 00:28:53 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 00:28:53 cached tickers: 8/40
+gdelt BHARTIARTL.NS: "Bharti Airtel" sourcelang:english
+gdelt KOTAKBANK.NS: "Kotak Mahindra Bank" sourcelang:english
+gdelt LT.NS: ("Larsen & Toubro" OR "Larsen and Toubro") sourcelang:english
+gdelt AXISBANK.NS: "Axis Bank" sourcelang:english
+2026-10-23 01:43:41 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 01:43:41 cached tickers: 11/40
+gdelt AXISBANK.NS: "Axis Bank" sourcelang:english
+2026-10-23 02:41:40 GDELT error: GDELT failed after 8 tries (last HTTP -1): Could not resolve hostname [api.gdeltproject.org]:
+Could not resolve host: ap
+2026-10-23 02:41:40 cached tickers: 11/40
+gdelt AXISBANK.NS: "Axis Bank" sourcelang:english
+gdelt ASIANPAINT.NS: "Asian Paints" sourcelang:english
+gdelt MARUTI.NS: "Maruti Suzuki" sourcelang:english
+2026-10-23 03:36:54 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 03:36:54 cached tickers: 13/40
+gdelt MARUTI.NS: "Maruti Suzuki" sourcelang:english
+gdelt SUNPHARMA.NS: "Sun Pharmaceutical" sourcelang:english
+gdelt TITAN.NS: "Titan Company" sourcelang:english
+gdelt BAJFINANCE.NS: "Bajaj Finance" sourcelang:english
+gdelt WIPRO.NS: "Wipro" sourcelang:english
+2026-10-23 08:58:08 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 08:58:09 cached tickers: 17/40
+gdelt WIPRO.NS: "Wipro" sourcelang:english
+gdelt HCLTECH.NS: "HCL Technologies" sourcelang:english
+gdelt ULTRACEMCO.NS: "UltraTech Cement" sourcelang:english
+2026-10-23 10:06:35 GDELT error: GDELT failed after 8 tries (last HTTP 429): Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail
+2026-10-23 10:06:35 cached tickers: 19/40
+gdelt ULTRACEMCO.NS: "UltraTech Cement" sourcelang:english

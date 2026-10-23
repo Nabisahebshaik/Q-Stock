@@ -1,0 +1,17 @@
+"market","task","regime","group","share_within_task"
+"NASDAQ","T2_direction","high-vol","classical",0.723395958110278
+"NSE","T2_direction","high-vol","classical",0.478324041316027
+"NASDAQ","T2_direction","low-vol","classical",0.711873187025112
+"NSE","T2_direction","low-vol","classical",0.473967700982196
+"NASDAQ","T1_volatility","high-vol","HAR-RV",0.658893593854555
+"NSE","T1_volatility","high-vol","HAR-RV",0.425025840464796
+"NASDAQ","T1_volatility","low-vol","HAR-RV",0.673219644914894
+"NSE","T1_volatility","low-vol","HAR-RV",0.433095118155641
+"NASDAQ","T1_volatility","high-vol","QSW (omega = 0.25)",0.341106406145445
+"NSE","T1_volatility","high-vol","QSW (omega = 0.25)",0.574974159535204
+"NASDAQ","T2_direction","high-vol","QSW (omega = 0.25)",0.276604041889722
+"NSE","T2_direction","high-vol","QSW (omega = 0.25)",0.521675958683973
+"NASDAQ","T1_volatility","low-vol","QSW (omega = 0.25)",0.326780355085106
+"NSE","T1_volatility","low-vol","QSW (omega = 0.25)",0.566904881844359
+"NASDAQ","T2_direction","low-vol","QSW (omega = 0.25)",0.288126812974888
+"NSE","T2_direction","low-vol","QSW (omega = 0.25)",0.526032299017804

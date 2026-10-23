@@ -1,0 +1,12 @@
+List of 6
+ $ duplicates                  : int 0
+ $ missing_or_nonpositive_close: int 20
+ $ holiday_bars_dropped        : int 40
+ $ holiday_dates               : chr "NSE 2025-03-18; NSE 2026-01-15"
+ $ zero_or_missing_volume      : int 2
+ $ abs_logret_gt_0.4           : int 2
+
+Extreme moves (|log return| > 0.4):
+      ticker       date  close    log_ret
+6265     AMD 2016-04-22  3.990  0.4206170
+81246   NFLX 2022-04-20 22.619 -0.4325785
