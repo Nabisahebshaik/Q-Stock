@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, ArrowDownUp, Database, Radio } from "lucide-react";
-import { Market, Quote, SNAPSHOT, useCandles, useForecast, useGraph, useLive } from "../lib/api";
+import { Market, Quote, useShowingSnapshot, useCandles, useForecast, useGraph, useLive } from "../lib/api";
 import { ago, changeColor, compact, cssHex, pct, price, useReducedMotion, useThemeTick } from "../lib/util";
 import { AnimatedNumber, Boundary, Card, Delta, Kpi, OmegaDial, Segmented, Skeleton, Sparkline } from "../components/ui";
 import QuantumGraph3D, { GNode } from "../components/QuantumGraph3D";
@@ -10,6 +10,7 @@ import CandleChart from "../components/CandleChart";
 type SortKey = "label" | "last" | "change" | "rv" | "spill" | "qself" | "fc";
 
 export default function LivePage({ market, setMarket, dark }: { market: Market; setMarket: (m: Market) => void; dark: boolean }) {
+  const SNAPSHOT = useShowingSnapshot();
   const [omega, setOmega] = useState(0.25);
   const [look, setLook] = useState(120);
   const [sel, setSel] = useState<Record<Market, string>>({ NSE: "RELIANCE.NS", NASDAQ: "NVDA" });

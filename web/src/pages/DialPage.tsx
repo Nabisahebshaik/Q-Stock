@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Market, SNAPSHOT, useDial } from "../lib/api";
+import { Market, useShowingSnapshot, useDial } from "../lib/api";
 import { cssHex, mix, useReducedMotion, useThemeTick } from "../lib/util";
 import { Card, OmegaDial, Segmented, Skeleton } from "../components/ui";
 import QuantumGraph3D, { GNode } from "../components/QuantumGraph3D";
@@ -9,6 +9,7 @@ import QuantumGraph3D, { GNode } from "../components/QuantumGraph3D";
 const entropy = (p: number[]) => -p.reduce((s, x) => s + (x > 0 ? x * Math.log(x) : 0), 0);
 
 export default function DialPage({ dark }: { dark: boolean }) {
+  const SNAPSHOT = useShowingSnapshot();
   const [market, setMarket] = useState<Market>("NASDAQ");
   const [date, setDate] = useState("");
   const [omega, setOmega] = useState(0.25);

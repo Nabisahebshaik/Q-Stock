@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Atom, Camera, LineChart, Moon, Network, Sun, Workflow } from "lucide-react";
-import { Market, SNAPSHOT, useSnapshotMeta, useStatus } from "./lib/api";
+import { Market, SNAPSHOT, useFallback, useSnapshotMeta, useStatus } from "./lib/api";
 import { useTheme } from "./lib/util";
 import { Boundary, Skeleton } from "./components/ui";
 
@@ -28,6 +28,7 @@ export default function App() {
   });
   const status = useStatus();
   const meta = useSnapshotMeta();
+  const fallback = useFallback();
   useEffect(() => { const f = () => setTab(fromHash()); window.addEventListener("hashchange", f); return () => window.removeEventListener("hashchange", f); }, []);
   const go = (t: Tab) => { window.location.hash = t; setTab(t); };
   const dark = theme === "dark";
@@ -56,7 +57,8 @@ export default function App() {
           </nav>
           <div className="hidden items-center gap-2 lg:flex">
             {SNAPSHOT && <span className="chip border-warn/50 text-warn"><Camera size={12} /> Snapshot · {meta.data?.snapshot_iso ?? "…"}</span>}
-            {!SNAPSHOT && status.data?.map((s) => (
+            {fallback && <span className="chip border-warn/50 text-warn"><Camera size={12} /> Snapshot (API waking)</span>}
+            {!SNAPSHOT && !fallback && status.data?.map((s) => (
               <span key={s.market} className="chip" title={s.tz}>
                 <span className={`h-1.5 w-1.5 rounded-full ${s.open ? "animate-pulseDot bg-up" : "bg-muted"}`} />{s.market} {s.local_time.split(" ").slice(1).join(" ")}
               </span>
@@ -67,6 +69,12 @@ export default function App() {
           </button>
         </div>
       </header>
+      {fallback && (
+        <div className="border-b border-warn/30 bg-warn/10 px-4 py-2 text-center text-xs text-ink/80">
+          The live R API is waking up or unreachable, so this page shows the saved snapshot from <b>{meta.data?.snapshot_iso ?? "…"}</b>.
+          It retries every minute and switches to live data automatically (a sleeping free-tier server takes about a minute to start).
+        </div>
+      )}
       {SNAPSHOT && (
         <div className="border-b border-warn/30 bg-warn/10 px-4 py-2 text-center text-xs text-ink/80">
           Static snapshot of the R pipeline taken <b>{meta.data?.snapshot_iso ?? "…"}</b>. Prices and graphs do not update here.

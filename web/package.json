@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:snapshot": "tsc -b && vite build --mode snapshot --outDir dist-snapshot",
+    "build:vercel": "tsc -b && node scripts/vercel-build.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

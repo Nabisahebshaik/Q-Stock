@@ -34,3 +34,7 @@ web/node_modules/
 web/dist/
 web/dist-snapshot/
 results/api_run.log
+
+# Assembled deployment bundles
+build/
+web/dist-vercel/

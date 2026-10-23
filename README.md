@@ -46,6 +46,11 @@ data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
   - Research: every headline result, read from `results/tables`.
   - Pipeline.
 - **Static snapshot (for Vercel, which cannot run R):** `Rscript scripts/25_export_snapshot.R`, then `cd web && npm run build:snapshot`. `web/vercel.json` builds and serves `web/dist-snapshot`. Every page is labelled with the snapshot time.
+- **Live deployment (Vercel + Hugging Face Spaces):**
+  1. Build the R API bundle: `Rscript scripts/26_export_ghar_coef.R && bash scripts/27_build_hf_space.sh`. This writes `build/hf-space/`: Dockerfile, R library, API and model coefficients; no raw data. Prices download from Yahoo when the image builds.
+  2. Create a Docker Space on huggingface.co and upload the contents of `build/hf-space/`.
+  3. Put `VITE_API_URL=https://<user>-<space>.hf.space` in `web/.env.production` (or as a Vercel environment variable) and push. Vercel then builds the live UI.
+  - While the free Space is asleep or unreachable, the site falls back to the bundled snapshot with a notice, then switches to live data automatically.
 - **Computation stays in R.** The UI only renders API responses.
 - **Tests:**
   - `Rscript tests/test_api.R`: 20 end-to-end checks with a mocked feed.

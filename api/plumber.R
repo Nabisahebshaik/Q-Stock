@@ -10,7 +10,15 @@ ROOT <- getOption("qstock.root", normalizePath("."))
 local({ old <- setwd(ROOT); on.exit(setwd(old))
   for (f in list.files("R", pattern = "\\.R$", full.names = TRUE)) source(f, local = globalenv())
   assign("PRICES", clean_prices(load_market_data())$data, globalenv())
-  assign("GHAR_LIVE", lapply(c(NSE = "NSE", NASDAQ = "NASDAQ"), ghar_live_model), globalenv())
+  # Full fit when the curated research data are present; otherwise (cloud container) the
+  # exported coefficients of the same fit (scripts/26_export_ghar_coef.R).
+  saved <- if (file.exists("api/model/ghar_live_model.json")) jsonlite::fromJSON("api/model/ghar_live_model.json") else NULL
+  assign("GHAR_LIVE", lapply(c(NSE = "NSE", NASDAQ = "NASDAQ"), function(mk) {
+    m <- ghar_live_model(mk)
+    if (is.null(m) && !is.null(saved[[mk]])) m <- list(coef = unlist(saved[[mk]]$coef, use.names = FALSE),
+      train_from = as.Date(saved[[mk]]$train_from), train_to = as.Date(saved[[mk]]$train_to), n = saved[[mk]]$n)
+    m
+  }), globalenv())
 })
 RW <- lapply(split(PRICES, PRICES$market), returns_wide)
 FETCH <- getOption("qstock.live_fetcher", fetch_intraday_many)
