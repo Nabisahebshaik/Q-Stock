@@ -18,6 +18,9 @@ USER user
 # unreachable from the builder, the API downloads it at start-up instead.
 RUN Rscript -e 'for (f in list.files("R", pattern = "[.]R$", full.names = TRUE)) source(f); invisible(load_market_data())' || true
 
+# One BLAS/OpenMP thread: the base image's OpenBLAS otherwise starts one thread per detected
+# core (8) on a 0.1-CPU container, and thread contention made small matrix products ~170x slower.
+ENV OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 ENV QSTOCK_HOST=0.0.0.0 PORT=7860
 EXPOSE 7860
 CMD ["Rscript", "api/run_api.R"]

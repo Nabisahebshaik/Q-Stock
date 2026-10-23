@@ -18,5 +18,8 @@ COPY results/tables ./results/tables
 RUN Rscript -e 'for (f in list.files("R", pattern = "[.]R$", full.names = TRUE)) source(f); invisible(load_market_data())' || true
 
 # Render provides PORT; listen on all interfaces.
+# One BLAS/OpenMP thread: the base image's OpenBLAS otherwise starts one thread per detected
+# core (8) on a 0.1-CPU container, and thread contention made small matrix products ~170x slower.
+ENV OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 ENV QSTOCK_HOST=0.0.0.0
 CMD ["Rscript", "api/run_api.R"]
