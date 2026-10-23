@@ -60,7 +60,7 @@ export default function ResearchPage({ dark }: { dark: boolean }) {
               <Legend verticalAlign="top" height={28} wrapperStyle={{ fontSize: 12 }} />
               <ReferenceLine y={0.8} stroke={c.muted} strokeDasharray="4 4" />
               {(["NASDAQ", "NSE"] as Market[]).map((mk, i) => (
-                <Line key={mk} name={mk} data={R.power.filter((p) => p.market === mk).map((p) => ({ x: p.signal_corr_with_return as number, y: p.detection_rate as number }))}
+                <Line isAnimationActive={false} key={mk} name={mk} data={R.power.filter((p) => p.market === mk).map((p) => ({ x: p.signal_corr_with_return as number, y: p.detection_rate as number }))}
                       dataKey="y" stroke={i ? c.quantum : c.accent} strokeWidth={2.5} dot={{ r: 4 }} />))}
             </LineChart>
           </ResponsiveContainer></div>
@@ -101,7 +101,7 @@ function DialCurve({ R, mk, c, tip }: { R: ResultsData; mk: Market; c: C; tip: T
           <ReferenceLine y={0} stroke={c.muted} strokeDasharray="4 4" />
           <Tooltip {...tip} formatter={(v: number | number[], n) => (n === "diff" ? (v as number).toFixed(5) : String(v))}
                    labelFormatter={(w) => { const d = data.find((x) => x.omega === w); return `ω = ${w}${d && isFinite(d.p) ? ` · Holm p = ${sci(d.p)}` : ""}`; }} />
-          <Line dataKey="diff" name="ΔMSE vs ω = 1" stroke={mk === "NASDAQ" ? c.accent : c.quantum} strokeWidth={2.5} dot={{ r: 4 }}>
+          <Line isAnimationActive={false} dataKey="diff" name="ΔMSE vs ω = 1" stroke={mk === "NASDAQ" ? c.accent : c.quantum} strokeWidth={2.5} dot={{ r: 4 }}>
             <ErrorBar dataKey="err" width={5} stroke={c.muted} />
           </Line>
         </ComposedChart>
@@ -128,7 +128,7 @@ function Models({ R, mk, c, tip }: { R: ResultsData; mk: Market; c: C; tip: Tip 
           <ReferenceLine x={0} stroke={c.muted} />
           <YAxis type="category" dataKey="m" width={150} tick={{ fill: c.muted, fontSize: 11 }} />
           <Tooltip {...tip} formatter={(v: number) => v.toFixed(4)} />
-          <Bar dataKey="r2" name="OOS R²" radius={[0, 4, 4, 0]}>
+          <Bar isAnimationActive={false} dataKey="r2" name="OOS R²" radius={[0, 4, 4, 0]}>
             <LabelList dataKey="r2" content={(p) => {
               const { x = 0, y = 0, width = 0, height = 0, value } = p as { x?: number; y?: number; width?: number; height?: number; value?: number };
               const v = Number(value), lo = Math.min(+x, +x + +width), hi = Math.max(+x, +x + +width);
@@ -157,7 +157,7 @@ function Gpu({ R, c, tip }: { R: ResultsData; c: C; tip: Tip }) {
           <Tooltip {...tip} formatter={(v: number) => `${v.toFixed(4)} s`} labelFormatter={(v) => `${v} nodes`} />
           <Legend verticalAlign="top" height={28} wrapperStyle={{ fontSize: 12 }} />
           {backs.map(([b, name, color]) => (
-            <Line key={b} name={name} data={g.filter((x) => x.backend === b).map((x) => ({ n: x.n_nodes as number, s: x.median_seconds as number }))}
+            <Line isAnimationActive={false} key={b} name={name} data={g.filter((x) => x.backend === b).map((x) => ({ n: x.n_nodes as number, s: x.median_seconds as number }))}
                   dataKey="s" stroke={color} strokeWidth={2.2} dot={{ r: 3.5 }} />))}
         </LineChart>
       </ResponsiveContainer></div>

@@ -90,9 +90,9 @@ export default function DialPage({ dark }: { dark: boolean }) {
               <YAxis tick={{ fill: col.muted, fontSize: 11 }} tickFormatter={(v) => v.toFixed(2)} />
               <Tooltip contentStyle={{ background: dark ? "#0c1220" : "#fff", border: `1px solid ${col.line}`, borderRadius: 12 }} formatter={(v: number) => v.toFixed(4)} />
               <Legend wrapperStyle={{ fontSize: 12, color: col.muted }} />
-              <Bar dataKey="sel" name={`ω = ${omega.toFixed(2)} (selected)`} fill={col.accent} radius={[4, 4, 0, 0]} />
-              <Bar dataKey="q" name="ω = 0 (quantum)" fill={col.quantum} radius={[4, 4, 0, 0]} />
-              <Bar dataKey="c" name="ω = 1 (classical)" fill={dark ? "#7d8799" : "#9aa3b2"} radius={[4, 4, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey="sel" name={`ω = ${omega.toFixed(2)} (selected)`} fill={col.accent} radius={[4, 4, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey="q" name="ω = 0 (quantum)" fill={col.quantum} radius={[4, 4, 0, 0]} />
+              <Bar isAnimationActive={false} dataKey="c" name="ω = 1 (classical)" fill={dark ? "#7d8799" : "#9aa3b2"} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
