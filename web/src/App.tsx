@@ -1,14 +1,24 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { ComponentType, lazy, Suspense, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Atom, Camera, LineChart, Moon, Network, Sun, Workflow } from "lucide-react";
 import { Market, SNAPSHOT, useFallback, useSnapshotMeta, useStatus } from "./lib/api";
 import { useTheme } from "./lib/util";
 import { Boundary, Skeleton } from "./components/ui";
 
-const LivePage = lazy(() => import("./pages/LivePage"));
-const DialPage = lazy(() => import("./pages/DialPage"));
-const ResearchPage = lazy(() => import("./pages/ResearchPage"));
-const PipelinePage = lazy(() => import("./pages/PipelinePage"));
+// After a new deployment, a page opened earlier asks for code chunks whose hashed names no
+// longer exist. Reload once to pick up the new build instead of failing (guarded against loops).
+const lazyPage = <P extends object>(load: () => Promise<{ default: ComponentType<P> }>) => lazy(() => load().then(
+  (m) => { try { sessionStorage.removeItem("qstock-chunk-reload"); } catch { /* storage unavailable */ } return m; },
+  (err) => {
+    let reloaded = false;
+    try { reloaded = sessionStorage.getItem("qstock-chunk-reload") === "1"; sessionStorage.setItem("qstock-chunk-reload", "1"); } catch { /* storage unavailable */ }
+    if (!reloaded) { window.location.reload(); return new Promise<never>(() => {}); }
+    throw err;
+  }));
+const LivePage = lazyPage(() => import("./pages/LivePage"));
+const DialPage = lazyPage(() => import("./pages/DialPage"));
+const ResearchPage = lazyPage(() => import("./pages/ResearchPage"));
+const PipelinePage = lazyPage(() => import("./pages/PipelinePage"));
 
 const TABS = [
   { id: "live", label: "Live market", icon: LineChart },

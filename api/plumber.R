@@ -229,8 +229,14 @@ function(pr) {
   # Server-Timing header: compute time of every request (visible in browser dev tools / curl -I).
   pr <- plumber::pr_hooks(pr, list(
     preroute = function(req) req$qs_t0 <- Sys.time(),
-    postroute = function(req, res) if (!is.null(req$qs_t0))
-      res$setHeader("Server-Timing", sprintf("r;dur=%.0f", 1000 * as.numeric(difftime(Sys.time(), req$qs_t0, units = "secs"))))))
+    postroute = function(req, res) {
+      if (!is.null(req$qs_t0))
+        res$setHeader("Server-Timing", sprintf("r;dur=%.0f", 1000 * as.numeric(difftime(Sys.time(), req$qs_t0, units = "secs"))))
+      # Hashed build assets never change; the HTML page must always be revalidated.
+      p <- req$PATH_INFO
+      if (startsWith(p, "/assets/")) res$setHeader("Cache-Control", "public, max-age=31536000, immutable")
+      else if (p %in% c("/", "/index.html")) res$setHeader("Cache-Control", "no-cache")
+    }))
   pr <- plumber::pr_set_error(pr, function(req, res, err) {
     res$status <- if (inherits(err, "qs_bad_request")) 400 else 500
     list(error = conditionMessage(err))
