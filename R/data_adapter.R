@@ -84,7 +84,7 @@ read_prices_csv <- function(f) {
 sql_path <- function(path) gsub("'", "''", normalizePath(path, "/", mustWork = FALSE))
 
 write_prices_parquet <- function(df, path) {
-  con <- DBI::dbConnect(duckdb::duckdb(shared_home = FALSE))  # parquet is built in; no extension home needed
+  con <- DBI::dbConnect(duck_drv())  # parquet is built in; no extensions needed
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
   duckdb::duckdb_register(con, "prices_df", df)
   # Write a temp file and rename it, so a concurrent reader never sees a partial file.
@@ -98,7 +98,7 @@ write_prices_parquet <- function(df, path) {
 }
 
 read_prices_parquet <- function(path) {
-  con <- DBI::dbConnect(duckdb::duckdb(shared_home = FALSE))  # parquet is built in; no extension home needed
+  con <- DBI::dbConnect(duck_drv())  # parquet is built in; no extensions needed
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
   df <- DBI::dbGetQuery(con, sprintf("SELECT * FROM read_parquet('%s')", sql_path(path)))
   # Match read.csv + as.Date: double-backed Date, plain data.frame, automatic row names.

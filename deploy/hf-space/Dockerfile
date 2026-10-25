@@ -6,7 +6,11 @@ FROM rocker/r-ver:4.4.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libcurl4-openssl-dev libssl-dev libsodium-dev zlib1g-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-RUN install2.r --error --skipinstalled plumber duckdb RSQLite DBI curl jsonlite Matrix
+RUN install2.r --error --skipinstalled plumber RSQLite DBI curl jsonlite Matrix
+# duckdb (live candle store) pinned to the version the tests ran on (1.5.6): the image's own CRAN
+# snapshot has 1.2.0, and current CRAN is 2.x. P3M serves it as a prebuilt binary for this distro.
+RUN install2.r --error -r "https://p3m.dev/cran/__linux__/$(. /etc/os-release && echo $VERSION_CODENAME)/2026-10-20" duckdb \
+    && Rscript -e 'stopifnot(packageVersion("duckdb") == "1.5.6")'
 
 # Spaces run the container as user 1000.
 RUN useradd -m -u 1000 user

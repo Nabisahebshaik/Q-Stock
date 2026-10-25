@@ -41,7 +41,7 @@ rows$interval_sec <- as.integer(rows$interval_sec)
 for (k in c("bucket_start", "updated_at")) rows[[k]] <- round(as.numeric(rows[[k]]))  # BIGINT columns
 rows <- rows[!duplicated(rows[, c("ticker", "interval_sec", "bucket_start")], fromLast = TRUE), ]  # DuckDB updates a row once per command
 
-con <- dbConnect(duckdb(shared_home = FALSE), dst)
+con <- dbConnect(duck_drv(), dst)
 on.exit(if (dbIsValid(con)) dbDisconnect(con, shutdown = TRUE), add = TRUE)
 invisible(dbExecute(con, CANDLE_DDL))
 duckdb_register(con, "src_rows", rows)
@@ -103,7 +103,7 @@ dbDisconnect(con, shutdown = TRUE)
 # days), so rewrite it compactly; COPY FROM DATABASE keeps the schema and constraints.
 if (n_exp > 0) {
   tmp <- paste0(dst, ".compact"); unlink(tmp)
-  cc <- dbConnect(duckdb(shared_home = FALSE))
+  cc <- dbConnect(duck_drv())
   invisible(dbExecute(cc, sprintf("ATTACH '%s' AS a (READ_ONLY)", sq(dst))))
   invisible(dbExecute(cc, sprintf("ATTACH '%s' AS b", sq(tmp))))
   invisible(dbExecute(cc, "COPY FROM DATABASE a TO b"))

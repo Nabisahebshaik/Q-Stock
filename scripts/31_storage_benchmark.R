@@ -23,7 +23,7 @@ rows <- dbGetQuery(lite, "SELECT * FROM candles")
 rows$interval_sec <- as.integer(rows$interval_sec)
 for (k in c("bucket_start", "updated_at")) rows[[k]] <- round(as.numeric(rows[[k]]))
 duck_path <- file.path(tmp, "candles_full.duckdb")
-duck <- dbConnect(duckdb(shared_home = FALSE), duck_path)
+duck <- dbConnect(duck_drv(), duck_path)
 invisible(dbExecute(duck, CANDLE_DDL))
 duckdb_register(duck, "src_rows", rows)
 invisible(dbExecute(duck, "INSERT INTO candles SELECT * FROM src_rows"))
@@ -33,7 +33,7 @@ pq_dir <- file.path(tmp, "parquet")
 invisible(dbExecute(duck, sprintf("COPY (SELECT *, CAST(make_timestamp(bucket_start * 1000000) AS DATE) AS day FROM candles
                                    ORDER BY ticker, interval_sec, bucket_start)
                                    TO '%s' (FORMAT parquet, COMPRESSION zstd, PARTITION_BY (interval_sec, day))", sq(pq_dir))))
-pqc <- dbConnect(duckdb(shared_home = FALSE))  # in-memory engine that only reads the Parquet files
+pqc <- dbConnect(duck_drv())  # in-memory engine that only reads the Parquet files
 invisible(dbExecute(pqc, sprintf("CREATE VIEW candles AS SELECT ticker, CAST(interval_sec AS INTEGER) AS interval_sec, bucket_start,
                                   open, high, low, close, volume, source, updated_at
                                   FROM read_parquet('%s/**/*.parquet', hive_partitioning = true)", sq(pq_dir))))
@@ -75,7 +75,7 @@ add("d_daily_rollup", "parquet_arg_min_max", function() dbGetQuery(pqc, duck_nat
 # Chart query including connect + disconnect: the cost a request pays without a pooled connection.
 add("a_chart_latest_session", "sqlite_with_connect", function() { c1 <- dbConnect(RSQLite::SQLite(), src, flags = RSQLite::SQLITE_RO); on.exit(dbDisconnect(c1)); dbGetQuery(c1, queries$a_chart_latest_session) })
 dbDisconnect(duck, shutdown = TRUE)  # a DuckDB file has one read-write process; reopen per call read-only
-add("a_chart_latest_session", "duckdb_with_connect", function() { c1 <- dbConnect(duckdb(shared_home = FALSE), duck_path, read_only = TRUE); on.exit(dbDisconnect(c1, shutdown = TRUE)); dbGetQuery(c1, queries$a_chart_latest_session) })
+add("a_chart_latest_session", "duckdb_with_connect", function() { c1 <- dbConnect(duck_drv(), duck_path, read_only = TRUE); on.exit(dbDisconnect(c1, shutdown = TRUE)); dbGetQuery(c1, queries$a_chart_latest_session) })
 
 # ---- e) daily prices: CSV vs Parquet ----
 prices <- read.csv(prices_csv)

@@ -4,9 +4,17 @@
 # Gotchas: one read-write process per DuckDB file; close with
 # DBI::dbDisconnect(con, shutdown = TRUE) so the file lock is released at once.
 
+# duckdb >= 1.4 takes shared_home (FALSE silences the extension home-dir notice); older
+# versions, e.g. 1.2.0 on CRAN snapshots for R 4.4, stop on any unknown argument.
+duck_drv <- function(dbdir = ":memory:", ...) {
+  a <- list(dbdir = dbdir, ...)
+  if ("shared_home" %in% names(formals(duckdb::duckdb))) a$shared_home <- FALSE
+  do.call(duckdb::duckdb, a)
+}
+
 duck_store_open <- function(path, memory_limit = "128MB", threads = 1L) {
   if (path != ":memory:") dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
-  con <- DBI::dbConnect(duckdb::duckdb(dbdir = path, shared_home = FALSE))   # no extensions needed; silences the home-dir notice
+  con <- DBI::dbConnect(duck_drv(path))
   DBI::dbExecute(con, sprintf("SET memory_limit = '%s'", memory_limit))
   DBI::dbExecute(con, sprintf("SET threads = %d", as.integer(threads)))
   DBI::dbExecute(con, CANDLE_DDL)
