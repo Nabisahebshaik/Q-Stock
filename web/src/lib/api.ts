@@ -92,3 +92,31 @@ export const useDial = (m: Market, date: string, omega: number) =>
   useQuery({ queryKey: ["dial", m, date, omega], queryFn: () => load<DialData>(`/api/dial?market=${m}&date=${date}&omega=${omega}`, `dial_${m}_${tag(omega)}.json`),
              placeholderData: (p) => p, staleTime: Infinity });
 export const useResults = () => useQuery({ queryKey: ["results"], queryFn: () => load<ResultsData>("/api/results", "results.json"), staleTime: 5 * 60_000 });
+
+// Chart workspace (docs/design/CHART_WORKSPACE.md §3). Times are exchange-local epoch seconds.
+export type BarInterval = "5s" | "1m" | "5m" | "15m" | "30m" | "1h" | "1d" | "1w" | "1mo";
+export type BarRange = "1D" | "5D" | "1M" | "3M" | "6M" | "YTD" | "1Y" | "5Y" | "ALL";
+export interface Bar { time: number; open: number; high: number; low: number; close: number; volume: number }
+export interface IndicatorOut {
+  id: string; type: "vwap" | "sma" | "ema" | "bb" | "rsi"; pane: "price" | "rsi";
+  params: { n?: number; k?: number };
+  lines: { name: string; values: { time: number; value: number }[] }[];
+}
+export interface BarsData {
+  market: Market; ticker: string; label: string; name: string;
+  interval: BarInterval; range: BarRange; tz: string; source: "store" | "daily" | "snapshot_5s";
+  live: boolean; as_of: number | null; note: string | null;
+  bars: Bar[]; indicators: IndicatorOut[];
+}
+const INTRADAY: BarInterval[] = ["1m", "5m", "15m", "30m", "1h"];
+/** Bars + server-computed indicators. `ind` is the contract's comma list (e.g. "vwap,sma:20"). */
+export const useBars = (m: Market, t: string | null, interval: BarInterval, range: BarRange, ind: string) =>
+  useQuery({
+    queryKey: ["bars", m, t, interval, range, ind],
+    queryFn: () => load<BarsData>(
+      `/api/bars/${m}/${encodeURIComponent(t!)}?interval=${interval}&range=${range}${ind ? `&ind=${encodeURIComponent(ind)}` : ""}`,
+      `bars_${m}_${t}_${interval}.json`),
+    enabled: !!t,
+    refetchInterval: every(interval === "5s" ? 2_000 : INTRADAY.includes(interval) ? 60_000 : 30 * 60_000),
+    placeholderData: (p) => p,
+  });

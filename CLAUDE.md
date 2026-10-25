@@ -27,11 +27,11 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 
 | Task | Command |
 |---|---|
-| Unit tests (42 blocks / 187 expectations) | `Rscript tests/run_tests.R` |
+| Unit tests (61 blocks / 357 expectations) | `Rscript tests/run_tests.R` |
 | API end-to-end (offline, mocked feed) | `Rscript tests/test_api.R` |
 | Shiny server tests | `Rscript tests/test_app.R` |
 | Web type check / lint | `cd web && npx tsc -b` / `npm run lint` |
-| API + built UI on :8000 | `cd web && npm ci && npm run build`, then `Rscript api/run_api.R` |
+| API + built UI on :8000 | `cd web && npm ci && VITE_API_URL= npm run build` (plain `npm run build` targets the Render API via `.env.production`), then `Rscript api/run_api.R` |
 | Web dev server | `cd web && npm run dev` (set `VITE_API_URL` to the API) |
 | Shiny dashboard on :8050 | `Rscript -e "shiny::runApp('app', port = 8050, launch.browser = TRUE)"` |
 | Static snapshot | `Rscript scripts/25_export_snapshot.R`, then `cd web && npm run build:snapshot` |

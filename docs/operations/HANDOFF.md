@@ -118,3 +118,11 @@ Read this first when resuming (a new Claude session or you).
 - Daily prices load from `data/curated/prices.parquet` (identical() to the CSV frame; 0.95 s → 0.03 s).
 - Scripts: `29_migrate_sqlite_to_duckdb.R`, `30_prices_to_parquet.R`, `31_storage_benchmark.R`. Dockerfiles install `duckdb`.
 - Tests: 51 blocks / 234 expectations, 20 API checks, Shiny tests pass. Not yet deployed or measured on Render.
+
+## TradingView-style chart workspace (2026-10-25)
+
+- Design, contract and limits: `docs/design/CHART_WORKSPACE.md`.
+- Backend: `GET /api/bars/<market>/<ticker>?interval&range&ind` (`R/bars.R`, `R/indicators.R`); intervals 5s (snapshot-built), 1m–1h (DuckDB roll-ups), 1D/1W/1M; VWAP, SMA, EMA, Bollinger, RSI computed in R.
+- Frontend: `web/src/components/chart/` (toolbar, legend with eye/settings/remove/more, indicators dialog, six chart types, range bar + exchange clock, screenshot, fullscreen) and `chart/drawing/` (trend, ray, h/v lines, rectangle, Fibonacci, measure, text; magnet, lock, hide, undo/redo; per-ticker persistence). Replaces the candle card on the Live page.
+- Snapshot regenerated (211 files, 12.3 MB, incl. `bars_*`).
+- Not yet observed: 5s bars during market hours; deployment to Render/Vercel.

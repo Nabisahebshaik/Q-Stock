@@ -179,6 +179,7 @@ All endpoints are `GET`, JSON (`unboxedJSON`, `NA → null`), CORS `*`. Errors: 
 | `/api/graph/<market>` | `omega`, `look` | Nodes (+ change, rv, q_self, q_ent, q_volspill), edges with ρ, P | Per batch |
 | `/api/forecast/<market>` | — | GHAR 5-day vol forecasts per ticker, model training span | 30 min |
 | `/api/dial` | `market`, `date`, `omega` | Daily graph, P at ω, plus `P_quantum` (ω = 0) and `P_classical` (ω = 1) | Precomputed latest date; per-key cache |
+| `/api/bars/<market>/<ticker>` | `interval` 5s…1mo, `range` 1D…ALL, `ind` (vwap, sma:n, ema:n, bb:n:k, rsi:n; max 8) | Bars (exchange-local time) + indicator lines; see `CHART_WORKSPACE.md` §3 | Store / roll-ups in DuckDB; daily refresh 30 min; 5s snapshot aggregator |
 | `/api/bench` | — | Timings of one 20-node QSW (RK4 and exact limits), R loop, cores | — |
 | `/api/results` | — | Research tables from `results/tables` (dial curve, tuned, LightGBM, GHAR, naive, power, GPU, Spark, robustness, economic, MLP, MR groups) | — |
 

@@ -29,12 +29,19 @@ save <- function(path, file) {
 }
 tag <- function(w) sprintf("%03d", round(w * 100))
 omegas <- seq(0, 1, by = 0.05)
+bar_ind <- utils::URLencode("vwap,sma:20,ema:50,bb:20:2,rsi:14", reserved = TRUE)
 
 st <- save("/api/status", "status.json")
 for (s in st) {
   mk <- s$market
   save(paste0("/api/live/", mk), sprintf("live_%s.json", mk))
-  for (tk in vapply(s$tickers, `[[`, "", "ticker")) save(sprintf("/api/candles/%s/%s", mk, utils::URLencode(tk, reserved = TRUE)), sprintf("candles_%s_%s.json", mk, tk))
+  for (tk in vapply(s$tickers, `[[`, "", "ticker")) {
+    etk <- utils::URLencode(tk, reserved = TRUE)
+    save(sprintf("/api/candles/%s/%s", mk, etk), sprintf("candles_%s_%s.json", mk, tk))
+    # Chart workspace: the two views the snapshot UI offers, with the default indicator set
+    save(sprintf("/api/bars/%s/%s?interval=1m&range=1D&ind=%s", mk, etk, bar_ind), sprintf("bars_%s_%s_1m.json", mk, tk))
+    save(sprintf("/api/bars/%s/%s?interval=1d&range=1Y&ind=%s", mk, etk, bar_ind), sprintf("bars_%s_%s_1d.json", mk, tk))
+  }
   for (w in omegas) {
     save(sprintf("/api/graph/%s?omega=%.2f&look=120", mk, w), sprintf("graph_%s_%s.json", mk, tag(w)))
     save(sprintf("/api/dial?market=%s&omega=%.2f", mk, w), sprintf("dial_%s_%s.json", mk, tag(w)))

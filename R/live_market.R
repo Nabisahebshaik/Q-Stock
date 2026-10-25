@@ -65,6 +65,7 @@ parse_intraday <- function(json_text, symbol) {
   m <- res$meta
   attr(d, "meta") <- list(prev_close = m$chartPreviousClose %||% NA_real_,
                           price = m$regularMarketPrice %||% NA_real_,
+                          volume = m$regularMarketVolume %||% NA_real_,
                           market_time = as.POSIXct(m$regularMarketTime %||% NA_real_, origin = "1970-01-01", tz = "UTC"))
   d
 }
@@ -91,6 +92,16 @@ fetch_many <- function(symbols, url_fun, parse_fun, timeout = 20) {
 
 fetch_intraday_many <- function(symbols, interval = "1m", range = "1d")
   fetch_many(symbols, function(s) yahoo_chart_url(s, interval, range), parse_intraday)
+
+# Latest price snapshot of one symbol (meta of the 1-minute chart): price, trade time
+# (epoch seconds) and cumulative day volume. Used by the 5-second bars (R/bars.R).
+fetch_snapshot <- function(symbol, timeout = 5) {
+  r <- curl::curl_fetch_memory(yahoo_chart_url(symbol, "1m", "1d"), handle = curl::new_handle(useragent = "Mozilla/5.0", timeout = timeout))
+  if (r$status_code != 200) stop(symbol, ": HTTP ", r$status_code)
+  m <- jsonlite::fromJSON(rawToChar(r$content), simplifyVector = FALSE)$chart$result[[1]]$meta
+  list(price = as.numeric(m$regularMarketPrice %||% NA_real_), time = as.numeric(m$regularMarketTime %||% NA_real_),
+       volume = as.numeric(m$regularMarketVolume %||% NA_real_))
+}
 
 fetch_daily_many <- function(symbols, market, range = "1y") {
   r <- fetch_many(symbols, function(s) yahoo_chart_url(s, "1d", range), function(txt, s) parse_yahoo_daily(txt, s, market))

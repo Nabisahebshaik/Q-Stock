@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Activity, AlertTriangle, ArrowDownUp, Database, Radio } from "lucide-react";
-import { Market, Quote, useShowingSnapshot, useCandles, useForecast, useGraph, useLive } from "../lib/api";
+import { Market, Quote, useShowingSnapshot, useForecast, useGraph, useLive } from "../lib/api";
 import { ago, changeColor, compact, cssHex, pct, price, useReducedMotion, useThemeTick } from "../lib/util";
 import { AnimatedNumber, Boundary, Card, Delta, Kpi, OmegaDial, Segmented, Skeleton, Sparkline } from "../components/ui";
 import QuantumGraph3D, { GNode } from "../components/QuantumGraph3D";
-import CandleChart from "../components/CandleChart";
+import TradingWorkspace from "../components/chart/TradingWorkspace";
 
 type SortKey = "label" | "last" | "change" | "rv" | "spill" | "qself" | "fc";
 
@@ -19,7 +19,6 @@ export default function LivePage({ market, setMarket, dark }: { market: Market; 
   const graph = useGraph(market, omega, look);
   const fc = useForecast(market);
   const ticker = sel[market];
-  const candles = useCandles(market, ticker);
   const reduced = useReducedMotion();
   useThemeTick();
   const col = { up: cssHex("up"), down: cssHex("down"), muted: cssHex("muted"), accent: cssHex("accent"), line: cssHex("line") };
@@ -140,12 +139,8 @@ export default function LivePage({ market, setMarket, dark }: { market: Market; 
         </div>
       </div>
 
-      {/* candles */}
-      <Card title={<span>{q?.label ?? ticker} · 1-minute candles, VWAP, volume ({market === "NSE" ? "IST" : "New York time"})</span>}
-            right={candles.data?.active_last ? <span className="chip"><span className="h-1.5 w-1.5 animate-pulseDot rounded-full bg-accent" /> last candle forming</span> : null}
-            bodyClass="p-3">
-        {candles.data?.candles?.length ? <Boundary label="candle chart"><CandleChart candles={candles.data.candles} height={430} /></Boundary> : <Skeleton h={400} />}
-      </Card>
+      {/* TradingView-style chart workspace (docs/design/CHART_WORKSPACE.md) */}
+      <Boundary label="chart workspace"><TradingWorkspace market={market} ticker={ticker} onTicker={(t) => setSel({ ...sel, [market]: t })} /></Boundary>
 
       {/* risk table */}
       <Card title="Live risk table" right={L?.store && (

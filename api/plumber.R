@@ -74,17 +74,133 @@ chart_bars <- function(mk, ticker, days) {
   x[dd %in% head(sort(unique(dd), decreasing = TRUE), days), ]
 }
 
+# Daily Yahoo refresh of one market (cleaned like the research prices), cached 30 minutes
+# and shared by the forecast and the daily chart bars. A failed fetch keeps the last good data.
+daily_state <- function(mk, max_age = 1800) {
+  key <- paste0("daily_", mk); c0 <- CACHE[[key]]
+  if (!is.null(c0) && epoch(Sys.time()) - c0$at < max_age) return(c0$d)
+  d <- tryCatch(FETCH_DAILY(names(QS$universe[[mk]]), mk), error = function(e) NULL)
+  d <- if (!is.null(d) && !is.null(d$data)) tryCatch(clean_prices(d$data)$data, error = function(e) NULL)
+  if (is.null(d) && !is.null(c0)) d <- c0$d
+  CACHE[[key]] <- list(at = epoch(Sys.time()), d = d)
+  d
+}
+
 forecast_state <- function(mk, max_age = 1800) {
   key <- paste0("fc_", mk); c0 <- CACHE[[key]]
   if (!is.null(c0) && epoch(Sys.time()) - c0$at < max_age) return(c0$f)
   m <- GHAR_LIVE[[mk]]; f <- NULL
   if (!is.null(m)) {
-    d <- tryCatch(FETCH_DAILY(names(QS$universe[[mk]]), mk), error = function(e) NULL)
-    if (!is.null(d) && !is.null(d$data))
-      f <- tryCatch(ghar_live_forecast(clean_prices(d$data)$data, m, mk), error = function(e) NULL)
+    d <- daily_state(mk, max_age)
+    if (!is.null(d)) f <- tryCatch(ghar_live_forecast(d, m, mk), error = function(e) NULL)
   }
   CACHE[[key]] <- list(at = epoch(Sys.time()), f = f)
   f
+}
+
+# ---- chart workspace bars (/api/bars; docs/design/CHART_WORKSPACE.md) ----
+SNAP <- snapshot_state()
+check_ticker <- function(mk, ticker) {
+  if (!ticker %in% names(QS$universe[[mk]])) bad_request(sprintf("unknown ticker for %s: %s", mk, ticker))
+  ticker
+}
+store_last <- function(ticker, iv = 60)
+  DBI::dbGetQuery(STORE, "SELECT max(bucket_start) b FROM candles WHERE ticker = ? AND interval_sec = ?",
+                  params = list(ticker, as.integer(iv)))$b
+act_rows <- function(mk, ticker) {
+  a <- CACHE[[mk]]$active
+  if (NROW(a)) a[a$ticker == ticker, c("bucket", "open", "high", "low", "close", "volume")] else NULL
+}
+
+# 1-minute store (+ forming bar) rolled up to w seconds, from `since` (epoch). Same freshness
+# rule as chart_bars: fetch only on a cold store or when > 5 minutes behind during the session.
+intraday_bars <- function(mk, ticker, w, since) {
+  last <- store_last(ticker); st <- market_status(mk)
+  if (is.na(last) || (isTRUE(st$open) && epoch(Sys.time()) - last > 300)) live_state(mk)
+  act <- act_rows(mk, ticker)
+  if (w == 60) {
+    d <- candle_read(STORE, ticker, 60, since, parquet_dir = PARQUET)
+    x <- rbind(d[, c("bucket", "open", "high", "low", "close", "volume")], act)
+    if (!NROW(x)) return(empty_bars())
+    x <- x[order(x$bucket), ]; return(x[!duplicated(x$bucket, fromLast = TRUE), ])
+  }
+  r <- if (is_duck(STORE)) rollup_intraday_duck(STORE, ticker, mk, w, since, PARQUET) else
+    rollup_intraday_r(candle_read(STORE, ticker, 60, since), mk, w)
+  if (!NROW(act)) return(r)
+  a <- rollup_intraday_r(act, mk, w)                       # forming minute joins its bucket
+  x <- rbind(r, a); x <- x[order(x$bucket), ]
+  y <- agg_ohlc(x, as.numeric(x$bucket))
+  data.frame(bucket = as.POSIXct(y$key, origin = "1970-01-01", tz = "UTC"), y[, -1])
+}
+
+# Research daily prices + the 30-minute daily refresh for newer dates + days the 1-minute store
+# holds beyond that (today's forming session merged into the daily bar of the same date).
+daily_bars <- function(mk, ticker) {
+  cols <- c("date", "open", "high", "low", "close", "volume")
+  h <- PRICES[PRICES$ticker == ticker, cols]
+  r <- daily_state(mk); r <- if (!is.null(r)) r[r$ticker == ticker, cols]
+  if (NROW(r)) h <- rbind(h, r[r$date > max(h$date, as.Date("1900-01-01")), ])
+  m <- rbind(candle_read(STORE, ticker, 60, epoch(Sys.time()) - 10 * 86400)[, c("bucket", "open", "high", "low", "close", "volume")],
+             act_rows(mk, ticker))
+  if (NROW(m)) {
+    m <- m[order(m$bucket), ]; m <- m[!duplicated(m$bucket, fromLast = TRUE), ]
+    g <- agg_ohlc(m, local_day(m$bucket, mk)); g$date <- as.Date(g$key); g <- g[, cols]
+    last <- if (nrow(h)) max(h$date) else as.Date("1900-01-01")
+    today <- as.Date(format(Sys.time(), "%Y-%m-%d", tz = LIVE$sessions[[mk]]$tz))
+    if (last == today && today %in% g$date) {            # the refresh's bar of today is up to 30 min old
+      i <- which(h$date == today); j <- which(g$date == today)
+      h$high[i] <- max(h$high[i], g$high[j]); h$low[i] <- min(h$low[i], g$low[j]); h$close[i] <- g$close[j]
+      h$volume[i] <- max(h$volume[i], g$volume[j], na.rm = TRUE)
+    }
+    h <- rbind(h, g[g$date > last, ])
+  }
+  h[order(h$date), ]
+}
+
+bars_payload <- function(mk, ticker, interval, range, ind) {
+  mk <- check_market(mk); check_ticker(mk, ticker)
+  if (!interval %in% names(BAR_INTERVALS)) bad_request(paste("unknown interval:", interval))
+  range <- toupper(range); if (!range %in% BAR_RANGES) bad_request(paste("unknown range:", range))
+  specs <- parse_ind_spec(ind); w <- BAR_INTERVALS[[interval]]; st <- market_status(mk)
+  tz <- LIVE$sessions[[mk]]$tz; notes <- character(); intraday <- w < 86400
+  today <- as.Date(format(Sys.time(), "%Y-%m-%d", tz = tz))
+  if (intraday) {
+    if (w == 5) {
+      sn <- snapshot_tick(SNAP, mk, ticker, STORE)
+      notes <- c(notes, if (!sn$open) "market closed: 5s bars are built from live 2 s snapshots only during market hours"
+                 else "snapshot-built: 5s bars from 2 s price snapshots (volume = change in cumulative volume)",
+                 if (!is.null(sn$error)) paste("snapshot failed:", sn$error))
+      x <- snapshot_bars(SNAP, ticker, STORE, epoch(Sys.time()) - 10 * 86400); source <- "snapshot_5s"
+    } else {
+      last <- store_last(ticker); last <- if (is.na(last)) epoch(Sys.time()) else last
+      cut0 <- range_start(range, as.Date(format(as.POSIXct(last, origin = "1970-01-01", tz = "UTC"), "%Y-%m-%d", tz = tz)))
+      since <- if (range == "ALL") 0 else if (range %in% c("1D", "5D")) last - (if (range == "1D") 10 else 14) * 86400 else
+        as.numeric(as.POSIXct(format(cut0), tz = "UTC")) - 7 * 86400           # 7 days of warm-up for the indicators
+      x <- intraday_bars(mk, ticker, w, since); source <- "store"
+    }
+    day <- local_day(x$bucket, mk)
+    off <- as.POSIXlt(x$bucket, tz = tz)$gmtoff
+    time <- epoch(x$bucket) + off; true_t <- epoch(x$bucket)
+  } else {
+    x <- daily_bars(mk, ticker)
+    if (w > 86400) x <- rollup_daily(x, if (interval == "1w") "week" else "month")
+    day <- x$date; time <- as.numeric(x$date) * 86400; source <- "daily"
+    true_t <- as.numeric(as.POSIXct(paste(format(x$date), LIVE$sessions[[mk]]$open), tz = tz))   # session open of the bar's first day
+  }
+  start <- range_start(range, day)
+  keep <- if (length(day)) day >= start else logical()
+  if (length(day)) notes <- c(notes, range_note(range, day, start))
+  vol <- ifelse(is.finite(x$volume), x$volume, 0)
+  bd <- data.frame(time = time, open = x$open, high = x$high, low = x$low, close = x$close, volume = vol)
+  ind_out <- compute_indicators(bd, specs, intraday, day, keep)
+  notes <- c(notes, attr(ind_out, "notes")); attr(ind_out, "notes") <- NULL
+  n <- sum(keep)
+  list(market = mk, ticker = ticker, label = short(ticker), name = unname(QS$universe[[mk]][ticker]),
+       interval = interval, range = range, tz = tz, source = source,
+       live = isTRUE(st$open) && n > 0 && day[length(day)] == today,
+       as_of = if (n) true_t[length(true_t)] else NA,
+       note = if (length(notes)) paste(unique(notes), collapse = "; ") else NA,
+       bars = bd[keep, , drop = FALSE], indicators = ind_out)
 }
 
 graph_payload <- function(g, P, extra = NULL) {
@@ -150,6 +266,16 @@ function(market, ticker, days = 1) {
        candles = data.frame(time = epoch(x$bucket) + off, open = x$open, high = x$high, low = x$low, close = x$close,
                             volume = vol, vwap = ifelse(cv > 0, cpv / cv, NA)))
 }
+
+#* Chart bars of one stock at any interval and range, with indicators computed in R (docs/design/CHART_WORKSPACE.md §3)
+#* @param market NSE or NASDAQ
+#* @param ticker Yahoo symbol of the market's universe
+#* @param interval 5s, 1m, 5m, 15m, 30m, 1h, 1d, 1w or 1mo (default 1m)
+#* @param range 1D, 5D, 1M, 3M, 6M, YTD, 1Y, 5Y or ALL (default 1D)
+#* @param ind comma list of at most 8: vwap, sma:n, ema:n, bb:n:k, rsi:n (n 2..500, k 0.5..5)
+#* @get /api/bars/<market>/<ticker>
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function(market, ticker, interval = "1m", range = "1D", ind = "") bars_payload(market, ticker, interval, range, ind)
 
 #* Live correlation graph of one-minute returns with QSW node features
 #* @param market NSE or NASDAQ

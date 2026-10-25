@@ -8,6 +8,7 @@ docs/
 ├── architecture/
 │   └── ARCHITECTURE.md           system context, layers, data flows, Big Data layer, serving, deployment, stack
 ├── design/
+│   ├── CHART_WORKSPACE.md        TradingView-style chart: /api/bars contract, intervals incl. snapshot-built 5s, indicators, drawing tools
 │   ├── DUCKDB_MIGRATION.md       live-candle and price storage on DuckDB + Parquet: design, migration, measured results
 │   └── DESIGN.md                 modules, algorithms (graph, DTQW/CTQW/QSW), walk-forward, data model, API contract, UI, tests, decisions
 ├── research/
