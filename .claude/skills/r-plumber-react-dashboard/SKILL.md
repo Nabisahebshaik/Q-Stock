@@ -26,7 +26,7 @@ description: Build and extend the Q-Stock serving layer - an R plumber REST API 
 
 ## Web UI (`web/`)
 
-- Pages: `LivePage`, `DialPage`, `ResearchPage`, `PipelinePage`; components `QuantumGraph3D` (r3f + d3-force-3d + postprocessing), `CandleChart` (lightweight-charts), `ui.tsx`.
+- Pages: `LivePage`, `DialPage`, `ResearchPage`, `PipelinePage`; components `QuantumGraph3D` (r3f + d3-force-3d + postprocessing), `CandleChart` (lightweight-charts), `ui.tsx`, and the TradingView-style workspace in `components/chart/` (`/api/bars`, indicators, drawings: see the `chart-workspace-bars-indicators` skill).
 - Modes: `VITE_SNAPSHOT=1` (static), `VITE_API_URL=<remote>` (live with snapshot fallback, fires `qstock-fallback` so pages show a notice), neither (same-origin API).
 - Polling via `refetchInterval` (disabled in snapshot mode); `placeholderData: (p) => p` keeps the previous frame during refetch.
 - Recharts: disable entry animation (`isAnimationActive={false}`) — animated series rendered blank.

@@ -23,6 +23,7 @@ docs/
 │   ├── runbook.md                end-to-end reproduction, VM start-up, pipeline steps
 │   ├── environment_report.md     host, VM and toolchain as observed
 │   ├── unresolved_issues.md      issues log (resolved and open)
+│   ├── COWORK_SETUP.md           Claude Cowork / Code setup: CLAUDE.md, the 10 project skills, upload steps
 │   └── HANDOFF.md                chronological session hand-off notes and deployment state
 └── course/
     └── course_outcome_mapping.md CSE 465 topic-to-evidence mapping
@@ -36,5 +37,8 @@ docs/
 | Know the headline numbers | [results/results.md](results/results.md) |
 | Check what was pre-registered | [research/preregistration_v2.md](research/preregistration_v2.md) |
 | Resume work in a new session | [operations/HANDOFF.md](operations/HANDOFF.md), then [../CLAUDE.md](../CLAUDE.md) |
+| Set up a Claude Cowork session and its skills | [operations/COWORK_SETUP.md](operations/COWORK_SETUP.md) |
+| Change the live candle store or storage formats | [design/DUCKDB_MIGRATION.md](design/DUCKDB_MIGRATION.md) |
+| Change the chart workspace or `/api/bars` | [design/CHART_WORKSPACE.md](design/CHART_WORKSPACE.md) |
 
 The manuscript draft is in [`../paper/manuscript_draft.md`](../paper/manuscript_draft.md).

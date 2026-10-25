@@ -10,7 +10,7 @@ Every entry point sources all of `R/*.R`; there is no package build. Configurati
 | Module | Responsibility | Key functions |
 |---|---|---|
 | `config.R` | Dates, universes (20 NSE + 20 NASDAQ), graph and walk-forward settings, column groups | `QS`, `CLASSICAL_COLS`, `GRAPH_METHODS`, `graph_cols()`, `SENTIMENT_COLS` |
-| `data_adapter.R` | Yahoo daily download, parsing, cleaning (holiday bars, NA-safe), cache in `data/raw/prices_yahoo.csv` | `fetch_yahoo_daily`, `parse_yahoo_daily`, `clean_prices`, `load_market_data` |
+| `data_adapter.R` | Yahoo daily download, parsing, cleaning (holiday bars, NA-safe), cache in `data/raw/prices_yahoo.csv` plus a Parquet copy `data/curated/prices.parquet` | `fetch_yahoo_daily`, `parse_yahoo_daily`, `clean_prices`, `load_market_data`, `write_/read_prices_parquet` |
 | `synthetic_data.R` | GARCH price simulator, **software validation only** | `simulate_garch_prices` |
 | `features.R` | Classical per-stock features with trailing (past-only) windows | `trailing_mean`, `trailing_sd`, `build_features` |
 | `market_graph.R` | Correlation kNN graph per date; five walk/diffusion processes; node features | `knn_graph`, `walk_distributions`, `node_features_from_P`, `graph_features_market` |
@@ -25,6 +25,9 @@ Every entry point sources all of `R/*.R`; there is no package build. Configurati
 | `evaluation.R` | Metrics, backtest, DM test, bootstrap CI, Holm/BH, QLIKE, rank IC | `dm_test`, `stationary_boot_ci`, `holm_adjust`, `bh_adjust`, `qlike`, `rank_ic`, `backtest` |
 | `hadoop_bridge.R` | WebHDFS REST client and VM ssh helper | `hdfs_put`, `hdfs_ls`, `hdfs_get_text`, `vm_ssh` |
 | `live_market.R` | Sessions, 1-min polling, candle store, tick aggregator, live graph, live GHAR forecast | `market_status`, `fetch_intraday_many`, `candle_upsert`, `tick_aggregator`, `live_graph`, `ghar_live_forecast` |
+| `store_duckdb.R` | DuckDB candle store backend, Parquet history export/read, version-portable driver | `duck_drv`, `duck_store_open`, `duck_upsert`, `duck_read`, `duck_stats`, `duck_export_parquet` |
+| `bars.R` | Interval roll-ups (DuckDB intraday on exchange-local time, R weekly/monthly), ranges, snapshot-built 5 s bars | `rollup_intraday_duck`, `rollup_daily`, `range_start`, `snapshot_tick`, `snapshot_bars` |
+| `indicators.R` | Chart indicators computed in R, spec parsing with 400 on bad input | `sma`, `ema`, `bollinger`, `rsi`, `vwap_session`, `parse_ind_spec`, `compute_indicators` |
 
 ## 2. Algorithms
 
@@ -148,9 +151,13 @@ sequenceDiagram
 | `results/tables/*.csv` (+ `.md`) | Every reported number | scripts 05–23 |
 | `results/predictions*/` | Out-of-sample prediction dumps (git-ignored) | experiment scripts |
 | `api/precomputed/dial_<MK>_<ω×100>.json` | Dial payloads for the latest date, ω step 0.05 | `25_export_snapshot.R` |
-| `web/public/data/*.json` | Snapshot of every API response for static hosting | `25_export_snapshot.R` |
+| `web/public/data/*.json` | Snapshot of every API response for static hosting (incl. `bars_<MK>_<TICKER>_{1m,1d}.json`) | `25_export_snapshot.R` |
+| `data/curated/prices.parquet` | Parquet copy of the daily prices, `identical()` to the CSV frame | `load_market_data()`, `30_prices_to_parquet.R` |
+| `data/live/candles.duckdb`, `candles_app.duckdb` | Live candle store (API / Shiny; one writer per file) | `live_market.R` via `store_duckdb.R` |
+| `data/live/parquet/interval_sec=…/day=…/` | Exported older live candles | `duck_export_parquet()`, `29_migrate_sqlite_to_duckdb.R` |
+| `results/tables/storage_benchmark.csv` | SQLite vs DuckDB vs Parquet timings | `31_storage_benchmark.R` |
 
-### 4.2 SQLite live store (PostgreSQL-compatible DDL)
+### 4.2 Live candle store (DuckDB; same DDL on the SQLite rollback, PostgreSQL-compatible)
 
 ```sql
 CREATE TABLE IF NOT EXISTS candles (
@@ -189,7 +196,7 @@ The TypeScript interfaces in `web/src/lib/api.ts` are the client-side copy of th
 
 | Page | Content | Main components |
 |---|---|---|
-| Live market | 3D force-directed market graph coloured by QSW features, ω slider, candlesticks with VWAP/volume, risk table with GHAR forecast | `QuantumGraph3D.tsx` (react-three-fiber, d3-force-3d, postprocessing), `CandleChart.tsx` (lightweight-charts) |
+| Live market | 3D force-directed market graph coloured by QSW features, ω slider, TradingView-style chart workspace (intervals 5s–1M, indicators, drawing tools; see `CHART_WORKSPACE.md` §4), risk table with GHAR forecast | `QuantumGraph3D.tsx` (react-three-fiber, d3-force-3d, postprocessing), `components/chart/TradingWorkspace.tsx` (lightweight-charts) |
 | Quantum dial | Historical daily graph; sweeping ω between the quantum and classical P matrices | `DialPage.tsx` |
 | Research | Every headline result from `/api/results` | `ResearchPage.tsx` (recharts, entry animation disabled to avoid blank charts) |
 | Pipeline | The Big Data pipeline and its validation | `PipelinePage.tsx` |
@@ -203,7 +210,9 @@ Data access is only through TanStack Query hooks in `lib/api.ts` (`useLive`, `us
 | Quantum core | `test_dtqw.R`, `test_ctqw.R`, `test_qsw.R` | Unitarity, Hermiticity, probability conservation, QSW limits vs closed forms (10⁻⁶), sparse = dense |
 | Pipeline | `test_stage2.R`, `test_baseline.R`, `test_v2.R` | Leakage (perturb future rows → features unchanged), embargo, holiday-bar cleaning, NA-safe windows, metric correctness |
 | Live | `test_live.R` | Sessions, candle split, idempotent upsert, all-rejected upsert, tick aggregator ordering, late ticks |
-| API | `tests/test_api.R` | 20 end-to-end checks with a mocked fetcher (`qstock.live_fetcher` option), offline |
+| Storage | `test_store_duckdb.R`, `test_prices_parquet.R` | DuckDB upsert/read/stats and Parquet export match SQLite; prices Parquet `identical()` to CSV |
+| Charts | `test_bars.R`, `test_indicators.R` | Roll-ups DuckDB = base R (incl. the 2026-11-01 US DST change), ranges, 5 s snapshot bars; indicator known values |
+| API | `tests/test_api.R` | 34 end-to-end checks with a mocked fetcher (`qstock.live_fetcher` option), offline |
 | Dashboard | `tests/test_app.R` | Shiny server logic with mocked fetchers |
 | UI | `npx tsc -b`, `npm run lint` | Types match the contract |
 | Big Data | in-script cross-checks | MR vs R (1.8×10⁻¹⁵), Hive consistency query, Spark vs R |

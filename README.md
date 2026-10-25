@@ -23,11 +23,13 @@ Course project for SRM University–AP, CSE 465 Principles of Big Data Managemen
 
 ```
 R/            library: dtqw, ctqw, qsw, market_graph, qsw_features, features, data_adapter,
-              sentiment_gdelt, walk_forward, evaluation, dataset, hadoop_bridge, live_market, config
+              sentiment_gdelt, walk_forward, evaluation, dataset, hadoop_bridge, live_market,
+              store_duckdb, bars, indicators, config
 app/          Shiny dashboard, including the Live market tab
-tests/        42 testthat blocks, 187 expectations (unitarity, Hermiticity, QSW limits, leakage,
-              embargo, live candle store and tick aggregator, ...) + dashboard server tests
-scripts/      01–22 numbered pipeline steps; overnight_*.sh orchestration; monitor_system.ps1
+tests/        61 testthat blocks, 357 expectations (unitarity, Hermiticity, QSW limits, leakage,
+              embargo, DuckDB/Parquet store, bar roll-ups, indicators, tick aggregator, ...)
+              + API end-to-end and dashboard server tests
+scripts/      01–31 numbered pipeline steps; overnight_*.sh orchestration; monitor_system.ps1
 hadoop/       Java MapReduce job; VM service start-up and HDFS fix scripts
 hive/         HiveQL DDL and queries
 docs/         index (docs/README.md); architecture/, design/, research/ (RQs, pre-registration,

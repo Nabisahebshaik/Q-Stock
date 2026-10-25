@@ -1,7 +1,7 @@
 # Q-Stock: system architecture
 
-Status: describes the system as built on 2026-10-25 (commit `9f9f3c7`).
-Companion documents: [`../design/DESIGN.md`](../design/DESIGN.md) (module design, algorithms, data model, API contract, decisions) and [`../operations/runbook.md`](../operations/runbook.md) (how to run it).
+Status: describes the system as built on 2026-10-25 (commit `b411144`, after the DuckDB/Parquet storage migration and the chart workspace).
+Companion documents: [`../design/DESIGN.md`](../design/DESIGN.md) (module design, algorithms, data model, API contract, decisions), [`../design/DUCKDB_MIGRATION.md`](../design/DUCKDB_MIGRATION.md), [`../design/CHART_WORKSPACE.md`](../design/CHART_WORKSPACE.md) and [`../operations/runbook.md`](../operations/runbook.md) (how to run it).
 
 ## 1. Purpose and scope
 
@@ -75,9 +75,10 @@ flowchart TB
     feat[features.R · qsw_features.R · dataset.R]
     wf[walk_forward.R · baseline_logit.R]
     ev[evaluation.R<br/>DM, Holm/BH, bootstrap, QLIKE]
+    bi[bars.R · indicators.R · store_duckdb.R<br/>roll-ups, VWAP/SMA/EMA/BB/RSI, candle store]
   end
   subgraph L4[4 · Orchestration]
-    scripts[scripts/01–27 numbered steps]
+    scripts[scripts/01–31 numbered steps]
     chains[overnight_*.sh, after_*.sh<br/>thermal_guard.ps1, monitor_system.ps1]
   end
   subgraph L5[5 · Presentation]
@@ -158,15 +159,15 @@ flowchart LR
 ```mermaid
 flowchart TB
   subgraph browser[Browser]
-    ui[React SPA<br/>Live · Dial · Research · Pipeline]
-    rq[TanStack Query<br/>polling 30–60 s]
+    ui[React SPA<br/>Live + chart workspace · Dial · Research · Pipeline]
+    rq[TanStack Query<br/>polling 2 s–30 min]
     snap[/bundled snapshot<br/>public/data/*.json/]
   end
   subgraph api[R process: api/plumber.R]
     hooks[hooks: Server-Timing, Cache-Control<br/>filters: CORS, no_dirs]
-    ep[GET /api/status · live · candles · graph<br/>forecast · dial · bench · results]
-    cache[(in-memory CACHE<br/>live 55 s · forecast 30 min · dial)]
-    core[R library: live_market, qsw, market_graph]
+    ep[GET /api/status · live · candles · bars · graph<br/>forecast · dial · bench · results]
+    cache[(in-memory CACHE<br/>live 55 s · forecast 30 min · daily bars 30 min · dial)]
+    core[R library: live_market, bars, indicators,<br/>qsw, market_graph]
     store[(DuckDB candle store<br/>+ Parquet history)]
     tables[(results/tables)]
     pre[(api/precomputed dial_*.json<br/>api/model ghar_live_model.json)]
@@ -183,6 +184,19 @@ flowchart TB
 * **One shared fetch per market per minute.** All viewers read the same cached Yahoo batch; the API never fans out per browser tab.
 * **Stale-but-available.** If a Yahoo fetch fails, the last good batch is served with `stale: true`.
 * **Live/research separation.** Live candles go only to `data/live/` (DuckDB + Parquet); nothing in the research pipeline reads it.
+* **Charts are store reads.** `/api/candles` and `/api/bars` read the DuckDB store (plus the in-memory forming bar) and fetch Yahoo only when the store is empty for a ticker. Intraday intervals above 1 min are DuckDB roll-ups on exchange-local time; 1W/1M are R roll-ups of daily bars; 5 s bars are built from price snapshots while a 5 s chart is open. Indicators are computed in R ([`CHART_WORKSPACE.md`](../design/CHART_WORKSPACE.md)).
+
+**Storage tiers for live data**
+
+| Tier | Store | Role |
+|---|---|---|
+| Hot | in-memory forming bar per ticker | the still-open minute |
+| Warm | DuckDB `data/live/candles.duckdb` (API) / `candles_app.duckdb` (Shiny) | finalised candles of the last ≈ 7 days; idempotent upsert; one writer per file |
+| Cold | Parquet `data/live/parquet/interval_sec=…/day=…` | older days, Hive-partitioned, ZSTD |
+| Daily cache | Parquet `data/curated/prices.parquet` | `identical()` to the CSV research prices; faster start-up |
+| Rollback | SQLite `data/live/candles.sqlite` | `options(qstock.store_backend = "sqlite")` |
+
+Engine comparison: `results/tables/storage_benchmark.csv` (summarised in [`DUCKDB_MIGRATION.md`](../design/DUCKDB_MIGRATION.md) §8).
 
 ### 6.2 Three UI build modes
 
@@ -211,7 +225,8 @@ flowchart LR
 |---|---|
 | API image contents | `R/`, `api/plumber.R`, `api/run_api.R`, `api/model`, `api/precomputed`, `results/tables`. No raw or curated data; prices download at image build |
 | Runtime settings | `OPENBLAS_NUM_THREADS=1`, `OMP_NUM_THREADS=1` (8 BLAS threads on 0.1 CPU made a 20-node QSW take 39 s; 2.0 s single-threaded); `QSTOCK_HOST=0.0.0.0`; no HTTP health check (it restarted the single-threaded server mid-computation) |
-| Measured on Render | live quotes ≈ 11 s, live graph ≈ 6 s, forecast ≈ 5 s, dial 0.1–4 s; ≈ 230 MB RAM |
+| Measured on Render | live quotes ≈ 11 s, live graph ≈ 6 s, forecast ≈ 5 s, dial 0.1–4 s; ≈ 230 MB RAM (2026-10-23, before DuckDB). 2026-10-25: daily bars 1Y with SMA/BB/RSI 2.4 s; first 1m/5m bars after a restart 8.6–11 s (one Yahoo fetch, empty store); candles from the store 0.45 s |
+| duckdb version | pinned to 1.5.6 from a dated P3M snapshot with a build-time check; `duck_drv()` stays compatible with older duckdb (1.2.0 crashed start-up) |
 | Cache headers | `/assets/*` immutable for a year; `index.html` `no-cache`; `/data/*` 5 min on Vercel |
 | Alternative kept | `deploy/hf-space` + `scripts/27_build_hf_space.sh` for Hugging Face Docker Spaces (paid since mid-2026) |
 
@@ -220,7 +235,7 @@ flowchart LR
 | Concern | Approach |
 |---|---|
 | **Reproducibility** | Fixed `end_date` in `QS`; cached raw data; numbered scripts; session info saved per stage (`results/*_sessionInfo.txt`); every doc number traceable to a CSV |
-| **Correctness** | 42 testthat blocks / 187 expectations: unitarity, Hermiticity, QSW limits (ω = 0 → CTQW, ω = 1 → heat kernel, to 10⁻⁶), leakage perturbation, embargo, candle store, tick aggregator; 20 offline API end-to-end checks; Shiny server tests; `tsc -b` |
+| **Correctness** | 61 testthat blocks / 357 expectations: unitarity, Hermiticity, QSW limits (ω = 0 → CTQW, ω = 1 → heat kernel, to 10⁻⁶), leakage perturbation, embargo, candle store (DuckDB and SQLite), prices Parquet `identical()`, bar roll-ups DuckDB = base R across DST, indicator known values, tick aggregator; 34 offline API end-to-end checks; Shiny server tests; `tsc -b`, lint |
 | **Statistical integrity** | DM tests with Newey–West variance, Holm within pre-registered families, BH for ablations, stationary bootstrap CIs, Model Confidence Set, power analysis with injected signals |
 | **Resource safety** | Thread caps (ranger 4, Spark `local[8]`, VM 4 vCPU of 20 threads); `thermal_guard.ps1` suspends R/Java and pauses the VM at GPU ≥ 87 °C, resumes ≤ 65 °C; Cloudera Management Service stopped to keep the VM responsive |
 | **Long runs** | Unattended shell chains with explicit R exit-status checks and `===` step markers in the log |

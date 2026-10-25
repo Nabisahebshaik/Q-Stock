@@ -142,3 +142,10 @@ Work paused here at the user's request. Everything below is committed and deploy
 3. Optional: automatic periodic Parquet export in the API; UI use of `days > 1` on `/api/candles` (the workspace already uses `/api/bars` ranges).
 4. Optional: lightweight-charts 5 panes so RSI/volume get their own axes; per-drawing style editing.
 5. Research side unchanged since 2026-10-23: paper writing still paused until the user asks.
+
+## Cowork setup refresh (2026-10-25, after the checkpoint)
+
+- Two new project skills for the work since the first setup: `duckdb-parquet-storage` and `chart-workspace-bars-indicators` (10 skills in total); `r-plumber-react-dashboard` points to the chart skill.
+- New `docs/operations/COWORK_SETUP.md` (what Cowork loads, how to package and upload the skills).
+- `ARCHITECTURE.md`, `DESIGN.md` and `README.md` brought up to date with the DuckDB/Parquet store, `/api/bars`, `R/bars.R`, `R/indicators.R`, storage tiers and current test counts (61 blocks / 357 expectations, 34 API checks).
+- No code or results changed.

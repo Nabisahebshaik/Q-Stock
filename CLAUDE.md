@@ -57,4 +57,4 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 
 ## Project skills
 
-`.claude/skills/` holds the workflows used in this project (quantum-walk simulation, leakage-safe evaluation, Hadoop/Hive/Spark, live market pipeline, R API + React UI, free-tier deployment, GPU/long-run safety, results audit). Zipped copies for Cowork upload are produced by `scripts/28_package_skills.ps1`.
+`.claude/skills/` holds the workflows used in this project (quantum-walk simulation, leakage-safe evaluation, Hadoop/Hive/Spark, DuckDB/Parquet storage, live market pipeline, chart workspace with bars and indicators, R API + React UI, free-tier deployment, GPU/long-run safety, results audit). Zipped copies for Cowork upload are produced by `scripts/28_package_skills.ps1`; setup steps in `docs/operations/COWORK_SETUP.md`.
