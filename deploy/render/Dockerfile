@@ -5,7 +5,8 @@ FROM rocker/r-ver:4.4.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libcurl4-openssl-dev libssl-dev libsodium-dev zlib1g-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-RUN install2.r --error --skipinstalled plumber RSQLite DBI curl jsonlite Matrix
+# duckdb: live candle store (R/store_duckdb.R); RSQLite stays for the rollback backend.
+RUN install2.r --error --skipinstalled plumber duckdb RSQLite DBI curl jsonlite Matrix
 
 WORKDIR /app
 COPY R ./R

@@ -114,7 +114,7 @@ sequenceDiagram
   participant API as plumber /api/live
   participant C as CACHE[mk]
   participant Y as Yahoo chart API
-  participant S as SQLite candles
+  participant S as DuckDB candles
   UI->>API: GET /api/live/NSE
   API->>C: age < 55 s?
   alt fresh
@@ -130,7 +130,7 @@ sequenceDiagram
 ```
 
 * **Sessions:** NSE 09:15–15:30 Asia/Kolkata, NASDAQ 09:30–16:00 America/New_York, DST-aware via time zones. Holidays are not modelled; "open by clock, no recent bars" is flagged instead.
-* **Hot/cold store:** the forming candle stays in memory; finalised candles are upserted to SQLite keyed by `(ticker, interval_sec, bucket_start)`. Replays are idempotent.
+* **Hot/cold store:** the forming candle stays in memory; finalised candles are upserted to DuckDB (older days moved to Parquet) keyed by `(ticker, interval_sec, bucket_start)`. Replays are idempotent.
 * **Tick aggregator** (for a future WebSocket feed): event-time buckets, watermark `grace_sec = 5`, duplicate-tick removal, late-tick corrections within `retention_sec = 3600`. Validated on synthetic and replayed ticks only.
 * **Live graph:** correlation kNN graph of the last `look` 1-minute returns, QSW at the requested ω, node features `q_self`, `q_ent`, `q_volspill`.
 * **Live forecast:** graph-HAR 5-day volatility from completed daily sessions only, using the research fit (or its exported coefficients `api/model/ghar_live_model.json` in the container).
@@ -175,7 +175,7 @@ All endpoints are `GET`, JSON (`unboxedJSON`, `NA → null`), CORS `*`. Errors: 
 |---|---|---|---|
 | `/api/status` | — | Per market: open flag, local time, tz, tickers | — |
 | `/api/live/<market>` | NSE / NASDAQ | Quotes (last, change, RV, volume), sparklines, store stats, stale flag, errors | Shared 55 s |
-| `/api/candles/<market>/<ticker>` | Yahoo symbol | 1-min OHLCV + VWAP of the latest session, exchange-local time | From live cache |
+| `/api/candles/<market>/<ticker>` | Yahoo symbol, `days` 1–30 | 1-min OHLCV + VWAP (reset per session) of the latest `days` sessions, exchange-local time | Candle store + in-memory forming bar; fetches only on an empty or > 5 min stale store during the session |
 | `/api/graph/<market>` | `omega`, `look` | Nodes (+ change, rv, q_self, q_ent, q_volspill), edges with ρ, P | Per batch |
 | `/api/forecast/<market>` | — | GHAR 5-day vol forecasts per ticker, model training span | 30 min |
 | `/api/dial` | `market`, `date`, `omega` | Daily graph, P at ω, plus `P_quantum` (ω = 0) and `P_classical` (ω = 1) | Precomputed latest date; per-key cache |
@@ -226,6 +226,7 @@ Runner: `Rscript tests/run_tests.R` prints `TOTAL: … blocks, … expectations`
 | D11 | Single BLAS thread, no health check, precomputed dial on Render | Defaults | Measured: 8 BLAS threads on 0.1 CPU made QSW 20× slower; the health check killed long requests |
 | D12 | CPU for experiments; GPU only for the scaling benchmark and the MLP | GPU everywhere | N = 20 graphs take milliseconds; GPU only helps above ~200 nodes, f64 is not faster on a consumer GPU |
 | D13 | Drop RQ5 rather than use partial GDELT data | Approximate with 21/40 tickers | Pre-stated precondition; partial data would bias the comparison |
+| D14 | Live candles in DuckDB (hot week) + Parquet (history); daily prices cached as Parquet; `/api/candles` reads the store instead of polling Yahoo | Keep SQLite; PostgreSQL server | Measured: cold chart 6.6 s → 0.04–0.09 s (no Yahoo wait), multi-session/market reads 1.4–2.3× and roll-ups 6–13× faster than SQLite, daily prices 0.95 s → 0.03 s. Single-session reads are ~0.6 ms either way. See `DUCKDB_MIGRATION.md` |
 
 ## 9. Known limitations
 

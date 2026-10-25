@@ -34,8 +34,9 @@ taus <- QS$walk_time * seq_len(10) / 10
 # ---- live market (fetchers and store can be swapped for tests via options) ----
 live_fetch <- getOption("qstock.live_fetcher", fetch_intraday_many)
 live_daily_fetch <- getOption("qstock.live_daily_fetcher", fetch_daily_many)
-live_con <- candle_store_open(getOption("qstock.live_db", P(LIVE$db_path)))
-onStop(function() DBI::dbDisconnect(live_con))
+# Own DuckDB file: the API may hold LIVE$db_path open, and DuckDB allows one writer process.
+live_con <- candle_store_open(getOption("qstock.live_db", P(if (store_backend() == "duckdb") LIVE$app_db_path else LIVE$sqlite_path)))
+onStop(function() candle_store_close(live_con))
 setwd(root); GHAR_LIVE <- lapply(c(NSE = "NSE", NASDAQ = "NASDAQ"), ghar_live_model); setwd(old)
 UP <- "#1baf7a"; DOWN <- "#d64545"; FLAT <- "#c9c8c3"
 pct <- function(x, d = 1) sprintf(paste0("%.", d, "f%%"), 100 * x)

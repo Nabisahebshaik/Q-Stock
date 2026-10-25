@@ -7,15 +7,21 @@
 #
 # Storage design (same idea as a Redis + PostgreSQL pipeline, without servers):
 #   hot  = the active (still-forming) candle of each ticker, kept in memory
-#   cold = finalised candles in SQLite via DBI, written with an idempotent upsert
-#          keyed by (ticker, interval_sec, bucket_start). The SQL is also valid
-#          PostgreSQL (>= 9.5), so RPostgres can replace RSQLite by changing the
-#          connection only.
+#   cold = finalised candles in DuckDB (default; R/store_duckdb.R) or SQLite, written with
+#          an idempotent upsert keyed by (ticker, interval_sec, bucket_start). Older days
+#          can be moved to Parquet (data/live/parquet) and are read back transparently.
+#          Backend: options(qstock.store_backend = "duckdb" | "sqlite"); SQLite is the
+#          rollback path. The SQL is also valid PostgreSQL (>= 9.5).
+#          A DuckDB file has a single read-write process, so the API and the Shiny app use
+#          different files (db_path, app_db_path).
 
 LIVE <- list(
   sessions = list(NSE = list(tz = "Asia/Kolkata", open = "09:15", close = "15:30", bars_per_day = 375),
                   NASDAQ = list(tz = "America/New_York", open = "09:30", close = "16:00", bars_per_day = 390)),
-  db_path = file.path("data", "live", "candles.sqlite"),
+  db_path = file.path("data", "live", "candles.duckdb"),
+  app_db_path = file.path("data", "live", "candles_app.duckdb"),
+  sqlite_path = file.path("data", "live", "candles.sqlite"),
+  parquet_dir = file.path("data", "live", "parquet"),
   grace_sec = 5,          # watermark delay for late ticks / still-forming bars
   retention_sec = 3600    # finalised candles kept in memory for late corrections
 )
@@ -107,7 +113,14 @@ split_active <- function(bars, interval_sec = 60, now = Sys.time(), market_open 
   list(final = bars[!active, ], active = bars[active, ])
 }
 
-# ---- cold store (SQLite via DBI; the SQL is PostgreSQL-compatible) ----
+# ---- cold store (DuckDB or SQLite via DBI; the SQL is PostgreSQL-compatible) ----
+
+# DuckDB unless asked otherwise or the package is missing (then SQLite, same contract).
+store_backend <- function() {
+  b <- getOption("qstock.store_backend", "duckdb")
+  if (b == "duckdb" && !requireNamespace("duckdb", quietly = TRUE)) "sqlite" else b
+}
+is_duck <- function(con) inherits(con, "duckdb_connection")
 
 CANDLE_DDL <- "CREATE TABLE IF NOT EXISTS candles (
   ticker        TEXT    NOT NULL,
@@ -124,7 +137,9 @@ CANDLE_DDL <- "CREATE TABLE IF NOT EXISTS candles (
   CHECK (high >= low AND high >= open AND high >= close AND low <= open AND low <= close)
 )"
 
-candle_store_open <- function(path = LIVE$db_path) {
+candle_store_open <- function(path = NULL, backend = store_backend()) {
+  if (is.null(path)) path <- if (backend == "duckdb") LIVE$db_path else LIVE$sqlite_path
+  if (backend == "duckdb") return(duck_store_open(path))
   if (path != ":memory:") dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE)
   con <- DBI::dbConnect(RSQLite::SQLite(), path)
   DBI::dbExecute(con, CANDLE_DDL)
@@ -135,6 +150,7 @@ candle_store_open <- function(path = LIVE$db_path) {
 # (late correction) replaces the stored values. Bars violating OHLC consistency are
 # rejected and counted, never stored.
 candle_upsert <- function(con, candles, interval_sec, source) {
+  if (is_duck(con)) return(duck_upsert(con, candles, interval_sec, source))
   if (is.null(candles) || !nrow(candles)) return(c(written = 0L, rejected = 0L))
   ok <- with(candles, is.finite(open) & is.finite(close) & high >= pmax(open, close, low) & low <= pmin(open, close))
   if (!any(ok)) return(c(written = 0L, rejected = sum(!ok)))
@@ -150,12 +166,22 @@ candle_upsert <- function(con, candles, interval_sec, source) {
   c(written = nrow(df), rejected = sum(!ok))
 }
 
-candle_read <- function(con, ticker, interval_sec = 60, since = 0) {
+candle_read <- function(con, ticker, interval_sec = 60, since = 0, parquet_dir = NULL) {
+  if (is_duck(con)) return(duck_read(con, ticker, interval_sec, since, parquet_dir = parquet_dir))
   d <- DBI::dbGetQuery(con, "SELECT * FROM candles WHERE ticker = ? AND interval_sec = ? AND bucket_start >= ?
                              ORDER BY bucket_start", params = list(ticker, as.integer(interval_sec), as.numeric(since)))
   d$bucket <- as.POSIXct(d$bucket_start, origin = "1970-01-01", tz = "UTC")
   d
 }
+
+candle_stats <- function(con, interval_sec = 60, parquet_dir = NULL) {
+  if (is_duck(con)) return(duck_stats(con, interval_sec, parquet_dir))
+  n <- DBI::dbGetQuery(con, "SELECT COUNT(*) n, COUNT(DISTINCT ticker) t FROM candles WHERE interval_sec = ?",
+                       params = list(as.integer(interval_sec)))
+  list(n = n$n, t = n$t)
+}
+
+candle_store_close <- function(con) if (is_duck(con)) DBI::dbDisconnect(con, shutdown = TRUE) else DBI::dbDisconnect(con)
 
 # ---- event-time tick aggregator (for a WebSocket tick feed) ----
 # Ticks: data.frame(ticker, ts [POSIXct], price, size, id [optional]).

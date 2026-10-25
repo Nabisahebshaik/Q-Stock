@@ -62,7 +62,7 @@ data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
 `Rscript -e "shiny::runApp('app', port = 8050, launch.browser = TRUE)"`, then open **Live market** (or go to `http://127.0.0.1:8050/?tab=Live%20market`).
 - **Data:** 1-minute bars for the 20 stocks of the selected market, polled every 60 s from the Yahoo chart API (curl multi, about 1–3 s for 20 stocks). It is free and unofficial; NSE bars were observed within seconds of real time, without guarantee.
 - **Views:** candlesticks with VWAP and volume (plotly); a live correlation graph of 1-minute returns with the QSW dial (visNetwork); a live risk table with intraday volatility, QSW spillover and a graph-HAR 5-day volatility forecast from completed sessions only.
-- **Storage:** the still-forming candle is held in memory (hot). Finalised candles go to SQLite (`data/live/candles.sqlite`, cold) through an idempotent `INSERT … ON CONFLICT DO UPDATE` keyed by (ticker, interval, bucket). The schema and SQL are PostgreSQL-compatible.
+- **Storage:** the still-forming candle is held in memory (hot). Finalised candles go to DuckDB (`data/live/candles.duckdb`, cold; older days in Parquet under `data/live/parquet`) through an idempotent `INSERT … ON CONFLICT DO UPDATE` keyed by (ticker, interval, bucket). The schema and SQL are PostgreSQL-compatible.
 - **Tick path:** `tick_aggregator()` handles a future WebSocket feed. It uses event-time buckets, a watermark, duplicate-tick removal and late-tick corrections. It is validated on synthetic and replayed ticks only, because no free tick feed exists.
 - **Separation:** live data are for viewing only and never enter the research datasets or results.
 

@@ -6,7 +6,7 @@ FROM rocker/r-ver:4.4.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libcurl4-openssl-dev libssl-dev libsodium-dev zlib1g-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-RUN install2.r --error --skipinstalled plumber RSQLite DBI curl jsonlite Matrix
+RUN install2.r --error --skipinstalled plumber duckdb RSQLite DBI curl jsonlite Matrix
 
 # Spaces run the container as user 1000.
 RUN useradd -m -u 1000 user

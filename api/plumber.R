@@ -23,7 +23,8 @@ local({ old <- setwd(ROOT); on.exit(setwd(old))
 RW <- lapply(split(PRICES, PRICES$market), returns_wide)
 FETCH <- getOption("qstock.live_fetcher", fetch_intraday_many)
 FETCH_DAILY <- getOption("qstock.live_daily_fetcher", fetch_daily_many)
-STORE <- candle_store_open(getOption("qstock.live_db", file.path(ROOT, LIVE$db_path)))
+STORE <- candle_store_open(getOption("qstock.live_db", file.path(ROOT, if (store_backend() == "duckdb") LIVE$db_path else LIVE$sqlite_path)))
+PARQUET <- file.path(ROOT, LIVE$parquet_dir)
 CACHE <- new.env()
 TAUS <- QS$walk_time * seq_len(10) / 10
 tab <- function(f) { p <- file.path(ROOT, "results", "tables", f); if (file.exists(p)) read.csv(p, check.names = FALSE) else NULL }
@@ -48,12 +49,29 @@ live_state <- function(mk, max_age = 55) {
     return(list(at = epoch(Sys.time()), bars = NULL, errors = r$errors, stale = TRUE))
   }
   s <- split_active(do.call(rbind, r$data), 60, Sys.time(), st$open)
-  out <- list(at = epoch(Sys.time()), bars = rbind(s$final, s$active), n_active = nrow(s$active),
+  out <- list(at = epoch(Sys.time()), bars = rbind(s$final, s$active), n_active = nrow(s$active), active = s$active,
               meta = lapply(r$data, attr, "meta"), errors = r$errors, stale = FALSE, range = rng,
               fetch_sec = as.numeric(difftime(Sys.time(), t0, units = "secs")),
               store = candle_upsert(STORE, s$final, 60, "yahoo_poll"), walks = new.env())
   CACHE[[mk]] <- out
   out
+}
+
+# Chart bars: finalised candles from the store plus the forming bar held in memory.
+# /api/live is the one place that polls Yahoo; a chart fetches only when the store has
+# nothing for the ticker (cold start) or, during the session, is more than 5 minutes behind.
+# The hot DuckDB window holds about a week; longer requests also read the Parquet history.
+chart_bars <- function(mk, ticker, days) {
+  rd <- function() candle_read(STORE, ticker, 60, 0, parquet_dir = if (days > 5) PARQUET)
+  d <- rd(); st <- market_status(mk)
+  if (!nrow(d) || (isTRUE(st$open) && epoch(Sys.time()) - max(d$bucket_start) > 300)) { live_state(mk); d <- rd() }
+  cols <- c("ticker", "bucket", "open", "high", "low", "close", "volume")
+  act <- CACHE[[mk]]$active; act <- if (NROW(act)) act[act$ticker == ticker, cols]
+  x <- rbind(d[, cols], act)
+  if (!nrow(x)) return(x)
+  x <- x[order(x$bucket), ]; x <- x[!duplicated(x$bucket, fromLast = TRUE), ]
+  dd <- local_day(x$bucket, mk)
+  x[dd %in% head(sort(unique(dd), decreasing = TRUE), days), ]
 }
 
 forecast_state <- function(mk, max_age = 1800) {
@@ -108,26 +126,29 @@ function(market) {
                last_time = epoch(tail(x$ts, 1)))
   })); rownames(q) <- NULL
   spark <- lapply(split(cur, cur$ticker), function(x) round(tail(x$close[order(x$bucket)], 90), 4))
-  n <- DBI::dbGetQuery(STORE, "SELECT COUNT(*) n, COUNT(DISTINCT ticker) t FROM candles WHERE interval_sec = 60")
+  n <- candle_stats(STORE, 60, PARQUET)
   c(base, list(newest_bar_age = epoch(Sys.time()) - max(epoch(s$bars$ts)), session_day = format(max(local_day(cur$bucket, mk))),
                fetch_sec = s$fetch_sec, range = s$range, quotes = q, spark = spark,
                store = list(candles = n$n, tickers = n$t, written = s$store[["written"]], rejected = s$store[["rejected"]])))
 }
 
-#* One-minute candles of the latest session (time shifted to exchange-local clock time)
+#* One-minute candles of the latest session(s) from the candle store (time shifted to exchange-local clock time)
 #* @param market NSE or NASDAQ
 #* @param ticker Yahoo symbol
+#* @param days number of latest sessions, 1 to 30 (default 1)
 #* @get /api/candles/<market>/<ticker>
 #* @serializer unboxedJSON list(na = "null", digits = NA)
-function(market, ticker) {
-  mk <- check_market(market); s <- live_state(mk)
-  if (is.null(s$bars)) return(list(ticker = ticker, candles = list()))
-  x <- pick_session(s$bars, mk); x <- x[x$ticker == ticker, ]; x <- x[order(x$bucket), ]
+function(market, ticker, days = 1) {
+  mk <- check_market(market); days <- suppressWarnings(as.integer(days))
+  days <- if (is.na(days)) 1L else min(max(days, 1L), 30L)
+  x <- chart_bars(mk, ticker, days)
+  if (!nrow(x)) return(list(ticker = ticker, candles = list()))
   off <- as.POSIXlt(x$bucket, tz = LIVE$sessions[[mk]]$tz)$gmtoff
-  vol <- ifelse(is.finite(x$volume), x$volume, 0); cv <- cumsum(vol)
-  list(ticker = ticker, label = short(ticker), active_last = isTRUE(s$n_active > 0),
+  vol <- ifelse(is.finite(x$volume), x$volume, 0); day <- local_day(x$bucket, mk)
+  cv <- ave(vol, day, FUN = cumsum); cpv <- ave((x$high + x$low + x$close) / 3 * vol, day, FUN = cumsum)   # VWAP resets each session
+  list(ticker = ticker, label = short(ticker), active_last = isTRUE(CACHE[[mk]]$n_active > 0),
        candles = data.frame(time = epoch(x$bucket) + off, open = x$open, high = x$high, low = x$low, close = x$close,
-                            volume = vol, vwap = ifelse(cv > 0, cumsum((x$high + x$low + x$close) / 3 * vol) / cv, NA)))
+                            volume = vol, vwap = ifelse(cv > 0, cpv / cv, NA)))
 }
 
 #* Live correlation graph of one-minute returns with QSW node features
@@ -228,6 +249,7 @@ function() {
 function(pr) {
   # Server-Timing header: compute time of every request (visible in browser dev tools / curl -I).
   pr <- plumber::pr_hooks(pr, list(
+    exit = function() candle_store_close(STORE),         # DuckDB: checkpoint and release the file lock
     preroute = function(req) req$qs_t0 <- Sys.time(),
     postroute = function(req, res) {
       if (!is.null(req$qs_t0))

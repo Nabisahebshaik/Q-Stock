@@ -11,7 +11,7 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 - **Synthetic data only validates software.** No predictive claim rests on it.
 - **Report findings faithfully; never tune for significance.** The v2 ω grid {0, 0.1, 0.25, 0.5, 0.75, 0.9, 1}, targets and Holm families are pre-registered (`docs/research/preregistration_v2.md`). Anything else is labelled *exploratory*.
 - **Every number in docs must trace to a CSV** in `results/tables/`. After changing results, re-audit docs, README and `paper/manuscript_draft.md` against the CSVs.
-- **Live data never enters research datasets.** Live candles go only to `data/live/candles.sqlite`.
+- **Live data never enters research datasets.** Live candles go only to `data/live/` (DuckDB + Parquet; SQLite rollback copy).
 - **Thermal rule for long GPU/CPU runs:** pause at 87 °C, resume at 50–65 °C (`scripts/thermal_guard.ps1`).
 - The user prefers quantum-centred work and gave a free hand for improvements; paper writing is paused until they ask.
 - Commit only when asked. Project lives in OneDrive: keep large outputs in git-ignored paths.
@@ -36,6 +36,7 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 | Shiny dashboard on :8050 | `Rscript -e "shiny::runApp('app', port = 8050, launch.browser = TRUE)"` |
 | Static snapshot | `Rscript scripts/25_export_snapshot.R`, then `cd web && npm run build:snapshot` |
 | Full pipeline | numbered `scripts/02`–`23` (see runbook), or `scripts/overnight_v2.sh` unattended |
+| Storage (DuckDB/Parquet) | `Rscript scripts/29_migrate_sqlite_to_duckdb.R` (SQLite → DuckDB, verify, export old days), `scripts/30_prices_to_parquet.R`, `scripts/31_storage_benchmark.R`; rollback `options(qstock.store_backend = "sqlite")` |
 
 ## Layout
 

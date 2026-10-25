@@ -66,7 +66,7 @@ flowchart TB
     cur[(data/curated<br/>dataset_graph.rds, qsw_features.rds)]
     hdfs[(HDFS /user/cloudera/qstock)]
     hive[(Hive external tables)]
-    sqlite[(data/live/candles.sqlite<br/>hot/cold candle store)]
+    sqlite[(data/live/candles.duckdb + parquet/<br/>hot/cold candle store)]
     res[(results/<br/>tables, figures, predictions, logs)]
   end
   subgraph L3[3 · Computation core: R library]
@@ -167,7 +167,7 @@ flowchart TB
     ep[GET /api/status · live · candles · graph<br/>forecast · dial · bench · results]
     cache[(in-memory CACHE<br/>live 55 s · forecast 30 min · dial)]
     core[R library: live_market, qsw, market_graph]
-    store[(SQLite candle store)]
+    store[(DuckDB candle store<br/>+ Parquet history)]
     tables[(results/tables)]
     pre[(api/precomputed dial_*.json<br/>api/model ghar_live_model.json)]
   end
@@ -182,7 +182,7 @@ flowchart TB
 * **Computation stays in R.** The UI only renders API responses; types in `web/src/lib/api.ts` mirror `api/plumber.R`.
 * **One shared fetch per market per minute.** All viewers read the same cached Yahoo batch; the API never fans out per browser tab.
 * **Stale-but-available.** If a Yahoo fetch fails, the last good batch is served with `stale: true`.
-* **Live/research separation.** Live candles go only to `data/live/candles.sqlite`; nothing in the research pipeline reads it.
+* **Live/research separation.** Live candles go only to `data/live/` (DuckDB + Parquet); nothing in the research pipeline reads it.
 
 ### 6.2 Three UI build modes
 
@@ -234,8 +234,8 @@ flowchart LR
 | Language / core | R 4.6.1 (host), R 4.4.2 (container); base R linear algebra, `Matrix` for sparse DTQW |
 | ML / stats | `stats` (OLS, logit), ranger, glmnet (elastic net), lightgbm, torch for R (MLP, CUDA benchmark) |
 | Big Data | Hadoop 2.6 / YARN, Java MapReduce (JDK 1.7), Hive 1.1, Spark 3.5.9 via sparklyr 1.9.6, WebHDFS |
-| Storage | CSV/RDS files, HDFS, Hive (MySQL metastore), SQLite (PostgreSQL-compatible SQL) |
-| API | plumber, jsonlite, curl (multi), RSQLite/DBI |
+| Storage | CSV/RDS files, HDFS, Hive (MySQL metastore), DuckDB + Parquet (live candles, daily-price cache), SQLite rollback (PostgreSQL-compatible SQL) |
+| API | plumber, jsonlite, curl (multi), duckdb/DBI, RSQLite (rollback) |
 | Dashboards | Shiny + bslib, plotly, visNetwork, DT; chromote for screenshots |
 | Web UI | React 18, TypeScript 5.6, Vite 5, Tailwind 3, TanStack Query 5, three.js / react-three-fiber, d3-force-3d, lightweight-charts, recharts, framer-motion |
 | Deployment | Docker (rocker/r-ver), Render Blueprint (`render.yaml`), Vercel (`web/vercel.json`) |

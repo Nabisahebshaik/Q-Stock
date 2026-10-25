@@ -109,3 +109,12 @@ Read this first when resuming (a new Claude session or you).
 - `CLAUDE.md` at the root: ground rules, environment, commands, conventions. Loaded automatically by Claude Code and Cowork sessions in this folder.
 - Project skills in `.claude/skills/` (8): quantum-walk-simulation, leakage-safe-forecast-evaluation, hadoop-hive-spark-pipeline, live-market-data-pipeline, r-plumber-react-dashboard, free-tier-r-deployment, gpu-and-long-run-safety, research-results-audit. `scripts/28_package_skills.ps1` zips them into `build/skills/` for upload.
 - Docs reorganised into `docs/{architecture,design,research,results,operations,course}` with `docs/README.md` as the index; all path references in scripts, README and the manuscript updated. New: `docs/architecture/ARCHITECTURE.md`, `docs/design/DESIGN.md`.
+
+## DuckDB + Parquet storage migration (2026-10-25)
+
+- Design and measured results: `docs/design/DUCKDB_MIGRATION.md` (decision D14 in DESIGN.md). The live store was SQLite (PostgreSQL-compatible SQL, no PostgreSQL server).
+- Live candles: DuckDB (`R/store_duckdb.R`, `data/live/candles.duckdb` for the API, `candles_app.duckdb` for Shiny) with Parquet history under `data/live/parquet`. SQLite is kept as rollback: `options(qstock.store_backend = "sqlite")`; `candles.sqlite` was not modified.
+- `/api/candles` now reads the store (+ the in-memory forming bar) and takes `days` (1–30); cold chart 6.6 s → 0.04–0.09 s locally.
+- Daily prices load from `data/curated/prices.parquet` (identical() to the CSV frame; 0.95 s → 0.03 s).
+- Scripts: `29_migrate_sqlite_to_duckdb.R`, `30_prices_to_parquet.R`, `31_storage_benchmark.R`. Dockerfiles install `duckdb`.
+- Tests: 51 blocks / 234 expectations, 20 API checks, Shiny tests pass. Not yet deployed or measured on Render.

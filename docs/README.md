@@ -8,6 +8,7 @@ docs/
 ├── architecture/
 │   └── ARCHITECTURE.md           system context, layers, data flows, Big Data layer, serving, deployment, stack
 ├── design/
+│   ├── DUCKDB_MIGRATION.md       live-candle and price storage on DuckDB + Parquet: design, migration, measured results
 │   └── DESIGN.md                 modules, algorithms (graph, DTQW/CTQW/QSW), walk-forward, data model, API contract, UI, tests, decisions
 ├── research/
 │   ├── research_questions.md     RQ1–RQ6 and scope statements

@@ -59,6 +59,8 @@ After step 05, re-run step 03 to load the experiment results and predictions int
 | GPU MLP (QLIKE) | `Rscript scripts/18_mlp_qlike_gpu.R` | `v2_mlp_qlike_gpu*.csv` |
 | Power analysis | `Rscript scripts/19_power_analysis.R` | `power_analysis*.csv` |
 | Dashboard | `Rscript -e "shiny::runApp('app', port = 8050, launch.browser = TRUE)"` | browser; Live market tab: `http://127.0.0.1:8050/?tab=Live%20market` (needs internet; NSE 09:15–15:30 IST, NASDAQ 09:30–16:00 New York) |
+| Live store migration | `Rscript scripts/29_migrate_sqlite_to_duckdb.R [--export-before-days 7] [--force]` (SQLite → DuckDB + Parquet, verified) | `data/live/candles.duckdb`, `data/live/parquet/` |
+| Prices Parquet + storage benchmark | `Rscript scripts/30_prices_to_parquet.R`, `Rscript scripts/31_storage_benchmark.R` | `data/curated/prices.parquet`, `storage_benchmark.csv` |
 | Dashboard screenshot | `Rscript scripts/22_dashboard_screenshot.R "Live market" 25` (dashboard must be running; uses Edge via chromote) | `results/screenshots/` |
 
 GPU scripts set `TORCH_CUDATOOLKIT=FALSE`: the libtorch cu128 bundle ships its own CUDA DLLs.

@@ -72,11 +72,68 @@ clean_prices <- function(df) {
   list(data = df, issues = issues)
 }
 
+# Daily-price Parquet cache (data/curated/prices.parquet). The frame read back is
+# identical() to the CSV-loaded one, so research results reproduce exactly.
+read_prices_csv <- function(f) {
+  df <- read.csv(f, stringsAsFactors = FALSE)
+  df$date <- as.Date(df$date)
+  df
+}
+
+# Absolute forward-slash path with quotes escaped, for a DuckDB SQL literal.
+sql_path <- function(path) gsub("'", "''", normalizePath(path, "/", mustWork = FALSE))
+
+write_prices_parquet <- function(df, path) {
+  con <- DBI::dbConnect(duckdb::duckdb(shared_home = FALSE))  # parquet is built in; no extension home needed
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  duckdb::duckdb_register(con, "prices_df", df)
+  # Write a temp file and rename it, so a concurrent reader never sees a partial file.
+  tmp <- paste0(path, ".tmp")
+  DBI::dbExecute(con, sprintf("COPY (SELECT * FROM prices_df) TO '%s' (FORMAT parquet, COMPRESSION zstd)",
+                              sql_path(tmp)))
+  duckdb::duckdb_unregister(con, "prices_df")
+  if (file.exists(path)) unlink(path)
+  if (!file.rename(tmp, path)) { unlink(tmp); stop("could not move ", tmp, " to ", path) }
+  invisible(path)
+}
+
+read_prices_parquet <- function(path) {
+  con <- DBI::dbConnect(duckdb::duckdb(shared_home = FALSE))  # parquet is built in; no extension home needed
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
+  df <- DBI::dbGetQuery(con, sprintf("SELECT * FROM read_parquet('%s')", sql_path(path)))
+  # Match read.csv + as.Date: double-backed Date, plain data.frame, automatic row names.
+  for (j in names(df)) if (inherits(df[[j]], "Date"))
+    df[[j]] <- structure(as.double(unclass(df[[j]])), class = "Date")
+  df <- as.data.frame(df, stringsAsFactors = FALSE)
+  attr(df, "row.names") <- .set_row_names(nrow(df))
+  df
+}
+
+# Best-effort cache write: a Parquet failure (or no duckdb) never breaks loading.
+cache_prices_parquet <- function(df, pq) {
+  if (!requireNamespace("duckdb", quietly = TRUE)) return(invisible(FALSE))
+  tryCatch({
+    dir.create(dirname(pq), recursive = TRUE, showWarnings = FALSE)
+    write_prices_parquet(df, pq)
+    invisible(TRUE)
+  }, error = function(e) {
+    message("prices parquet cache not written: ", conditionMessage(e))
+    invisible(FALSE)
+  })
+}
+
 load_market_data <- function(refresh = FALSE, pause = 0.5) {
   f <- file.path(QS$paths$raw, "prices_yahoo.csv")
+  pq <- file.path(QS$paths$curated, "prices.parquet")
   if (file.exists(f) && !refresh) {
-    df <- read.csv(f, stringsAsFactors = FALSE)
-    df$date <- as.Date(df$date)
+    # Parquet only when at least as new as the CSV (a rebuilt CSV invalidates it).
+    if (file.exists(pq) && file.mtime(pq) >= file.mtime(f) &&
+        requireNamespace("duckdb", quietly = TRUE)) {
+      df <- tryCatch(read_prices_parquet(pq), error = function(e) NULL)
+      if (!is.null(df)) return(df)
+    }
+    df <- read_prices_csv(f)
+    cache_prices_parquet(df, pq)
     return(df)
   }
   dir.create(QS$paths$raw, recursive = TRUE, showWarnings = FALSE)
@@ -88,5 +145,7 @@ load_market_data <- function(refresh = FALSE, pause = 0.5) {
   }
   df <- do.call(rbind, parts)
   write.csv(df, f, row.names = FALSE)
+  # Cache the CSV-round-tripped frame: that is what later loads must reproduce.
+  cache_prices_parquet(read_prices_csv(f), pq)
   df
 }

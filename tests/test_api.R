@@ -49,6 +49,10 @@ cd <- body(get("/api/candles/NSE/RELIANCE.NS"))$candles
 check(nrow(cd) == 150 && all(cd$high >= pmax(cd$open, cd$close)) && all(cd$low <= pmin(cd$open, cd$close)), "candles are OHLC-consistent")
 check(is.na(cd$vwap[1]) && all(is.finite(cd$vwap[-1])), "VWAP undefined before the first traded volume, finite after")
 check(all(diff(cd$time) == 60), "candle times on a one-minute grid")
+check(identical(body(get("/api/candles/NSE/RELIANCE.NS?days=3"))$candles, cd) &&
+      identical(body(get("/api/candles/NSE/RELIANCE.NS?days=x"))$candles, cd), "days: one mocked session; bad value falls back to 1")
+cn <- body(get("/api/candles/NASDAQ/NVDA"))$candles                                       # store empty for NASDAQ: one fetch
+check(nrow(cn) == 150 && body(get("/api/live/NASDAQ"))$store$candles >= 20 * 148, "cold store: first chart request fills it")
 
 g <- body(get("/api/graph/NSE?omega=0.25&look=120"))
 P <- g$P
