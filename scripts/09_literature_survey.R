@@ -27,7 +27,7 @@ d$single_stock_noted <- grepl("only (one|tcs|reliance|hdfc|aapl|tesla)|single|on
 # "network" alone matches "neural network", so only graph/quantum-specific terms count.
 d$graph_or_quantum <- has("graph|quantum|random walk|correlation network|stock network|market network")
 
-out_csv <- "docs/literature_survey_structured.csv"
+out_csv <- "docs/research/literature_survey_structured.csv"
 write.csv(d, out_csv, row.names = FALSE)
 cat("papers:", nrow(d), " years:", paste(range(d$year, na.rm = TRUE), collapse = "-"),
     " DOI links:", sum(d$doi_ok), "\n")

@@ -7,7 +7,7 @@ for (f in list.files("R", pattern = "\\.R$", full.names = TRUE)) source(f)
 ensure_dirs()
 workers <- as.integer(commandArgs(trailingOnly = TRUE)[1]); if (is.na(workers)) workers <- 10
 
-OMEGAS <- c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)   # pre-registered grid (docs/preregistration_v2.md)
+OMEGAS <- c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)   # pre-registered grid (docs/research/preregistration_v2.md)
 prices <- clean_prices(load_market_data())$data
 jobs <- c(
   apply(expand.grid(market = c("NSE", "NASDAQ"), omega = OMEGAS, graph = "corr",

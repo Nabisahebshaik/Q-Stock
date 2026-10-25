@@ -2,7 +2,7 @@
 
 Data: Yahoo daily OHLCV, 2015-01-01 to 2026-10-21, 20 NSE + 20 NASDAQ current large caps (survivorship bias: see limitations).
 Evaluation: monthly walk-forward, 24-month rolling training window, embargo on label dates, test months 2017-03 to 2026-10.
-Pre-registration: `docs/preregistration_v2.md`, written before any v2 run.
+Pre-registration: `docs/research/preregistration_v2.md`, written before any v2 run.
 Tables: `results/tables/v2_*.csv`. Figure: `results/figures/fig7_quantumness_dial.png`.
 
 All walks are **classical simulations** of quantum dynamics (RK4 integration of the Lindblad equation in R). No quantum hardware was used and no quantum speed-up is claimed.

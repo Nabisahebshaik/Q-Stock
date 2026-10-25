@@ -10,7 +10,7 @@ Course project for SRM University–AP, CSE 465 Principles of Big Data Managemen
 > All quantum walks are **classical simulations** (R on CPU; torch/CUDA for the GPU benchmark). No quantum hardware is used and no quantum speed-up is claimed.
 > Synthetic data is used **only** to validate software.
 
-## Headline findings (details: `docs/results_v2.md`, `docs/results.md`)
+## Headline findings (details: `docs/results/results_v2.md`, `docs/results/results.md`)
 
 * **Next-day direction:** no feature set (classical, classical diffusion or quantum walk) beats a naive base-rate predictor in either market.
 * **5-day realised volatility (pre-registered primary target):**
@@ -30,8 +30,9 @@ tests/        42 testthat blocks, 187 expectations (unitarity, Hermiticity, QSW 
 scripts/      01–22 numbered pipeline steps; overnight_*.sh orchestration; monitor_system.ps1
 hadoop/       Java MapReduce job; VM service start-up and HDFS fix scripts
 hive/         HiveQL DDL and queries
-docs/         environment report, runbook, CO mapping, research questions, pre-registration,
-              novelty audit, literature-survey analysis, results, issues log
+docs/         index (docs/README.md); architecture/, design/, research/ (RQs, pre-registration,
+              novelty audit, literature survey), results/, operations/ (runbook, environment,
+              issues log, hand-off), course/ (CO mapping)
 paper/        manuscript draft
 results/      tables/ (csv + md), figures/ (png), logs, predictions
 data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
@@ -67,7 +68,7 @@ data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
 
 ## Reproduce
 
-See `docs/runbook.md`. In short:
+See `docs/operations/runbook.md`. In short:
 - run `tests/run_tests.R`
 - run `scripts/02` to `16` in order (`03` needs the Cloudera VM; `13` needs an NVIDIA GPU)
 - or run `scripts/overnight_v2.sh` for an unattended run

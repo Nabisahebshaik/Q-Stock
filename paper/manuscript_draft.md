@@ -1,6 +1,6 @@
 # Does quantum coherence help forecast volatility? A pre-registered quantum-to-classical audit of quantum stochastic walks on NSE and NASDAQ correlation networks
 
-> **Framing update (after the GHAR check, `docs/results_v2.md`).** The pre-registered within-family effect (intermediate ω beats ω = 1 on NASDAQ) holds.
+> **Framing update (after the GHAR check, `docs/results/results_v2.md`).** The pre-registered within-family effect (intermediate ω beats ω = 1 on NASDAQ) holds.
 > However, QSW features give **no gain over a simple linear graph-HAR (GHAR) baseline** in either market.
 > The paper should therefore be framed as a rigorous audit: coherence measurably changes the diffusion, but it adds no forecasting value beyond classical graph spillovers.
 > The abstract below must be rewritten accordingly before submission.
@@ -19,7 +19,7 @@ We conclude that partial coherence can help, depending on the market, while a ge
 
 ## 1 Introduction
 - Motivation: network spillovers in volatility; quantum walks as alternative diffusion kernels (interference, localisation).
-- Gap (from `docs/novelty_audit.md` and the 45-paper survey):
+- Gap (from `docs/research/novelty_audit.md` and the 45-paper survey):
   - Prior quantum-walk finance work models return distributions (De Backer et al. [VERIFY]), portfolio weights (Chang et al., 2026, npj Unconventional Computing) or network entropy (Bai et al., IJCAI 2020). It does not isolate whether coherence helps forecasting.
   - Recent ML stock-prediction papers rarely use walk-forward evaluation, naive baselines, costs or multiple-testing control.
 - Contributions:
@@ -30,7 +30,7 @@ We conclude that partial coherence can help, depending on the market, while a ge
 
 ## 2 Related work
 - Quantum walks: DTQW (Aharonov et al. 1993 [VERIFY]), CTQW (Farhi & Gutmann 1998 [VERIFY]), QSW (Whitfield, Rodríguez-Rosario & Aspuru-Guzik 2010 [VERIFY]).
-- Quantum walks in finance: P1–P6 in `docs/novelty_audit.md`.
+- Quantum walks in finance: P1–P6 in `docs/research/novelty_audit.md`.
 - Volatility forecasting: HAR-RV (Corsi 2009 [VERIFY]); network spillovers (Diebold & Yilmaz [VERIFY]).
 - Forecast evaluation: Diebold–Mariano (1995 [VERIFY]); stationary bootstrap (Politis & Romano 1994 [VERIFY]); Holm (1979 [VERIFY]).
 
@@ -44,7 +44,7 @@ We conclude that partial coherence can help, depending on the market, while a ge
 
 ## 4 Methods
 - 4.1 Market-state graph: 60-day correlations, symmetrised kNN (k = 4), weights max(ρ, 0.01).
-- 4.2 QSW: Lindblad equation (`docs/preregistration_v2.md`). Limits ω = 0 (CTQW) and ω = 1 (classical CTRW) are verified to 10⁻⁶ by unit tests. RK4 integration with h = 0.02, time-averaged over τ ∈ {0.2, …, 2}.
+- 4.2 QSW: Lindblad equation (`docs/research/preregistration_v2.md`). Limits ω = 0 (CTQW) and ω = 1 (classical CTRW) are verified to 10⁻⁶ by unit tests. RK4 integration with h = 0.02, time-averaged over τ ∈ {0.2, …, 2}.
 - 4.3 Node features: self, mom, ent, volspill.
 - 4.4 Models: HAR-RV OLS (T1), logistic regression (T2), rank IC (T3). Exploratory baselines: graph-HAR (GHAR), elastic net, LightGBM and a QLIKE-trained MLP (GPU), all with nested walk-forward validation.
 - 4.5 Evaluation: monthly walk-forward; DM with Newey–West variance; stationary bootstrap (mean block 20, 1000 reps); Holm within each pre-registered family.
@@ -70,4 +70,4 @@ We conclude that partial coherence can help, depending on the market, while a ge
 Survivorship bias, unofficial data, a single pre-registered graph construction, small effect sizes, economic evaluation limited to a simple inverse-volatility portfolio, sentiment not evaluated (the GDELT download stopped at 21/40 tickers under HTTP 429 rate-limiting; partial data were not used), and classical simulation only.
 
 ## 8 Reproducibility
-`docs/runbook.md`; all scripts, unit tests, the pre-registration and the logs are in the repository.
+`docs/operations/runbook.md`; all scripts, unit tests, the pre-registration and the logs are in the repository.

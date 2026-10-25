@@ -2,7 +2,7 @@
 # the Cloudera QuickStart VM. Run from the project root after 02_build_dataset.R
 # (and again after 05_experiments.R to load the results tables).
 #
-# Requires: VM running, SSH key access on host port 2222 (see docs/runbook.md).
+# Requires: VM running, SSH key access on host port 2222 (see docs/operations/runbook.md).
 
 for (f in list.files("R", pattern = "\\.R$", full.names = TRUE)) source(f)
 ensure_dirs()

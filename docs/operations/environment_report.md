@@ -58,4 +58,4 @@ WSL Ubuntu 24.04.3 exists (about 11 GB RAM visible) but has no Java, R, Hadoop o
 ## GPU decision
 
 The quantum-walk simulations run on market graphs of N = 20 nodes per market. Measured cost (`results/tables/qw_scalability.csv`) is in milliseconds at that size, so a GPU would add transfer overhead and dependencies (CUDA build of `torch` for R, about 2 GB) for no benefit.
-The scalability study shows where a GPU would start to matter (dense methods at N in the high hundreds or more); see `docs/results.md`.
+The scalability study shows where a GPU would start to matter (dense methods at N in the high hundreds or more); see `docs/results/results.md`.

@@ -33,7 +33,7 @@ All quantum walks are **classical simulations**.
 
 ## 3. Volatility and the quantum-to-classical dial (v2; pre-registered)
 
-See `docs/results_v2.md` for the full tables. In summary:
+See `docs/results/results_v2.md` for the full tables. In summary:
 
 * **H2 (quantum hypothesis), NASDAQ: supported.** QSW at ω = 0.25 beats the classical limit ω = 1.
   - MSE: Δ = −0.0037, 95% CI [−0.0052, −0.0019], Holm p = 4.8×10⁻⁶. The most significant contrast is ω = 0.5 (Δ = −0.0025, Holm p = 4.7×10⁻⁸).
@@ -128,7 +128,7 @@ The evaluation could detect weak signals (power analysis), so this is an informa
 ## 5. Research question 5 (sentiment): not evaluated
 
 - **RQ5 is not evaluated.** The GDELT DOC 2.0 download ended at its deadline (2026-10-23 12:06) with **21 of 40** tickers. The server rejected requests with HTTP 429 (rate limit), and 7 tickers each failed all 8 retries with back-off.
-- Under the precondition in `docs/research_questions.md`, partial sentiment data are not used. The chain therefore skipped the sentiment experiment (`results/overnight_chain.log`, 12:23:56).
+- Under the precondition in `docs/research/research_questions.md`, partial sentiment data are not used. The chain therefore skipped the sentiment experiment (`results/overnight_chain.log`, 12:23:56).
 - The point-in-time sentiment join itself is implemented and validated in Spark against R (agreement 6.5×10⁻⁷ on the decay features, §1). Only the data collection is incomplete.
 
 ## 6. Status

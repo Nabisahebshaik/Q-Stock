@@ -1,6 +1,6 @@
 # Pre-registration: Q-Stock v2 hypotheses
 
-Written on **2026-10-22, before any v2 experiment was run**. The v1 results (`docs/results.md`) are already known and motivate v2.
+Written on **2026-10-22, before any v2 experiment was run**. The v1 results (`docs/results/results.md`) are already known and motivate v2.
 Analyses not listed here will be labelled *exploratory* in any write-up.
 
 ## Motivation from v1

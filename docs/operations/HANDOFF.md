@@ -22,7 +22,7 @@ Read this first when resuming (a new Claude session or you).
    - `ablation_results.csv`
    - `experiment_results.csv` (refreshed to 2026-10-21)
    - `power_analysis_summary.csv`
-3. Write `docs/results.md` (final, v1 + v2). The current numbers are in `docs/results_v2.md`; the v1 numbers there must be refreshed from the re-run.
+3. Write `docs/results/results.md` (final, v1 + v2). The current numbers are in `docs/results/results_v2.md`; the v1 numbers there must be refreshed from the re-run.
 4. If GDELT completed (40 files): check `results/overnight_chain.log` for the sentiment experiment and add RQ5. Otherwise report RQ5 as not evaluated.
 5. Rewrite `paper/manuscript_draft.md` with the audit framing (see its header note). Resolve every **[VERIFY]**.
 6. Optionally re-run `scripts/03_hadoop_hive.R` with the VM up, to load the refreshed results into Hive.
@@ -33,7 +33,7 @@ Read this first when resuming (a new Claude session or you).
 - `20_tuned_models.R` (nested validation: adaptive ω, elastic net, combination) and `21_lightgbm_nested.R`.
   - Linear GHAR (NASDAQ) or a combination (NSE) is the best achievable forecast.
   - No tuned or nonlinear model beats GHAR significantly, and QSW features add nothing in any model class.
-  - Recorded in `docs/results.md` §3b.
+  - Recorded in `docs/results/results.md` §3b.
 - Timing integrity: LightGBM finished at 00:09:39 and the scalability benchmark started at 00:09:48, so they did not overlap. v1 RF runtimes (until 23:49) did not overlap the power analysis either.
 - The user asked for the paper writing to pause (the references.bib write was declined). Focus on results until asked.
 
@@ -48,7 +48,7 @@ Read this first when resuming (a new Claude session or you).
 
 ## Update 2026-10-23 (morning)
 
-- The memory-pressure reaper stopped the thermal guard and some waiters around 00:30. The GPU benchmark was frozen until the guard was back, then resumed on AC power at 08:59. It finished OK at 09:03 (`gpu_benchmark.csv`, fig8). `docs/results.md` §3c has the results.
+- The memory-pressure reaper stopped the thermal guard and some waiters around 00:30. The GPU benchmark was frozen until the guard was back, then resumed on AC power at 08:59. It finished OK at 09:03 (`gpu_benchmark.csv`, fig8). `docs/results/results.md` §3c has the results.
 - The thermal guard and health logger were stopped at the user's request; the user is awake and monitoring.
 - `scripts/resume_gpu_chain.sh` replaced the stopped waiters. The GPU MLP smoke test passed; the **full MLP run started 09:06**. The duplicate original `after_gpu_mlp.sh` waiter was terminated so that only one MLP run uses the GPU.
 - Doc-vs-CSV audit of every headline number, with corrections:
@@ -103,3 +103,9 @@ Read this first when resuming (a new Claude session or you).
   - OpenBLAS started 8 threads on a 0.1-CPU container; a 20-node QSW walk took 39 s. With `OPENBLAS_NUM_THREADS=1` it takes 2.0 s.
   - The dial is cached and precomputed for the latest date; the exact limits at ω = 0 and 1 are used.
 - **Measured on Render:** live quotes about 11 s (fetch plus parse at 0.1 CPU), live graph about 6 s, forecast about 5 s, dial 0.1–4 s. Memory about 230 MB of 512 MB.
+
+## Project setup for Claude sessions (2026-10-25)
+
+- `CLAUDE.md` at the root: ground rules, environment, commands, conventions. Loaded automatically by Claude Code and Cowork sessions in this folder.
+- Project skills in `.claude/skills/` (8): quantum-walk-simulation, leakage-safe-forecast-evaluation, hadoop-hive-spark-pipeline, live-market-data-pipeline, r-plumber-react-dashboard, free-tier-r-deployment, gpu-and-long-run-safety, research-results-audit. `scripts/28_package_skills.ps1` zips them into `build/skills/` for upload.
+- Docs reorganised into `docs/{architecture,design,research,results,operations,course}` with `docs/README.md` as the index; all path references in scripts, README and the manuscript updated. New: `docs/architecture/ARCHITECTURE.md`, `docs/design/DESIGN.md`.

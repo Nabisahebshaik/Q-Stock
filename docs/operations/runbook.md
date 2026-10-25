@@ -23,7 +23,7 @@ ssh -i ~/.ssh/qstock_vm_rsa -p 2222 -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAccep
 ```
 
 `vm_start_services.sh` does three things:
-1. Applies the DataNode include-list fix (see `docs/unresolved_issues.md`, item 4).
+1. Applies the DataNode include-list fix (see `docs/operations/unresolved_issues.md`, item 4).
 2. Starts ZooKeeper and Hive through the Cloudera Manager REST API.
 3. Restarts HiveServer2 if it came up before the metastore.
 

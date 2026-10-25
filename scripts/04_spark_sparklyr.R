@@ -1,6 +1,6 @@
 # Stage 3 (Spark part): distributed feature engineering with sparklyr (no PySpark).
 #
-# Compatibility finding (see docs/environment_report.md): sparklyr 1.9.6 ships
+# Compatibility finding (see docs/operations/environment_report.md): sparklyr 1.9.6 ships
 # backend JARs only for Spark >= 2.4, so it cannot drive the VM's Spark 1.6.0.
 # This script therefore runs Spark 3.5 in local mode on the host (Java 17).
 #

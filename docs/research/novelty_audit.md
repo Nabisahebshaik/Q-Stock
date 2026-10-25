@@ -44,7 +44,7 @@ Foundational references (from general knowledge; confirm DOI and venue before ci
 
 ## Student literature survey (45 papers, 2024–2026)
 
-Source: `Literature_Survey_UROP_Batch_1_2023.xlsx`, structured by `scripts/09_literature_survey.R` into `docs/literature_survey_structured.csv`.
+Source: `Literature_Survey_UROP_Batch_1_2023.xlsx`, structured by `scripts/09_literature_survey.R` into `docs/research/literature_survey_structured.csv`.
 The derived columns are keyword rules over the survey's own summaries, not a reading of the papers. 44/45 entries have DOI links, which have not been resolved one by one.
 
 * **Methods:** RNN/LSTM/DNN 20, Transformer 4, tree/ensemble 5, SVM/SVR 3, linear/statistical 2, unspecified 11.
@@ -52,7 +52,7 @@ The derived columns are keyword rules over the survey's own summaries, not a rea
 * **Targets:** 26 predict price levels, 12 direction/trend, 7 unclear.
   Price-level metrics such as R² of 94.7% (#3) or RMSE are dominated by price persistence and do not show predictability.
 * **Direction accuracies reported by the survey summaries:** 52.77% (#7, Reliance, LR/RF/XGBoost), about 51.5% (#38, LR), 72% (#8, LSTM).
-  Our 50–52% (`docs/results.md`) agrees with #7 and #38. A 72% directional accuracy would be extraordinary for daily data and should be checked for look-ahead or overlapping train/test windows before it is cited as a benchmark.
+  Our 50–52% (`docs/results/results.md`) agrees with #7 and #38. A 72% directional accuracy would be extraordinary for daily data and should be checked for look-ahead or overlapping train/test windows before it is cited as a benchmark.
 * **Gaps that recur in the survey's own "Limitation" column:** single stock or a few stocks (≥ 8 papers), no walk-forward evaluation, no transaction costs, no naive baseline, no significance tests. Q-Stock addresses each one:
   - 40 stocks in 2 markets
   - monthly walk-forward with an embargo
@@ -78,4 +78,4 @@ The derived columns are keyword rules over the survey's own summaries, not a rea
    - `"continuous-time quantum walk" AND (correlation network OR market)`
    - `"discrete-time quantum walk" AND (finance OR stock)`
 2. Open and read P1–P6. Record what they evaluate and against which baselines.
-3. Frame any paper around the evidence in `docs/results.md`: matched classical controls, a random-graph control, a naive baseline and a negative result.
+3. Frame any paper around the evidence in `docs/results/results.md`: matched classical controls, a random-graph control, a naive baseline and a negative result.

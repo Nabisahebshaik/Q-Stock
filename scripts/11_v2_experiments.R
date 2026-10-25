@@ -1,4 +1,4 @@
-# v2 confirmatory experiments (see docs/preregistration_v2.md).
+# v2 confirmatory experiments (see docs/research/preregistration_v2.md).
 #   T1 (primary): 5-day-ahead log realised variance; OLS; HAR-RV baseline.
 #   T2: next-day direction; logistic regression; classical baseline.
 #   T3: cross-sectional rank IC of the T2 scores.
