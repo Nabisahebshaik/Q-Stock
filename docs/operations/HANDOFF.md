@@ -126,3 +126,19 @@ Read this first when resuming (a new Claude session or you).
 - Frontend: `web/src/components/chart/` (toolbar, legend with eye/settings/remove/more, indicators dialog, six chart types, range bar + exchange clock, screenshot, fullscreen) and `chart/drawing/` (trend, ray, h/v lines, rectangle, Fibonacci, measure, text; magnet, lock, hide, undo/redo; per-ticker persistence). Replaces the candle card on the Live page.
 - Snapshot regenerated (211 files, 12.3 MB, incl. `bars_*`).
 - Not yet observed: 5s bars during market hours; deployment to Render/Vercel.
+
+## Checkpoint 2026-10-25 (tag `checkpoint-2026-10-25`)
+
+Work paused here at the user's request. Everything below is committed and deployed.
+
+**Deployed and verified (Sunday, markets closed)**
+- UI https://q-stock-pink.vercel.app: new chart workspace on the Live page, live mode against Render (`/api/bars` 1m request 0.64 s from the browser).
+- API https://q-stock-api.onrender.com: commit `36871df`. The first deploy of `3788ebd` crashed at start-up (image's duckdb 1.2.0 rejects `shared_home`); fixed with `duck_drv()` and duckdb pinned to 1.5.6 in both Dockerfiles. Measured: daily bars 1Y with SMA/BB/RSI 2.4 s; first 1m/5m request after a restart 8.6–11 s (one Yahoo fetch, empty store); candles from the store 0.45 s.
+- Tests at this point: 61 testthat blocks / 357 expectations, 34 API checks, Shiny tests, `tsc -b`, lint (0 errors), build: all pass.
+
+**Open items, in order**
+1. Watch 5s snapshot-built bars live during NSE hours (Mon 09:15 IST): `/api/bars/NSE/RELIANCE.NS?interval=5s` while the 5s chart is open.
+2. Check Render memory under DuckDB in the dashboard Metrics tab (was ≈ 230 MB of 512 MB before; DuckDB limited to 128 MB).
+3. Optional: automatic periodic Parquet export in the API; UI use of `days > 1` on `/api/candles` (the workspace already uses `/api/bars` ranges).
+4. Optional: lightweight-charts 5 panes so RSI/volume get their own axes; per-drawing style editing.
+5. Research side unchanged since 2026-10-23: paper writing still paused until the user asks.

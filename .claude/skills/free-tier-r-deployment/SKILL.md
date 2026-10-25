@@ -10,7 +10,7 @@ Live: UI https://q-stock-pink.vercel.app · API https://q-stock-api.onrender.com
 ## Render (API)
 
 - `render.yaml`: `type: web`, `runtime: docker`, `plan: free`, `region: singapore`, `dockerfilePath: ./deploy/render/Dockerfile`, `dockerContext: .`, `autoDeploy: true`.
-- Dockerfile: `rocker/r-ver:4.4.2`; system libs (curl, ssl, sodium, zlib); `install2.r plumber duckdb RSQLite DBI curl jsonlite Matrix`.
+- Dockerfile: `rocker/r-ver:4.4.2`; system libs (curl, ssl, sodium, zlib); `install2.r plumber RSQLite DBI curl jsonlite Matrix`, then duckdb **pinned to 1.5.6** from a dated P3M binary snapshot (the image's own CRAN snapshot has 1.2.0, whose `duckdb()` rejects unknown arguments such as `shared_home`; that crashed the first deploy). Use `duck_drv()` instead of calling `duckdb::duckdb()` directly.
 - Copy **only** what the API needs: `R/`, `api/plumber.R`, `api/run_api.R`, `api/model`, `api/precomputed`, `results/tables`. No raw/curated data (licence + size). Prices download at build (`|| true` so a Yahoo hiccup does not fail the build; start-up retries).
 - `ENV OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1` — on 0.1 CPU, 8 BLAS threads made a 20-node QSW take 39 s; single-threaded 2.0 s.
 - **No HTTP health check**: the single-threaded R server could not answer it during a long computation and Render restarted it.
