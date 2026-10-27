@@ -5,6 +5,8 @@ Start with **architecture**, then **design**. Use **operations** to run things, 
 ```
 docs/
 ├── README.md                     this index
+├── Q-Stock_Project_Brief.pdf     24-page end-to-end brief: system flow, stack, every code element and its usage, results
+├── Q-Stock_Project_Brief.html    source of the PDF (regeneration command in its header comment)
 ├── architecture/
 │   └── ARCHITECTURE.md           system context, layers, data flows, Big Data layer, serving, deployment, stack
 ├── design/
@@ -31,6 +33,7 @@ docs/
 
 | I want to… | Read |
 |---|---|
+| Get the whole project in one document (shareable PDF) | [Q-Stock_Project_Brief.pdf](Q-Stock_Project_Brief.pdf) |
 | Understand how the system fits together | [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) |
 | Change code in `R/`, `api/` or `web/` | [design/DESIGN.md](design/DESIGN.md) |
 | Re-run the pipeline or start the VM | [operations/runbook.md](operations/runbook.md) |

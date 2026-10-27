@@ -1,0 +1,646 @@
+<!doctype html>
+<!-- Source of docs/Q-Stock_Project_Brief.pdf. Regenerate from the project root in Git Bash (headless Edge, A4):
+  "/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless=new --disable-gpu --no-pdf-header-footer --allow-file-access-from-files --print-to-pdf="$(pwd -W)/docs/Q-Stock_Project_Brief.pdf" "file:///$(pwd -W)/docs/Q-Stock_Project_Brief.html"
+  Figures are read from ../results/figures/. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Q-Stock — End-to-End Project Brief</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm;
+    @bottom-left { content: "Q-Stock · end-to-end project brief"; font: 8pt 'Segoe UI', sans-serif; color: #8a8f98; }
+    @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8pt 'Segoe UI', sans-serif; color: #8a8f98; } }
+  @page :first { @bottom-left { content: none; } @bottom-right { content: none; } }
+  :root { --ink:#14171c; --muted:#5b6270; --line:#dfe3ea; --soft:#f4f6f9; --accent:#2a5bd7; --accent2:#0f8a6a; --warn:#b5541b; }
+  * { box-sizing: border-box; }
+  body { font: 9.6pt/1.45 'Segoe UI', Inter, system-ui, sans-serif; color: var(--ink); margin: 0; background: #fff; }
+  h1 { font-size: 26pt; line-height: 1.1; margin: 0 0 6pt; letter-spacing: -0.5px; }
+  h2 { font-size: 15pt; margin: 0 0 8pt; padding-bottom: 4pt; border-bottom: 2px solid var(--accent); color: #0d1b3e; }
+  h3 { font-size: 11pt; margin: 12pt 0 5pt; color: #0d1b3e; }
+  h4 { font-size: 9.8pt; margin: 9pt 0 3pt; }
+  p { margin: 0 0 6pt; }
+  ul { margin: 0 0 6pt; padding-left: 15pt; } li { margin: 1.5pt 0; }
+  code, .mono { font-family: Consolas, 'Cascadia Mono', monospace; font-size: 8.4pt; background: var(--soft); padding: 0 2.5pt; border-radius: 2pt; }
+  pre { font: 8.2pt/1.4 Consolas, monospace; background: var(--soft); border: 1px solid var(--line); border-radius: 4pt; padding: 6pt 8pt; margin: 4pt 0 8pt; white-space: pre-wrap; }
+  table { width: 100%; border-collapse: collapse; margin: 4pt 0 9pt; font-size: 8.6pt; page-break-inside: auto; }
+  tr { page-break-inside: avoid; }
+  th { text-align: left; background: #eaf0fb; color: #0d1b3e; font-weight: 600; padding: 4pt 5pt; border-bottom: 1px solid #c9d4ea; }
+  td { padding: 3.5pt 5pt; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td code { font-size: 8pt; }
+  .section { page-break-before: always; }
+  .avoid { page-break-inside: avoid; }
+  .cover { height: 262mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .band { background: linear-gradient(135deg, #0d1b3e 0%, #2a5bd7 70%, #3aa3c7 100%); color: #fff; border-radius: 8pt; padding: 30pt 26pt; }
+  .band h1 { color: #fff; } .band .sub { font-size: 12pt; opacity: .92; margin-bottom: 14pt; }
+  .tag { display: inline-block; font-size: 8pt; border: 1px solid rgba(255,255,255,.55); border-radius: 10pt; padding: 1pt 7pt; margin: 0 4pt 4pt 0; }
+  .meta td { border: none; padding: 2pt 6pt 2pt 0; font-size: 9pt; } .meta td:first-child { color: var(--muted); width: 32mm; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7pt; }
+  .card { border: 1px solid var(--line); border-radius: 5pt; padding: 7pt 9pt; background: #fff; page-break-inside: avoid; }
+  .card h4 { margin-top: 0; }
+  .kpi { font-size: 15pt; font-weight: 700; color: var(--accent); line-height: 1.1; }
+  .kpi small { display: block; font-size: 7.8pt; font-weight: 400; color: var(--muted); margin-top: 2pt; }
+  .note { border-left: 3px solid var(--warn); background: #fdf4ee; padding: 5pt 8pt; margin: 6pt 0; font-size: 8.8pt; }
+  .ok { border-left: 3px solid var(--accent2); background: #eef8f4; padding: 5pt 8pt; margin: 6pt 0; font-size: 8.8pt; }
+  .muted { color: var(--muted); }
+  .toc td { border: none; padding: 2.2pt 0; font-size: 9.6pt; } .toc td:first-child { width: 9mm; color: var(--accent); font-weight: 600; }
+  figure { margin: 6pt 0 8pt; text-align: center; page-break-inside: avoid; }
+  figure img { max-width: 100%; max-height: 95mm; border: 1px solid var(--line); border-radius: 4pt; }
+  figcaption { font-size: 8pt; color: var(--muted); margin-top: 3pt; }
+  svg text { font-family: 'Segoe UI', sans-serif; }
+  .pill { display:inline-block; font-size:7.6pt; padding:0.5pt 5pt; border-radius:8pt; background:#eaf0fb; color:#0d1b3e; margin-right:3pt; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="band">
+    <div class="tag">CSE 465 · Principles of Big Data Management</div><div class="tag">SRM University–AP</div><div class="tag">Research target: Q1 journal</div>
+    <h1 style="margin-top:14pt">Q-Stock</h1>
+    <div class="sub">A Big Data framework for financial forecasting with classically simulated quantum walks on market-state graphs — end-to-end project brief: architecture, technology stack, code and usage of every element</div>
+    <div class="tag">R 4.6</div><div class="tag">Hadoop · MapReduce · Hive</div><div class="tag">Spark (sparklyr)</div><div class="tag">DuckDB · Parquet</div><div class="tag">CUDA (torch for R)</div><div class="tag">plumber API</div><div class="tag">React · three.js</div><div class="tag">Render · Vercel</div>
+  </div>
+
+  <div>
+    <table class="meta">
+      <tr><td>Repository</td><td>github.com/Nabisahebshaik/Q-Stock (branch <code>main</code>, commit <code>ba25e23</code>, 17 commits)</td></tr>
+      <tr><td>Live web UI</td><td>https://q-stock-pink.vercel.app</td></tr>
+      <tr><td>Live R API</td><td>https://q-stock-api.onrender.com (interactive docs at <code>/__docs__/</code>)</td></tr>
+      <tr><td>Markets</td><td>20 NSE (India) + 20 NASDAQ (US) large caps, daily data 2015-01-01 → 2026-10-21, plus live 1-minute data</td></tr>
+      <tr><td>Document date</td><td>27 October 2026</td></tr>
+      <tr><td>Scope statement</td><td>All quantum walks are <b>classical simulations</b> (dense/sparse linear algebra on CPU; CUDA only for a benchmark). No quantum hardware is used and no quantum speed-up is claimed. Synthetic data only validates software.</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Contents</h4>
+    <table class="toc">
+      <tr><td>1</td><td>Executive summary</td></tr>
+      <tr><td>2</td><td>End-to-end system flow</td></tr>
+      <tr><td>3</td><td>Technology stack and what each element is used for</td></tr>
+      <tr><td>4</td><td>Repository layout</td></tr>
+      <tr><td>5</td><td>Research method: graphs, quantum walks, features, evaluation</td></tr>
+      <tr><td>6</td><td>Code reference — R library (<code>R/</code>)</td></tr>
+      <tr><td>7</td><td>Code reference — pipeline scripts (<code>scripts/</code>)</td></tr>
+      <tr><td>8</td><td>Big Data layer — HDFS, MapReduce, Hive, Spark</td></tr>
+      <tr><td>9</td><td>Storage — files, DuckDB, Parquet, SQLite</td></tr>
+      <tr><td>10</td><td>Serving — R API, Shiny dashboard, React web UI, chart workspace</td></tr>
+      <tr><td>11</td><td>Testing and quality</td></tr>
+      <tr><td>12</td><td>Deployment and operations</td></tr>
+      <tr><td>13</td><td>Results (headline numbers)</td></tr>
+      <tr><td>14</td><td>Key engineering decisions, limitations, open items</td></tr>
+      <tr><td>15</td><td>Development timeline and Claude workspace setup</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 1 SUMMARY ============ -->
+<div class="section">
+<h2>1 · Executive summary</h2>
+<p><b>Question.</b> Do quantum walks — run on graphs of how stocks move together — carry information that helps forecast markets, beyond what their classical counterparts and simple baselines already provide?</p>
+<p><b>Approach.</b> Every trading day, Q-Stock builds a correlation network of 20 stocks per market. It runs classical diffusions and quantum walks (DTQW, CTQW and a <i>quantum stochastic walk</i> whose dial ω moves smoothly from fully quantum, ω = 0, to fully classical, ω = 1) on the same graph, turns the walk distributions into per-stock features, and tests them under a leakage-controlled, pre-registered walk-forward protocol with proper statistics.</p>
+<p><b>System.</b> Around this research core sits a complete Big Data and product stack: HDFS + Java MapReduce + Hive on a Cloudera VM, Spark through sparklyr, GPU benchmarks with CUDA, a DuckDB/Parquet live-data store, an R REST API, a Shiny dashboard and a TradingView-style React web app deployed free on Render and Vercel.</p>
+
+<div class="grid3" style="margin:8pt 0">
+  <div class="card"><div class="kpi">No beat<small>Next-day direction: no feature set beats a naive base-rate predictor in either market (log-loss 0.6930 NSE / 0.6921 NASDAQ).</small></div></div>
+  <div class="card"><div class="kpi">ω ≈ 0.25 wins<small>NASDAQ 5-day volatility: partially coherent QSW beats its classical limit (Holm p = 4.8×10⁻⁶); not on NSE.</small></div></div>
+  <div class="card"><div class="kpi">GHAR best<small>A simple classical graph-HAR model is as good or better; QSW features add nothing on top of it.</small></div></div>
+  <div class="card"><div class="kpi">5,680 groups<small>Java MapReduce output matches R exactly (max error 1.8×10⁻¹⁵); Hive consistency query 0 mismatches.</small></div></div>
+  <div class="card"><div class="kpi">430×<small>CUDA float32 CTQW at N = 1,600 vs base R (0.145 s vs 62.3 s).</small></div></div>
+  <div class="card"><div class="kpi">6.6 s → 0.09 s<small>Cold chart load after moving live candles to DuckDB and serving charts from the store.</small></div></div>
+</div>
+
+<p><b>Bottom line.</b> Quantum coherence measurably changes how a walk spreads over the market graph, and on NASDAQ an intermediate level of coherence gives slightly better volatility features than the classical limit of the same walk. But no quantum-walk feature set improves on simple classical baselines. The evaluation had the power to detect weak signals (power analysis), so this is an informative negative result about practical quantum advantage — the project's research contribution is the controlled quantum-to-classical audit itself.</p>
+
+<h3>Status (27 Oct 2026)</h3>
+<ul>
+  <li>All planned experiments complete; results in <code>docs/results/</code>, every number traceable to <code>results/tables/*.csv</code>.</li>
+  <li>Web app and API deployed and verified; checkpoint tag <code>checkpoint-2026-10-25</code>.</li>
+  <li>Tests: 61 testthat blocks / 357 expectations, 34 API end-to-end checks, Shiny server tests, TypeScript type-check, lint and build — all passing.</li>
+  <li>Open: observe 5-second bars during market hours; Render memory check; manuscript writing paused until requested.</li>
+</ul>
+</div>
+
+<!-- ============ 2 FLOW ============ -->
+<div class="section">
+<h2>2 · End-to-end system flow</h2>
+<p>The project has three faces that share one R computation library (<code>R/</code>): the <b>research pipeline</b> (batch), the <b>Big Data layer</b> (course component) and the <b>serving layer</b> (live product). Every entry point — scripts, tests, Shiny, the API and the Docker image — sources all of <code>R/*.R</code> and the shared configuration <code>QS</code>.</p>
+
+<svg viewBox="0 0 720 430" width="100%" style="margin:4pt 0 6pt">
+  <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#5b6270"/></marker></defs>
+  <style>.b{fill:#fff;stroke:#9fb2da;stroke-width:1.2;rx:7} .h{font-size:11px;font-weight:600;fill:#0d1b3e} .t{font-size:9.2px;fill:#3b4250} .l{stroke:#5b6270;stroke-width:1.2;fill:none;marker-end:url(#a)} .g{fill:#f4f7fd;stroke:#dfe6f5;rx:10} .gt{font-size:10px;font-weight:700;fill:#2a5bd7;letter-spacing:.5px}</style>
+  <rect class="g" x="5" y="5" width="140" height="420"/><text class="gt" x="15" y="22">SOURCES</text>
+  <rect class="g" x="155" y="5" width="270" height="420"/><text class="gt" x="165" y="22">RESEARCH + BIG DATA (laptop + VM)</text>
+  <rect class="g" x="435" y="5" width="280" height="420"/><text class="gt" x="445" y="22">SERVING + DEPLOYMENT</text>
+
+  <rect class="b" x="15" y="40" width="120" height="58"/><text class="h" x="25" y="58">Yahoo chart API</text><text class="t" x="25" y="73">daily OHLCV 2015–2026</text><text class="t" x="25" y="86">1-minute live bars</text>
+  <rect class="b" x="15" y="115" width="120" height="48"/><text class="h" x="25" y="133">GDELT DOC 2.0</text><text class="t" x="25" y="148">news tone (21/40 done)</text>
+  <rect class="b" x="15" y="180" width="120" height="48"/><text class="h" x="25" y="198">Synthetic GARCH</text><text class="t" x="25" y="213">software tests only</text>
+
+  <rect class="b" x="165" y="40" width="250" height="62"/><text class="h" x="175" y="58">Ingest + clean  (R/data_adapter.R)</text><text class="t" x="175" y="73">holiday bars, NA-safe windows, CSV cache</text><text class="t" x="175" y="86">→ Parquet cache (identical(), 31× faster)</text>
+  <rect class="b" x="165" y="115" width="250" height="74"/><text class="h" x="175" y="133">Features (R/features, market_graph, qsw)</text><text class="t" x="175" y="148">60-day correlation kNN graph per date</text><text class="t" x="175" y="161">rw · heat · ppr · DTQW · CTQW · QSW(ω)</text><text class="t" x="175" y="174">self / mom / ent / volspill features</text>
+  <rect class="b" x="165" y="202" width="250" height="62"/><text class="h" x="175" y="220">Walk-forward experiments (scripts 05–23)</text><text class="t" x="175" y="235">embargo · DM + Holm · bootstrap · MCS</text><text class="t" x="175" y="248">HAR, GHAR, logit, RF, LightGBM, GPU MLP</text>
+  <rect class="b" x="165" y="277" width="120" height="74"/><text class="h" x="175" y="295">Cloudera VM</text><text class="t" x="175" y="310">HDFS (WebHDFS)</text><text class="t" x="175" y="323">Java MapReduce</text><text class="t" x="175" y="336">Hive tables/queries</text>
+  <rect class="b" x="295" y="277" width="120" height="74"/><text class="h" x="305" y="295">Spark 3.5 local</text><text class="t" x="305" y="310">via sparklyr</text><text class="t" x="305" y="323">7.49 M rows, 4.8 s</text><text class="t" x="305" y="336">cross-check vs R</text>
+  <rect class="b" x="165" y="364" width="250" height="50"/><text class="h" x="175" y="382">results/ tables · figures · logs → docs/</text><text class="t" x="175" y="397">every reported number traces to a CSV</text>
+
+  <rect class="b" x="445" y="40" width="260" height="74"/><text class="h" x="455" y="58">Live pipeline (R/live_market.R, R/bars.R)</text><text class="t" x="455" y="73">60 s Yahoo poll · curl multi · sessions/DST</text><text class="t" x="455" y="86">tick aggregator → snapshot-built 5 s bars</text><text class="t" x="455" y="99">DuckDB hot store + Parquet history</text>
+  <rect class="b" x="445" y="127" width="260" height="62"/><text class="h" x="455" y="145">R plumber REST API (api/plumber.R)</text><text class="t" x="455" y="160">/api/live · candles · bars · graph · dial</text><text class="t" x="455" y="173">forecast · results · bench · status</text>
+  <rect class="b" x="445" y="202" width="125" height="62"/><text class="h" x="455" y="220">Shiny dashboard</text><text class="t" x="455" y="235">app/app.R :8050</text><text class="t" x="455" y="248">7 tabs, R-native</text>
+  <rect class="b" x="580" y="202" width="125" height="62"/><text class="h" x="590" y="220">React web UI</text><text class="t" x="590" y="235">three.js graph</text><text class="t" x="590" y="248">TradingView chart</text>
+  <rect class="b" x="445" y="277" width="125" height="74"/><text class="h" x="455" y="295">Render (free)</text><text class="t" x="455" y="310">Docker, rocker R</text><text class="t" x="455" y="323">0.1 CPU · 512 MB</text><text class="t" x="455" y="336">q-stock-api</text>
+  <rect class="b" x="580" y="277" width="125" height="74"/><text class="h" x="590" y="295">Vercel (free)</text><text class="t" x="590" y="310">static SPA</text><text class="t" x="590" y="323">snapshot fallback</text><text class="t" x="590" y="336">q-stock-pink</text>
+  <rect class="b" x="445" y="364" width="260" height="50"/><text class="h" x="455" y="382">Viewer's browser</text><text class="t" x="455" y="397">live JSON from Render · saved snapshot while it sleeps</text>
+
+  <path class="l" d="M135,69 L165,69"/><path class="l" d="M135,139 L165,150"/><path class="l" d="M290,102 L290,115"/><path class="l" d="M290,189 L290,202"/>
+  <path class="l" d="M225,264 L225,277"/><path class="l" d="M355,264 L355,277"/><path class="l" d="M290,264 L290,364"/>
+  <path class="l" d="M135,48 L150,48 L150,32 L432,32 L432,62 L445,62"/><path class="l" d="M575,114 L575,127"/><path class="l" d="M505,189 L505,202"/><path class="l" d="M640,189 L640,202"/>
+  <path class="l" d="M415,388 C 430,388 430,160 445,158"/><path class="l" d="M507,264 L507,277"/><path class="l" d="M642,264 L642,277"/><path class="l" d="M642,351 L642,364"/><path class="l" d="M507,351 L507,364"/>
+</svg>
+
+<h3>How a piece of data travels</h3>
+<table>
+  <tr><th style="width:24%">Stage</th><th>What happens</th><th style="width:26%">Code</th></tr>
+  <tr><td>1 · Acquire</td><td>Yahoo daily OHLCV for 40 tickers is downloaded once and cached; live 1-minute bars are polled every 60 s for viewing only.</td><td><code>R/data_adapter.R</code>, <code>R/live_market.R</code></td></tr>
+  <tr><td>2 · Clean</td><td>Holiday bars dropped, NA-safe rolling windows, extreme moves flagged (not silently removed); quality report written.</td><td><code>clean_prices()</code>, <code>results/data_quality_report.txt</code></td></tr>
+  <tr><td>3 · Graph</td><td>For each market and date: 60-day trailing correlations → symmetrised k = 4 nearest-neighbour graph → Laplacian.</td><td><code>R/market_graph.R</code></td></tr>
+  <tr><td>4 · Walk</td><td>Six processes run on the same graph from every start node, giving a distribution matrix P.</td><td><code>R/dtqw.R</code>, <code>R/ctqw.R</code>, <code>R/qsw.R</code></td></tr>
+  <tr><td>5 · Features</td><td>Identical node features from every P (return probability, momentum spillover, entropy, volatility spillover) joined with classical features and targets.</td><td><code>R/qsw_features.R</code>, <code>R/dataset.R</code></td></tr>
+  <tr><td>6 · Evaluate</td><td>Monthly walk-forward with an embargo; models fitted on the past only; DM tests with Holm correction, bootstrap CIs, MCS, power analysis.</td><td><code>R/walk_forward.R</code>, <code>R/evaluation.R</code></td></tr>
+  <tr><td>7 · Scale out</td><td>Same data stored in HDFS, aggregated by MapReduce, queried in Hive and recomputed in Spark — all cross-checked against R.</td><td><code>hadoop/</code>, <code>hive/</code>, <code>scripts/03–04</code></td></tr>
+  <tr><td>8 · Report</td><td>Tables (CSV + Markdown) and 300-dpi figures feed the docs and manuscript.</td><td><code>scripts/08</code>, <code>12</code>; <code>docs/results/</code></td></tr>
+  <tr><td>9 · Serve</td><td>The API computes live graphs, the quantum dial, forecasts and chart bars; React and Shiny render them; Render and Vercel host them.</td><td><code>api/</code>, <code>app/</code>, <code>web/</code>, <code>deploy/</code></td></tr>
+</table>
+</div>
+
+<!-- ============ 3 STACK ============ -->
+<div class="section">
+<h2>3 · Technology stack and what each element is used for</h2>
+<p class="muted">Versions are the ones installed on the development laptop (R packages) or pinned in <code>web/package.json</code> / the Dockerfiles.</p>
+
+<h3>3.1 Languages and runtimes</h3>
+<table>
+  <tr><th style="width:22%">Element</th><th style="width:16%">Version</th><th>Used for</th></tr>
+  <tr><td>R</td><td>4.6.1 (laptop), 4.4.2 (Docker)</td><td>All analysis: data, graphs, quantum-walk simulation, models, statistics, API, dashboard. A course rule: no Python/PySpark.</td></tr>
+  <tr><td>Java</td><td>JDK 1.7 (VM), Temurin 17 (host)</td><td>The MapReduce job (Hadoop's native language); Java 17 runs local Spark.</td></tr>
+  <tr><td>HiveQL</td><td>Hive 1.1 (CDH 5.13)</td><td>External tables, window-function queries and consistency checks.</td></tr>
+  <tr><td>TypeScript</td><td>5.6</td><td>The React web UI; types mirror the API contract.</td></tr>
+  <tr><td>Bash / PowerShell</td><td>Git Bash, PS 5.1</td><td>Overnight job chains, VM start-up, thermal guard, system monitor, skill packaging.</td></tr>
+  <tr><td>SQL (DuckDB / SQLite)</td><td>DuckDB 1.5.6</td><td>Candle upserts, intraday roll-ups, Parquet export and pruning.</td></tr>
+</table>
+
+<h3>3.2 R packages</h3>
+<table>
+  <tr><th style="width:18%">Package</th><th style="width:10%">Version</th><th>Used for</th><th style="width:24%">Where</th></tr>
+  <tr><td>base R, stats</td><td>4.6.1</td><td>Linear algebra (eigen, matrix products), OLS/logit, RK4 integration of the Lindblad equation</td><td><code>R/</code> throughout</td></tr>
+  <tr><td>Matrix</td><td>1.7.5</td><td>Sparse DTQW operators for large graphs (benchmarked to N = 1,600)</td><td><code>R/dtqw.R</code></td></tr>
+  <tr><td>ranger</td><td>0.18.0</td><td>Random-forest direction classifier (v1)</td><td><code>scripts/05</code>, <code>06</code></td></tr>
+  <tr><td>glmnet</td><td>5.1</td><td>Elastic-net volatility model with nested tuning</td><td><code>scripts/20</code></td></tr>
+  <tr><td>lightgbm</td><td>4.7.0</td><td>Nonlinear gradient-boosted forecaster, nested validation</td><td><code>scripts/21</code></td></tr>
+  <tr><td>torch (CUDA)</td><td>0.17.0</td><td>GPU benchmark of CTQW/DTQW; QLIKE-trained MLP on the RTX 4060</td><td><code>scripts/13</code>, <code>18</code></td></tr>
+  <tr><td>sparklyr + dplyr</td><td>1.9.6</td><td>Driving Spark 3.5: window features, point-in-time range join, scaling runs</td><td><code>scripts/04</code></td></tr>
+  <tr><td>duckdb + DBI</td><td>1.5.6 / 1.3.0</td><td>Live candle store, intraday roll-ups, Parquet read/write, price cache</td><td><code>R/store_duckdb.R</code>, <code>R/bars.R</code></td></tr>
+  <tr><td>RSQLite</td><td>3.53.3</td><td>Original candle store, kept as rollback backend</td><td><code>R/live_market.R</code></td></tr>
+  <tr><td>curl, jsonlite</td><td>8.1.0 / 2.0.0</td><td>Concurrent Yahoo/GDELT downloads (curl multi), JSON parsing and API output</td><td><code>R/data_adapter.R</code>, <code>live_market.R</code></td></tr>
+  <tr><td>plumber</td><td>1.3.3</td><td>REST API, static file serving, hooks (timing, cache headers), CORS filter</td><td><code>api/plumber.R</code></td></tr>
+  <tr><td>shiny, bslib, DT, plotly, visNetwork</td><td>1.14 / 0.12 / … / 4.12 / 2.1</td><td>R-native dashboard: tabs, tables, candlesticks, network graphs</td><td><code>app/app.R</code></td></tr>
+  <tr><td>ggplot2</td><td>4.0.3</td><td>Research figures (300 dpi)</td><td><code>scripts/08</code>, <code>12</code></td></tr>
+  <tr><td>testthat, callr, httr</td><td>3.3.2</td><td>Unit tests; background API process and HTTP checks in end-to-end tests</td><td><code>tests/</code></td></tr>
+  <tr><td>bench, chromote</td><td>1.1.4 / 0.5.1</td><td>Timing benchmarks; headless-Edge screenshots of the dashboard and web UI</td><td><code>scripts/07</code>, <code>22</code>, <code>24</code>, <code>31</code></td></tr>
+</table>
+
+<h3>3.3 Big Data platform</h3>
+<table>
+  <tr><th style="width:22%">Element</th><th style="width:18%">Version</th><th>Used for</th></tr>
+  <tr><td>Cloudera QuickStart VM</td><td>CDH 5.13, CentOS 6.7</td><td>The lab environment: 8 GB RAM, 4 vCPU in VirtualBox 7.2, reached over NAT-forwarded SSH (port 2222).</td></tr>
+  <tr><td>HDFS (WebHDFS REST)</td><td>Hadoop 2.6</td><td>Stores curated prices, code, experiment results and predictions under <code>/user/cloudera/qstock</code>.</td></tr>
+  <tr><td>YARN + MapReduce</td><td>2.6</td><td>Runs the Java job computing per ticker-month statistics with a combiner and 2 reducers.</td></tr>
+  <tr><td>Hive + HiveServer2 + Metastore (MySQL)</td><td>1.1</td><td>External tables over HDFS CSVs; analytic queries via beeline.</td></tr>
+  <tr><td>ZooKeeper, Cloudera Manager REST v18</td><td>CDH 5.13</td><td>Service coordination; starting services programmatically after each boot.</td></tr>
+  <tr><td>Apache Spark (local)</td><td>3.5.9, <code>local[8]</code></td><td>Distributed-style feature engineering through sparklyr (the VM's Spark 1.6 is incompatible with sparklyr).</td></tr>
+  <tr><td>winutils.exe / hadoop.dll</td><td>Hadoop 3.3.6 build</td><td>Hadoop native IO for Spark on Windows (third-party binaries, hashes recorded).</td></tr>
+</table>
+
+<h3>3.4 Web front end (<code>web/package.json</code>)</h3>
+<table>
+  <tr><th style="width:24%">Library</th><th style="width:11%">Version</th><th>Used for</th></tr>
+  <tr><td>React + React DOM</td><td>18.3.1</td><td>Single-page app with four pages (Live market, Quantum dial, Research, Pipeline)</td></tr>
+  <tr><td>Vite</td><td>5.4</td><td>Dev server and builds in three modes: local live, static snapshot, remote live (Vercel)</td></tr>
+  <tr><td>Tailwind CSS + PostCSS</td><td>3.4.14</td><td>Styling with CSS variables for light/dark themes</td></tr>
+  <tr><td>TanStack Query</td><td>5.59</td><td>API calls, polling (2 s / 60 s / 30 min), caching, keep-previous-data, fallback to snapshot</td></tr>
+  <tr><td>three.js, @react-three/fiber, drei, postprocessing</td><td>0.169 / 8.17 / 9.114 / 2.16</td><td>3D quantum market graph with glow, particles along edges</td></tr>
+  <tr><td>d3-force-3d</td><td>3.0.5</td><td>Force-directed 3D layout of the 20-stock graph</td></tr>
+  <tr><td>lightweight-charts</td><td>4.2.0</td><td>TradingView-style candles, volume and RSI bands, overlays; drawing tools via series primitives</td></tr>
+  <tr><td>recharts</td><td>2.13</td><td>Research and dial charts (entry animation disabled — it rendered blank)</td></tr>
+  <tr><td>framer-motion, lucide-react</td><td>11.11 / 0.453</td><td>Transitions; toolbar and menu icons</td></tr>
+  <tr><td>ESLint, typescript-eslint</td><td>9.x / 8.x</td><td>Lint (react-hooks rules)</td></tr>
+</table>
+
+<h3>3.5 Hosting and tooling</h3>
+<table>
+  <tr><th style="width:22%">Element</th><th>Used for</th></tr>
+  <tr><td>Docker (<code>rocker/r-ver:4.4.2</code>)</td><td>API container image; duckdb pinned to 1.5.6 from a dated Posit Package Manager binary snapshot.</td></tr>
+  <tr><td>Render (free web service)</td><td>Hosts the R API from <code>render.yaml</code> (Singapore, 0.1 CPU, 512 MB, sleeps after 15 min, auto-deploys from <code>main</code>).</td></tr>
+  <tr><td>Vercel</td><td>Hosts the built web UI from <code>web/vercel.json</code>; cache headers; bundled snapshot data for fallback.</td></tr>
+  <tr><td>Hugging Face Spaces (kept)</td><td>Alternative Docker bundle (<code>deploy/hf-space</code>), unused since Spaces became paid.</td></tr>
+  <tr><td>GitHub</td><td>Source of truth; Render and Vercel deploy on push; deploy statuses reported back.</td></tr>
+  <tr><td>NVIDIA RTX 4060 Laptop (8 GB)</td><td>CUDA benchmark and MLP training only; experiments on 20-node graphs run on CPU.</td></tr>
+  <tr><td>Claude Code / Cowork</td><td>Development assistant: <code>CLAUDE.md</code> rules, 10 project skills, parallel agents for independent work streams.</td></tr>
+</table>
+</div>
+
+<!-- ============ 4 LAYOUT ============ -->
+<div class="section">
+<h2>4 · Repository layout</h2>
+<table>
+  <tr><th style="width:15%">Folder</th><th style="width:15%">Size</th><th>Contents and role</th></tr>
+  <tr><td><code>R/</code></td><td>19 files · 2,016 lines</td><td>The computation library shared by every entry point: data, graphs, walks, features, evaluation, live market, storage, bars and indicators.</td></tr>
+  <tr><td><code>scripts/</code></td><td>40 files · 2,285 lines</td><td>Numbered pipeline steps 01–31, overnight orchestration shells, thermal guard and monitoring.</td></tr>
+  <tr><td><code>tests/</code></td><td>14 files · 993 lines</td><td>testthat unit tests, API end-to-end test, Shiny server test.</td></tr>
+  <tr><td><code>api/</code></td><td>2 files · 423 lines + JSON</td><td>plumber REST API, launcher, exported GHAR coefficients, precomputed dial payloads.</td></tr>
+  <tr><td><code>app/</code></td><td>1 file · 340 lines</td><td>Shiny dashboard.</td></tr>
+  <tr><td><code>web/</code></td><td>29 source files · 3,113 lines</td><td>React + TypeScript UI (pages, 3D graph, chart workspace, drawing tools), build scripts, snapshot data.</td></tr>
+  <tr><td><code>hadoop/</code>, <code>hive/</code></td><td>3 + 4 files · 310 lines</td><td>Java MapReduce job, VM start-up / HDFS fix scripts; HiveQL DDL and queries.</td></tr>
+  <tr><td><code>deploy/</code>, <code>render.yaml</code></td><td>—</td><td>Render and Hugging Face Dockerfiles; Render Blueprint.</td></tr>
+  <tr><td><code>results/</code></td><td>tables, figures, logs</td><td>Every reported number (CSV + Markdown), 9 figures, run logs, screenshots, session info.</td></tr>
+  <tr><td><code>data/</code></td><td>git-ignored</td><td><code>raw/</code> (Yahoo, GDELT cache), <code>curated/</code> (features RDS, prices Parquet), <code>live/</code> (DuckDB, Parquet, SQLite), <code>synthetic/</code>.</td></tr>
+  <tr><td><code>docs/</code></td><td>architecture, design, research, results, operations, course</td><td>Architecture and design documents, pre-registration, novelty audit, results, runbook, issues log, hand-off, CO mapping.</td></tr>
+  <tr><td><code>paper/</code></td><td>1 file</td><td>Manuscript draft (framed as a pre-registered quantum-to-classical audit).</td></tr>
+  <tr><td><code>.claude/</code>, <code>CLAUDE.md</code></td><td>10 skills</td><td>Instructions and reusable workflows for Claude sessions.</td></tr>
+</table>
+</div>
+
+<!-- ============ 5 METHOD ============ -->
+<div class="section">
+<h2>5 · Research method</h2>
+<h3>5.1 Market-state graph (per market, per trading day t)</h3>
+<ol>
+  <li>Daily log returns; Pearson correlations over the trailing 60 days ending at t (all known at the close of t). A stock joins the graph only if ≥ 80% of the window is observed.</li>
+  <li>Each stock links to its 4 most-correlated peers; links are symmetrised. Edge weight = max(ρ, 0.01).</li>
+  <li>Graph Laplacian L = D − W. A <b>random-graph control</b> replaces ρ with random values before the same kNN step, separating "network structure" from "pooling across stocks".</li>
+</ol>
+
+<h3>5.2 Walk processes (all on the same graph, started from every node)</h3>
+<table>
+  <tr><th style="width:18%">Process</th><th>Definition</th><th style="width:22%">Code</th></tr>
+  <tr><td>Random walk (rw)</td><td>Transition D⁻¹W, averaged over steps 1–10</td><td><code>walk_distributions()</code></td></tr>
+  <tr><td>Heat kernel</td><td>exp(−τL), averaged over a 10-point τ grid in (0, 2]</td><td><code>walk_distributions()</code></td></tr>
+  <tr><td>Personalised PageRank</td><td>(1−α)(I − αT)⁻¹, α = 0.85</td><td><code>walk_distributions()</code></td></tr>
+  <tr><td>DTQW</td><td>Grover-coin discrete-time quantum walk on the arc space of the graph (dense and sparse)</td><td><code>R/dtqw.R</code></td></tr>
+  <tr><td>CTQW</td><td>|exp(−iτL)|², the closed quantum walk</td><td><code>R/ctqw.R</code></td></tr>
+  <tr><td>QSW(ω)</td><td>Lindblad master equation interpolating quantum (ω = 0) ↔ classical (ω = 1)</td><td><code>R/qsw.R</code></td></tr>
+</table>
+<pre>dρ/dt = −(1−ω)·i[H, ρ] + ω·Σ<sub>i≠j</sub> γ<sub>ij</sub> ( L<sub>ij</sub> ρ L<sub>ij</sub>† − ½{L<sub>ij</sub>† L<sub>ij</sub>, ρ} ),   H = L,  L<sub>ij</sub> = |i⟩⟨j|,  γ<sub>ij</sub> = W<sub>ij</sub></pre>
+<p>The QSW is integrated with RK4 (step 0.02) for all start states at once as an N×N×N complex array; the dissipator is computed in closed form (diag(W·p) and diag(d)), avoiding N² jump operators. Unit tests verify that ω = 0 reproduces the CTQW and ω = 1 the heat kernel to 10⁻⁶. The pre-registered grid is ω ∈ {0, 0.1, 0.25, 0.5, 0.75, 0.9, 1}.</p>
+
+<h3>5.3 Features and targets</h3>
+<table>
+  <tr><th style="width:22%">Feature</th><th>Meaning</th></tr>
+  <tr><td><code>self</code></td><td>P[i, i] — how much of the walk returns to the stock (localisation)</td></tr>
+  <tr><td><code>mom</code></td><td>Walk-weighted mean of neighbours' z-scored 5-day returns (momentum spillover)</td></tr>
+  <tr><td><code>ent</code></td><td>Shannon entropy of P[i, ·] — how widely influence spreads</td></tr>
+  <tr><td><code>volspill</code></td><td>Walk-weighted mean of neighbours' log 5-day realised variance (volatility spillover)</td></tr>
+  <tr><td>Classical</td><td>ret_1, ret_5, ret_20, vol_10, vol_20, range, log_vol_z; HAR terms (log RV over 1, 5, 22 days); GHAR adds neighbour averages of the HAR terms</td></tr>
+</table>
+<p><b>Targets:</b> T1 (primary) log of next-5-day realised variance; T2 next-day direction; T3 cross-sectional rank IC.</p>
+
+<h3>5.4 Evaluation protocol</h3>
+<ul>
+  <li><b>Walk-forward:</b> 24-month rolling training window, one test month per fold (2017-03 → 2026-10). Training rows whose label is revealed inside the test month are dropped (embargo). Scaling and tuning use training data only; nested tuning uses the last 6 months of the training window.</li>
+  <li><b>Leakage tests:</b> future rows are perturbed and features asserted unchanged.</li>
+  <li><b>Statistics:</b> Diebold–Mariano with Newey–West variance; Holm within pre-registered families, Benjamini–Hochberg for ablations; stationary bootstrap CIs (block 20, 1,000 reps); Model Confidence Set (B = 2,000); exact linear SHAP; power analysis with injected signals.</li>
+  <li><b>Pre-registration:</b> hypotheses H1–H4, ω grid, targets and corrections fixed in <code>docs/research/preregistration_v2.md</code> before any v2 run; everything else labelled exploratory.</li>
+</ul>
+</div>
+
+<!-- ============ 6 R LIBRARY ============ -->
+<div class="section">
+<h2>6 · Code reference — R library (<code>R/</code>)</h2>
+<table>
+  <tr><th style="width:16%">File</th><th style="width:34%">Responsibility</th><th style="width:30%">Key functions</th><th>Used by</th></tr>
+  <tr><td><code>config.R</code></td><td>Dates, the 40-stock universe, graph and walk-forward settings, column groups</td><td><code>QS</code>, <code>CLASSICAL_COLS</code>, <code>GRAPH_METHODS</code>, <code>graph_cols()</code></td><td>everything</td></tr>
+  <tr><td><code>data_adapter.R</code></td><td>Yahoo download and parsing; cleaning; CSV cache; Parquet price cache (identical to CSV)</td><td><code>fetch_yahoo_daily</code>, <code>clean_prices</code>, <code>load_market_data</code>, <code>write/read_prices_parquet</code></td><td>scripts, API, Shiny</td></tr>
+  <tr><td><code>synthetic_data.R</code></td><td>GARCH price simulator for software validation</td><td><code>simulate_garch_prices</code></td><td>tests, stage 1</td></tr>
+  <tr><td><code>features.R</code></td><td>Classical per-stock features with past-only windows</td><td><code>trailing_mean</code>, <code>trailing_sd</code>, <code>build_features</code></td><td>scripts 02</td></tr>
+  <tr><td><code>market_graph.R</code></td><td>kNN correlation graph; classical and quantum walk distributions; node features</td><td><code>knn_graph</code>, <code>walk_distributions</code>, <code>node_features_from_P</code>, <code>returns_wide</code></td><td>scripts, API, Shiny</td></tr>
+  <tr><td><code>dtqw.R</code></td><td>Grover DTQW on graph arcs (dense + sparse) and on a cycle</td><td><code>dtqw_graph_operator(_sparse)</code>, <code>dtqw_evolve</code>, <code>is_unitary</code></td><td>features, benchmarks</td></tr>
+  <tr><td><code>ctqw.R</code></td><td>Continuous-time quantum walk with H = L</td><td><code>ctqw_propagator</code>, <code>ctqw_probs</code>, <code>is_hermitian</code></td><td>features, benchmarks</td></tr>
+  <tr><td><code>qsw.R</code></td><td>Quantum stochastic walk (Lindblad), batched RK4, exact limits</td><td><code>qsw_rhs</code>, <code>qsw_distributions</code>, <code>qsw_trace</code>, <code>qsw_purity</code></td><td>v2 features, API dial</td></tr>
+  <tr><td><code>qsw_features.R</code></td><td>v2 QSW features per ω, GHAR regressors, RV targets</td><td><code>qsw_features_market</code>, <code>ghar_features_market</code>, <code>build_vol_targets</code></td><td>scripts 10–23</td></tr>
+  <tr><td><code>sentiment_gdelt.R</code></td><td>GDELT tone timelines, per-ticker cache, point-in-time decay features</td><td><code>gdelt_timeline</code>, <code>sentiment_features</code></td><td>sentiment chain (RQ5)</td></tr>
+  <tr><td><code>dataset.R</code></td><td>Modelling table: features, regimes, fusion interactions</td><td><code>build_dataset</code>, <code>add_regime</code></td><td>scripts 02, 05</td></tr>
+  <tr><td><code>walk_forward.R</code></td><td>Monthly folds, embargoed split, train-only scaling, fit/predict loop</td><td><code>walk_forward_folds</code>, <code>wf_split</code>, <code>walk_forward(_reg)</code></td><td>all experiments</td></tr>
+  <tr><td><code>baseline_logit.R</code></td><td>Stage-1 chronological logistic baseline</td><td><code>chrono_split</code>, <code>fit_logit_baseline</code></td><td>stage 1</td></tr>
+  <tr><td><code>evaluation.R</code></td><td>Metrics, backtest, DM test, bootstrap, Holm/BH, QLIKE, rank IC</td><td><code>dm_test</code>, <code>stationary_boot_ci</code>, <code>holm_adjust</code>, <code>qlike</code></td><td>all experiments</td></tr>
+  <tr><td><code>hadoop_bridge.R</code></td><td>WebHDFS REST client and VM SSH helper</td><td><code>hdfs_put</code>, <code>hdfs_ls</code>, <code>hdfs_get_text</code>, <code>vm_ssh</code></td><td>script 03</td></tr>
+  <tr><td><code>live_market.R</code></td><td>Exchange sessions, Yahoo 1-min polling, candle-store dispatch, tick aggregator, live graph, live GHAR forecast, snapshot fetcher</td><td><code>market_status</code>, <code>fetch_intraday_many</code>, <code>candle_upsert</code>, <code>tick_aggregator</code>, <code>live_graph</code>, <code>ghar_live_forecast</code></td><td>API, Shiny</td></tr>
+  <tr><td><code>store_duckdb.R</code></td><td>DuckDB candle store: bulk idempotent upsert, range reads, Parquet export, version-portable driver</td><td><code>duck_drv</code>, <code>duck_store_open</code>, <code>duck_upsert</code>, <code>duck_read</code>, <code>duck_export_parquet</code></td><td>API, Shiny, scripts 29–31</td></tr>
+  <tr><td><code>bars.R</code></td><td>Chart bars: intraday roll-ups (DuckDB SQL and base R), daily/weekly/monthly roll-ups, range rules, snapshot-built 5 s bars</td><td><code>rollup_intraday_duck</code>, <code>rollup_daily</code>, <code>range_start</code>, <code>snapshot_tick</code>, <code>snapshot_bars</code></td><td><code>/api/bars</code></td></tr>
+  <tr><td><code>indicators.R</code></td><td>Technical indicators computed in R with warm-up history; request validation</td><td><code>sma</code>, <code>ema</code>, <code>bollinger</code>, <code>rsi</code>, <code>vwap_session</code>, <code>parse_ind_spec</code>, <code>compute_indicators</code></td><td><code>/api/bars</code></td></tr>
+</table>
+</div>
+
+<!-- ============ 7 SCRIPTS ============ -->
+<div class="section">
+<h2>7 · Code reference — pipeline scripts (<code>scripts/</code>)</h2>
+<table>
+  <tr><th style="width:24%">Script</th><th>Purpose</th><th style="width:27%">Main output</th></tr>
+  <tr><td><code>01_stage1_prototype.R</code></td><td>DTQW/CTQW demos and a classical logistic baseline</td><td><code>results/stage1_*</code></td></tr>
+  <tr><td><code>02_build_dataset.R</code></td><td>Real data → cleaned prices → classical + graph-walk features</td><td><code>data/curated/dataset_graph.rds</code></td></tr>
+  <tr><td><code>03_hadoop_hive.R</code></td><td>HDFS upload, MapReduce run, Hive tables and queries (needs the VM)</td><td><code>hive_*.tsv</code>, stage-3 log</td></tr>
+  <tr><td><code>04_spark_sparklyr.R</code></td><td>Spark window features, point-in-time join, scaling, R cross-check</td><td><code>spark_scaling.csv</code></td></tr>
+  <tr><td><code>05_experiments.R</code>, <code>05b</code></td><td>v1 direction experiments; naive base-rate reference</td><td><code>experiment_results.csv</code></td></tr>
+  <tr><td><code>06_ablations.R</code></td><td>Ablations and hyper-parameters</td><td><code>ablation_results.csv</code></td></tr>
+  <tr><td><code>07_scalability.R</code></td><td>CPU scalability of the walk simulations</td><td><code>qw_scalability.csv</code></td></tr>
+  <tr><td><code>08_figures.R</code>, <code>12_figures_v2.R</code></td><td>300-dpi figures and Markdown tables</td><td><code>results/figures/</code></td></tr>
+  <tr><td><code>09_literature_survey.R</code></td><td>Structures the 45-paper student survey for the novelty audit</td><td><code>docs/research/*.csv</code></td></tr>
+  <tr><td><code>10_qsw_features.R</code></td><td>QSW features for the pre-registered ω grid + random-graph controls (parallel)</td><td><code>qsw_features.rds</code></td></tr>
+  <tr><td><code>11_v2_experiments.R</code></td><td>Pre-registered H1–H3 tests</td><td><code>v2_*.csv</code></td></tr>
+  <tr><td><code>13_gpu_benchmark.R</code></td><td>GPU vs CPU timing of the walks (torch, CUDA)</td><td><code>gpu_benchmark.csv</code>, fig 8</td></tr>
+  <tr><td><code>14</code>, <code>15</code>, <code>16</code></td><td>Robustness (exploratory), exact SHAP, economic value</td><td><code>v2_robustness_*</code>, <code>explainability_*</code></td></tr>
+  <tr><td><code>17_ghar_mcs.R</code></td><td>Graph-HAR baseline and Model Confidence Set</td><td><code>v2_ghar_*.csv</code>, <code>v2_mcs.csv</code></td></tr>
+  <tr><td><code>18</code>, <code>23</code></td><td>QLIKE-trained GPU MLP; comparison with linear models on identical rows</td><td><code>v2_mlp_qlike_gpu*.csv</code></td></tr>
+  <tr><td><code>19_power_analysis.R</code></td><td>Positive control: can the pipeline detect a real signal?</td><td><code>power_analysis*.csv</code></td></tr>
+  <tr><td><code>20</code>, <code>21</code></td><td>Nested-tuned models (adaptive ω, elastic net, combination); LightGBM</td><td><code>v3_*.csv</code></td></tr>
+  <tr><td><code>22</code>, <code>24</code></td><td>Headless-Edge screenshots of the Shiny dashboard and the web UI</td><td><code>results/screenshots/</code></td></tr>
+  <tr><td><code>25_export_snapshot.R</code></td><td>Calls every API endpoint and saves JSON for static hosting (211 files)</td><td><code>web/public/data/</code></td></tr>
+  <tr><td><code>26_export_ghar_coef.R</code></td><td>Exports live graph-HAR coefficients for the container</td><td><code>api/model/*.json</code></td></tr>
+  <tr><td><code>27_build_hf_space.sh</code></td><td>Assembles the Hugging Face Space bundle</td><td><code>build/hf-space/</code></td></tr>
+  <tr><td><code>28_package_skills.ps1</code></td><td>Zips each Claude skill for Cowork upload</td><td><code>build/skills/*.zip</code></td></tr>
+  <tr><td><code>29_migrate_sqlite_to_duckdb.R</code></td><td>Verified SQLite → DuckDB migration, Parquet export, compaction</td><td><code>data/live/candles.duckdb</code></td></tr>
+  <tr><td><code>30_prices_to_parquet.R</code></td><td>Builds and verifies the Parquet price cache</td><td><code>data/curated/prices.parquet</code></td></tr>
+  <tr><td><code>31_storage_benchmark.R</code></td><td>SQLite vs DuckDB vs Parquet query timings</td><td><code>storage_benchmark.csv</code></td></tr>
+  <tr><td><code>overnight_v2.sh</code>, <code>after_*.sh</code>, <code>resume_gpu_chain.sh</code>, <code>overnight_sentiment_chain.sh</code></td><td>Unattended job chains with <code>=== step OK/FAIL</code> markers and explicit exit-status checks</td><td><code>results/overnight_*.log</code></td></tr>
+  <tr><td><code>thermal_guard.ps1</code>, <code>monitor_system.ps1</code></td><td>Pause R/Java and the VM at 87 °C, resume ≤ 65 °C; 5-minute health log</td><td><code>results/thermal_guard.log</code></td></tr>
+  <tr><td><code>fetch_sentiment_overnight.R</code></td><td>Patient GDELT download with per-ticker cache and retries</td><td><code>data/raw/gdelt_cache/</code></td></tr>
+</table>
+</div>
+
+<!-- ============ 8 BIG DATA ============ -->
+<div class="section">
+<h2>8 · Big Data layer</h2>
+<div class="grid2">
+  <div class="card"><h4>HDFS (via WebHDFS from R)</h4>
+    <p><code>R/hadoop_bridge.R</code> talks to the NameNode REST API (<code>http://127.0.0.1:50070/webhdfs/v1</code>) to create folders, upload, list, read and delete files under <code>/user/cloudera/qstock</code>: <code>curated/prices</code>, <code>raw/sentiment</code>, <code>code</code>, <code>results/…</code>. Replication 1, 128 MB blocks.</p>
+    <p class="muted">Fault fixed: Cloudera Manager wrote 127.0.0.1 into the DataNode include list while the DataNode registers as 10.0.2.15 → 0 live DataNodes, NameNode in safe mode. <code>hadoop/vm_start_services.sh</code> re-applies the fix on every boot.</p></div>
+  <div class="card"><h4>MapReduce (Java)</h4>
+    <p><code>hadoop/QStockMonthlyStats.java</code>: mapper → <b>combiner</b> → 2 reducers with custom counters, computing per ticker-month statistics on YARN. Compiled and run in the VM over SSH. Validation: <b>5,680 groups</b>, count difference 0, max error <b>1.8×10⁻¹⁵</b> vs an independent R computation.</p></div>
+  <div class="card"><h4>Hive (HiveServer2 :10000, MySQL metastore)</h4>
+    <p><code>hive/01_market_tables.hql</code> and <code>02_results_tables.hql</code> create external tables <code>prices</code>, <code>mr_monthly_stats</code>, <code>sentiment_daily</code>, <code>experiment_results</code>, <code>predictions</code>. <code>03/04_*.hql</code> run GROUP BY, <code>ROW_NUMBER</code>/<code>RANK</code> window functions, joins, and a MapReduce-vs-raw consistency query (<b>0 mismatches</b>). Run through beeline over SSH.</p></div>
+  <div class="card"><h4>Spark 3.5 through sparklyr</h4>
+    <p>sparklyr 1.9.6 cannot drive the VM's Spark 1.6 / Java 7, so Spark 3.5.9 runs locally (<code>local[8]</code>, Java 17, 8 GB driver memory). <code>scripts/04</code> computes rolling features with dplyr window functions and a point-in-time sentiment range join in Spark SQL, agrees with R to 10⁻¹⁵ (features) and 6.5×10⁻⁷ (sentiment decay), and scales to <b>7.49 M rows in 4.8 s</b>.</p></div>
+</div>
+<h3>VM operations</h3>
+<pre>VBoxManage startvm "cloudera-quickstart-vm-5.13.0-0-virtualbox" --type headless
+ssh -i ~/.ssh/qstock_vm_rsa -p 2222 cloudera@127.0.0.1 'bash -s' &lt; hadoop/vm_start_services.sh</pre>
+<p>The start-up script fixes the include list, starts ZooKeeper and Hive through the Cloudera Manager REST API, and restarts HiveServer2 if it came up before the metastore. The Cloudera Management Service is kept stopped (with it running the guest hung). Thread budget on the 20-thread host: ranger 4, Spark 8, VM 4 vCPU.</p>
+
+<h3>Course-outcome coverage (CSE 465)</h3>
+<table>
+  <tr><th style="width:28%">Course topic</th><th>Evidence in Q-Stock</th></tr>
+  <tr><td>Big Data concepts</td><td>Volume (40 tickers × 11.8 years, scaled to 7.5 M rows), variety (prices + news tone), velocity (60 s live feed, 5 s bars)</td></tr>
+  <tr><td>HDFS</td><td>WebHDFS client, block/replication inspection, DataNode fault diagnosis</td></tr>
+  <tr><td>Hadoop / MapReduce</td><td>Java job with combiner, counters, 2 reducers, validated against R</td></tr>
+  <tr><td>Ecosystem</td><td>YARN, Hive Metastore, HiveServer2/beeline, ZooKeeper, Cloudera Manager API</td></tr>
+  <tr><td>HiveQL</td><td>External tables, OpenCSVSerde, window functions, joins, consistency check</td></tr>
+  <tr><td>Spark</td><td>sparklyr pipeline, Spark SQL range join, scaling study</td></tr>
+  <tr><td>Analytics / ML in R</td><td>Quantum-walk simulation, OLS/logit/RF/elastic net/LightGBM/MLP, walk-forward, DM/Holm/bootstrap</td></tr>
+</table>
+</div>
+
+<!-- ============ 9 STORAGE ============ -->
+<div class="section">
+<h2>9 · Storage — files, DuckDB, Parquet, SQLite</h2>
+<table>
+  <tr><th style="width:30%">Data</th><th>Format / store</th><th style="width:30%">Produced by</th></tr>
+  <tr><td>Daily prices (40 tickers)</td><td><code>data/raw/prices_yahoo.csv</code> + <code>data/curated/prices.parquet</code> (ZSTD, 2.4 MB vs 12.7 MB CSV, loads 0.03 s vs 0.95 s, <code>identical()</code> to the CSV frame)</td><td><code>load_market_data()</code>, script 30</td></tr>
+  <tr><td>Research features</td><td>RDS: <code>dataset_graph.rds</code>, <code>qsw_features.rds</code>, <code>ghar_features.rds</code>, <code>vol_targets.rds</code></td><td>scripts 02, 10</td></tr>
+  <tr><td>Results</td><td>CSV + Markdown in <code>results/tables/</code>; PNG figures; prediction dumps (git-ignored)</td><td>scripts 05–23</td></tr>
+  <tr><td>Live 1-minute candles (hot week)</td><td>DuckDB <code>data/live/candles.duckdb</code> (API) and <code>candles_app.duckdb</code> (Shiny) — one writer process per file</td><td><code>/api/live</code>, Shiny poll</td></tr>
+  <tr><td>Live candle history</td><td>Hive-partitioned Parquet <code>data/live/parquet/interval_sec=60/day=YYYY-MM-DD/</code>, read with partition pruning</td><td><code>duck_export_parquet()</code>, script 29</td></tr>
+  <tr><td>5-second bars</td><td>Same DuckDB table with <code>interval_sec = 5</code>, source <code>yahoo_snapshot</code></td><td><code>snapshot_tick()</code></td></tr>
+  <tr><td>Rollback store</td><td>SQLite <code>data/live/candles.sqlite</code> (untouched by the migration)</td><td><code>options(qstock.store_backend = "sqlite")</code></td></tr>
+  <tr><td>Static snapshot</td><td>211 JSON files (12.3 MB) in <code>web/public/data/</code></td><td>script 25</td></tr>
+</table>
+<h3>Candle table (same DDL on DuckDB and SQLite; PostgreSQL-compatible)</h3>
+<pre>CREATE TABLE candles (ticker TEXT, interval_sec INTEGER, bucket_start BIGINT,
+  open, high, low, close DOUBLE PRECISION, volume DOUBLE PRECISION, source TEXT, updated_at BIGINT,
+  PRIMARY KEY (ticker, interval_sec, bucket_start),
+  CHECK (high &gt;= low AND high &gt;= open AND high &gt;= close AND low &lt;= open AND low &lt;= close));
+-- writes: INSERT … SELECT FROM registered frame ON CONFLICT (…) DO UPDATE  (idempotent, bulk)</pre>
+<h3>Measured storage engines (<code>storage_benchmark.csv</code>, median of 20)</h3>
+<table>
+  <tr><th>Query</th><th>SQLite</th><th>DuckDB</th><th>Parquet</th></tr>
+  <tr><td>One ticker, latest session (391 rows)</td><td><b>0.62 ms</b></td><td>1.23 ms</td><td>5.6 ms</td></tr>
+  <tr><td>One ticker, 5 sessions</td><td>1.97 ms</td><td><b>1.36 ms</b></td><td>6.2 ms</td></tr>
+  <tr><td>One market, latest session (7,236 rows)</td><td>7.28 ms</td><td><b>3.15 ms</b></td><td>8.0 ms</td></tr>
+  <tr><td>Daily roll-up of 1-min candles</td><td>83 ms</td><td><b>6.3–13 ms</b></td><td>8.7–14 ms</td></tr>
+  <tr><td>Daily prices load (117,660 rows)</td><td colspan="2">CSV 367–950 ms</td><td><b>25–30 ms</b></td></tr>
+</table>
+<p class="note">Honest reading: for a single-session chart both engines are sub-millisecond-scale. The user-visible win (cold chart 6.6 s → 0.04–0.09 s) came from serving charts from the store instead of waiting for a Yahoo fetch; DuckDB pulls ahead as queries grow (multi-session, whole market, aggregates).</p>
+</div>
+
+<!-- ============ 10 SERVING ============ -->
+<div class="section">
+<h2>10 · Serving — R API, Shiny dashboard, React web UI</h2>
+<h3>10.1 REST API (<code>api/plumber.R</code>, run with <code>Rscript api/run_api.R [port]</code>)</h3>
+<p>All endpoints are read-only <code>GET</code>, return JSON, carry a <code>Server-Timing</code> header and allow any origin (CORS). Bad input returns 400. The API also serves the built web UI from <code>web/dist</code>.</p>
+<table>
+  <tr><th style="width:30%">Endpoint</th><th>Returns</th><th style="width:28%">Caching / source</th></tr>
+  <tr><td><code>/api/status</code></td><td>Both markets: open flag, local time, time zone, tickers</td><td>—</td></tr>
+  <tr><td><code>/api/live/&lt;market&gt;</code></td><td>Quotes, change, intraday RV, sparklines, store statistics, stale flag</td><td>One shared Yahoo batch per minute</td></tr>
+  <tr><td><code>/api/candles/&lt;m&gt;/&lt;ticker&gt;?days=</code></td><td>1-min OHLCV + VWAP (reset per session), exchange-local time</td><td>DuckDB store + forming bar</td></tr>
+  <tr><td><code>/api/bars/&lt;m&gt;/&lt;ticker&gt;?interval&amp;range&amp;ind</code></td><td>Bars for 5s, 1m, 5m, 15m, 30m, 1h, 1D, 1W, 1M and ranges 1D…ALL, plus indicator lines (VWAP, SMA, EMA, BB, RSI)</td><td>Store, DuckDB roll-ups, daily history, 5 s snapshot aggregator</td></tr>
+  <tr><td><code>/api/graph/&lt;m&gt;?omega&amp;look</code></td><td>Live correlation graph of 1-min returns with QSW features and the P matrix</td><td>Per live batch</td></tr>
+  <tr><td><code>/api/dial?market&amp;date&amp;omega</code></td><td>Historical daily graph at ω plus the quantum (ω=0) and classical (ω=1) limits</td><td>Precomputed for latest date</td></tr>
+  <tr><td><code>/api/forecast/&lt;m&gt;</code></td><td>Graph-HAR 5-day volatility forecast per stock</td><td>30 min</td></tr>
+  <tr><td><code>/api/results</code></td><td>Research tables read from <code>results/tables</code> (nothing recomputed)</td><td>—</td></tr>
+  <tr><td><code>/api/bench</code></td><td>Speed check of the host (20-node QSW)</td><td>—</td></tr>
+</table>
+
+<h3>10.2 Shiny dashboard (<code>app/app.R</code>, port 8050)</h3>
+<p>bslib navbar with seven tabs — Overview, Live market (plotly candlesticks + visNetwork live graph + risk table), Quantum dial (live Lindblad integration on a chosen day), Volatility forecasts, Results (pre-registered tests, GHAR + MCS, robustness, power, direction, figures), Big Data pipeline, System health. <code>?tab=</code> deep links; screenshots with <code>scripts/22</code>.</p>
+
+<h3>10.3 React web UI (<code>web/src/</code>)</h3>
+<table>
+  <tr><th style="width:28%">Element</th><th>Usage</th></tr>
+  <tr><td><code>pages/LivePage.tsx</code></td><td>Market switch, KPI cards, 3D quantum market graph with ω slider, selected-stock panel, chart workspace, live risk table</td></tr>
+  <tr><td><code>pages/DialPage.tsx</code></td><td>Historical quantum dial: sweep ω between quantum and classical distributions for any date</td></tr>
+  <tr><td><code>pages/ResearchPage.tsx</code></td><td>Every headline result from <code>/api/results</code> as charts and tables</td></tr>
+  <tr><td><code>pages/PipelinePage.tsx</code></td><td>The Big Data pipeline and its validation numbers</td></tr>
+  <tr><td><code>components/QuantumGraph3D.tsx</code></td><td>react-three-fiber scene: nodes sized by volatility, glow by spillover, particles flowing in proportion to walk transition probabilities</td></tr>
+  <tr><td><code>lib/api.ts</code></td><td>Typed client and TanStack Query hooks; live/snapshot/fallback logic (<code>load(live, snap)</code>)</td></tr>
+  <tr><td><code>App.tsx</code></td><td>Routing, theme, recovery from stale chunks after a redeploy</td></tr>
+</table>
+
+<h3>10.4 TradingView-style chart workspace (<code>web/src/components/chart/</code>)</h3>
+<table>
+  <tr><th style="width:26%">Component</th><th>Elements and usage</th></tr>
+  <tr><td><code>TradingWorkspace.tsx</code></td><td>Holds state (ticker, interval, range, chart type, indicators, scale); range sets a default interval; persists preferences; screenshot, fullscreen, go-to-date, zoom</td></tr>
+  <tr><td><code>ChartToolbar.tsx</code></td><td>Symbol search · interval menu (5s "snapshot-built", 1m–1h, 1D/1W/1M) · chart type (candles, hollow, bars, line, area, baseline) · Indicators · undo/redo · settings (scale, grid, crosshair) · fullscreen · screenshot</td></tr>
+  <tr><td><code>TradingChart.tsx</code></td><td>lightweight-charts: main series, volume band, RSI band with 30/70 lines, SMA/EMA/VWAP/BB overlays, log/percent scale</td></tr>
+  <tr><td><code>ChartLegend.tsx</code></td><td>"TICKER · interval · market", O/H/L/C and change for the hovered bar; indicator rows with eye, gear, trash and more-menu icons</td></tr>
+  <tr><td><code>IndicatorsDialog.tsx</code></td><td>Add VWAP, SMA, EMA, Bollinger, RSI, Volume; edit length, k and colour; show/hide; remove</td></tr>
+  <tr><td><code>BottomBar.tsx</code></td><td>Ranges 1D · 5D · 1M · 3M · 6M · YTD · 1Y · 5Y · All, calendar, live exchange clock (e.g. UTC+5:30), % / log / auto, source badges</td></tr>
+  <tr><td><code>drawing/</code> (manager, toolbar)</td><td>Left toolbar: cursor, crosshair, trend line, ray, horizontal line/ray, vertical line, rectangle, Fibonacci, measure, text; magnet, lock, hide, remove all, zoom; undo/redo; drawings saved per stock in the browser</td></tr>
+</table>
+<p class="ok">Indicator values are computed in R (project rule: the UI only renders), and were cross-checked by hand on real data: daily SMA 20 = 1,192.59, Bollinger upper = 1,231.68, 1-min VWAP = 1,180.66, RSI 14 = 77.23 (RELIANCE.NS).</p>
+</div>
+
+<!-- ============ 11 TESTING ============ -->
+<div class="section">
+<h2>11 · Testing and quality</h2>
+<table>
+  <tr><th style="width:22%">Suite</th><th style="width:22%">Run with</th><th>What it proves</th></tr>
+  <tr><td>Quantum core</td><td><code>test_dtqw/ctqw/qsw.R</code></td><td>Unitarity, Hermiticity, probability conservation, QSW limits vs closed forms (10⁻⁶), sparse = dense</td></tr>
+  <tr><td>Pipeline</td><td><code>test_stage2/baseline/v2.R</code></td><td>Leakage (perturb future → features unchanged), embargo, holiday cleaning, NA-safe windows, metrics</td></tr>
+  <tr><td>Live and storage</td><td><code>test_live.R</code>, <code>test_store_duckdb.R</code>, <code>test_prices_parquet.R</code></td><td>Sessions, idempotent upsert, rejected bars, tick aggregator ordering and late ticks, DuckDB = SQLite, Parquet round-trip identical, no duplicate export</td></tr>
+  <tr><td>Bars and indicators</td><td><code>test_bars.R</code>, <code>test_indicators.R</code></td><td>Known-value SMA/EMA/BB/RSI/VWAP, spec validation, roll-up DuckDB = base R across the US DST change, 5 s aggregator with mocked snapshots</td></tr>
+  <tr><td>All unit tests</td><td><code>Rscript tests/run_tests.R</code></td><td><b>61 blocks / 357 expectations, 0 failed</b></td></tr>
+  <tr><td>API end-to-end</td><td><code>Rscript tests/test_api.R</code></td><td><b>34 checks</b> with a mocked feed: every endpoint, errors, caching, cold store, static serving</td></tr>
+  <tr><td>Dashboard</td><td><code>Rscript tests/test_app.R</code></td><td>Shiny server logic with mocked fetchers</td></tr>
+  <tr><td>Web</td><td><code>npx tsc -b</code>, <code>npm run lint</code>, <code>npm run build</code></td><td>Types match the API contract; 0 lint errors; production build</td></tr>
+  <tr><td>Big Data</td><td>in-script cross-checks</td><td>MapReduce vs R (1.8×10⁻¹⁵), Hive consistency (0 mismatches), Spark vs R (10⁻¹⁵)</td></tr>
+  <tr><td>Research integrity</td><td>doc-vs-CSV audits</td><td>Every number in docs, README and manuscript traced to its CSV; corrections logged in the hand-off</td></tr>
+</table>
+</div>
+
+<!-- ============ 12 DEPLOY / OPS ============ -->
+<div class="section">
+<h2>12 · Deployment and operations</h2>
+<h3>12.1 Deployment topology</h3>
+<table>
+  <tr><th style="width:20%">Part</th><th>How it is built and run</th></tr>
+  <tr><td>R API on Render</td><td><code>render.yaml</code> → <code>deploy/render/Dockerfile</code> (rocker/r-ver 4.4.2; plumber, RSQLite, DBI, curl, jsonlite, Matrix; duckdb 1.5.6 pinned from a dated binary snapshot with a version check). Copies only <code>R/</code>, <code>api/</code>, <code>results/tables</code>; prices download at build. <code>OPENBLAS_NUM_THREADS=1</code>; no HTTP health check. Auto-deploys on push to <code>main</code>.</td></tr>
+  <tr><td>Web UI on Vercel</td><td><code>web/vercel.json</code> → <code>npm run build:vercel</code> (live build against <code>VITE_API_URL</code> from <code>web/.env.production</code>), output <code>dist-vercel</code>; assets cached 1 year, data 5 min.</td></tr>
+  <tr><td>Fallback</td><td>While the free API sleeps or fails, the UI loads the bundled snapshot (<code>/data/*.json</code>), shows a notice, and switches back to live data automatically.</td></tr>
+</table>
+<h3>12.2 Measured on the deployed services (25 Oct 2026)</h3>
+<table>
+  <tr><th>Request</th><th>Time</th></tr>
+  <tr><td>Chart bars from the browser (1m, 1D)</td><td>0.64 s</td></tr>
+  <tr><td><code>/api/bars</code> daily 1Y with SMA, Bollinger, RSI</td><td>2.4 s</td></tr>
+  <tr><td>First 1m/5m request after a restart (one Yahoo fetch into an empty store)</td><td>8.6–11 s</td></tr>
+  <tr><td><code>/api/candles</code> from the store</td><td>0.45 s</td></tr>
+  <tr><td>Earlier free-tier findings: live quotes ≈ 11 s, graph ≈ 6 s, forecast ≈ 5 s, dial 0.1–4 s; ≈ 230 MB of 512 MB</td><td>—</td></tr>
+</table>
+<p class="note">Incident log: the first deploy of the chart workspace crashed at start-up because the image installed duckdb 1.2.0, which rejects the <code>shared_home</code> argument used locally with 1.5.6. Fixed by a version-portable driver (<code>duck_drv()</code>) and pinning duckdb 1.5.6 in the Dockerfiles; the public site stayed usable via the snapshot fallback meanwhile.</p>
+<h3>12.3 Everyday commands</h3>
+<pre># R is not on PATH:  & "C:\Program Files\R\R-4.6.1\bin\x64\Rscript.exe"
+Rscript tests/run_tests.R                       # unit tests
+Rscript tests/test_api.R                        # API end-to-end (offline)
+cd web &amp;&amp; VITE_API_URL= npm run build           # UI for the local API (plain build targets Render)
+Rscript api/run_api.R                           # API + UI on http://127.0.0.1:8000
+Rscript -e "shiny::runApp('app', port = 8050)"  # Shiny dashboard
+Rscript scripts/25_export_snapshot.R            # refresh the static snapshot
+bash scripts/overnight_v2.sh                    # unattended research re-run</pre>
+<p>Long runs write <code>=== step OK/FAIL</code> markers and check every R exit status; the thermal guard (<code>scripts/thermal_guard.ps1 -Hours 14</code>) pauses work at 87 °C.</p>
+</div>
+
+<!-- ============ 13 RESULTS ============ -->
+<div class="section">
+<h2>13 · Results (headline numbers)</h2>
+<p class="muted">Source: <code>docs/results/results.md</code> and <code>results_v2.md</code>; every value comes from <code>results/tables/*.csv</code>.</p>
+<table>
+  <tr><th style="width:34%">Finding</th><th>NSE</th><th>NASDAQ</th></tr>
+  <tr><td>Direction: naive base-rate log-loss</td><td><b>0.6930</b></td><td><b>0.6921</b></td></tr>
+  <tr><td>Direction: best model log-loss</td><td>0.6937</td><td>0.6930</td></tr>
+  <tr><td>Direction: AUC range (16 runs)</td><td>0.5025–0.5070</td><td>0.5012–0.5123</td></tr>
+  <tr><td>H2 (pre-registered): ω &lt; 1 beats classical ω = 1 for 5-day volatility</td><td>Not supported (classical best)</td><td><b>Supported</b>: ω = 0.25, Δ = −0.0037, 95% CI [−0.0052, −0.0019], Holm p = 4.8×10⁻⁶; ω = 0.5 Holm p = 4.7×10⁻⁸; holds under QLIKE, both halves of the sample, 17/20 stocks</td></tr>
+  <tr><td>H3: random-graph control reproduces the gain?</td><td>Yes (pooling effect)</td><td>No (p = 0.29)</td></tr>
+  <tr><td>Best achievable forecast (nested tuning)</td><td>Combination, OOS R² 0.178</td><td>Linear GHAR, OOS R² 0.348</td></tr>
+  <tr><td>QSW features on top of GHAR</td><td>No gain</td><td>No gain (worse under QLIKE, p = 0.004)</td></tr>
+  <tr><td>LightGBM vs GHAR</td><td>Worse (R² 0.144)</td><td>Worse (R² 0.329, p = 8.6×10⁻⁹)</td></tr>
+  <tr><td>GPU MLP (QLIKE-trained) vs GHAR on QLIKE</td><td>Worse (Holm p = 0.001)</td><td>Tie (p = 0.78)</td></tr>
+  <tr><td>Economic value (inverse-volatility portfolio)</td><td colspan="2">Sharpe changes ≤ 0.001 between ω = 0.25 and ω = 1 — no material benefit</td></tr>
+  <tr><td>Power analysis</td><td>Detects corr ≈ 0.05</td><td>Detects corr ≈ 0.035 (0% false positives)</td></tr>
+  <tr><td>RQ5 sentiment</td><td colspan="2">Not evaluated: GDELT stopped at 21/40 tickers (HTTP 429); partial data not used by design</td></tr>
+</table>
+
+<div class="grid2">
+  <figure><img src="../results/figures/fig7_quantumness_dial.png"><figcaption>Figure 7 · The quantumness dial: loss difference vs ω (scripts/12).</figcaption></figure>
+  <figure><img src="../results/figures/fig8_gpu_benchmark.png"><figcaption>Figure 8 · GPU vs CPU walk simulation time (scripts/13).</figcaption></figure>
+</div>
+<table>
+  <tr><th>GPU benchmark (N nodes)</th><th>base R f64</th><th>torch CPU f64</th><th>CUDA f32</th></tr>
+  <tr><td>CTQW, N = 1,600</td><td>62.3 s</td><td>0.804 s</td><td><b>0.145 s</b></td></tr>
+  <tr><td>CTQW, N = 3,200</td><td>—</td><td>5.62 s</td><td><b>0.466 s</b></td></tr>
+  <tr><td>DTQW, N = 1,600</td><td>—</td><td>8.68 s</td><td><b>0.572 s</b></td></tr>
+</table>
+<p class="muted">CUDA float64 is not faster than the CPU on this consumer GPU; below ~200 nodes the GPU has no advantage, so the study's 20-node graphs ran on CPU.</p>
+</div>
+
+<!-- ============ 14 DECISIONS ============ -->
+<div class="section">
+<h2>14 · Key engineering decisions, limitations, open items</h2>
+<table>
+  <tr><th style="width:30%">Decision</th><th>Reason</th></tr>
+  <tr><td>One walk family with a quantumness dial (QSW, ω)</td><td>Isolates coherence on an identical graph — v1 compared different feature families and could not.</td></tr>
+  <tr><td>Pre-register v2 before running it</td><td>Prevents tuning for significance; exploratory work is labelled.</td></tr>
+  <tr><td>Spark 3.5 locally via sparklyr</td><td>sparklyr has no backend for the VM's Spark 1.6 / Java 7.</td></tr>
+  <tr><td>Java MapReduce, R everywhere else</td><td>Course rule (R only, no PySpark); Java is Hadoop's native language.</td></tr>
+  <tr><td>R reaches the VM via WebHDFS + SSH/beeline</td><td>The CentOS 6.7 guest has no R; keeps the lab VM stock.</td></tr>
+  <tr><td>Live market built in R (curl multi + DuckDB)</td><td>R-only rule, no paid tick feed, memory headroom next to the 8 GB VM.</td></tr>
+  <tr><td>Computation only in R; UI only renders</td><td>One source of truth for the maths; indicators, roll-ups and walks are tested once.</td></tr>
+  <tr><td>Static snapshot + live fallback</td><td>Vercel cannot run R; the free API sleeps; the site must never be blank.</td></tr>
+  <tr><td>Render with one BLAS thread, no health check, precomputed dial</td><td>Measured: thread contention made a 20-node QSW 39 s (2.0 s single-threaded); the health check killed long requests.</td></tr>
+  <tr><td>DuckDB + Parquet for live candles; Parquet price cache</td><td>Charts served from the store (6.6 s → 0.09 s cold), faster multi-session/aggregate queries, 31× faster price loads.</td></tr>
+  <tr><td>Snapshot-built 5 s bars, labelled as such</td><td>Yahoo has no sub-minute data and no free tick feed; honest labelling instead of fabricated ticks.</td></tr>
+  <tr><td>Drop RQ5 rather than use partial GDELT data</td><td>Pre-stated precondition; partial data would bias the comparison.</td></tr>
+</table>
+<h3>Limitations</h3>
+<ul>
+  <li>Survivorship bias (today's large caps); Yahoo is unofficial and back-adjusted; one pre-registered graph construction; small effect sizes.</li>
+  <li>Economic value tested only with an inverse-volatility portfolio; sentiment (RQ5) not evaluated.</li>
+  <li>Live tab: exchange holidays not modelled; tick aggregator validated on synthetic/replayed ticks; 5 s bars build only while watched during market hours.</li>
+  <li>Chart: lightweight-charts 4 has no separate panes (RSI/volume are bands); intraday history limited to what the store holds.</li>
+  <li>Official CSE 465 CO statements still to be inserted; the novelty audit is preliminary (no systematic Scopus/IEEE search yet).</li>
+</ul>
+<h3>Open items</h3>
+<ol>
+  <li>Observe 5-second bars during NSE hours (09:15–15:30 IST).</li>
+  <li>Check Render memory under DuckDB (dashboard → Metrics).</li>
+  <li>Optional: automatic periodic Parquet export inside the API; lightweight-charts 5 panes; per-drawing styles.</li>
+  <li>Manuscript: resolve every [VERIFY] reference and rewrite the abstract with the audit framing — paused until requested.</li>
+</ol>
+</div>
+
+<!-- ============ 15 TIMELINE ============ -->
+<div class="section">
+<h2>15 · Development timeline and Claude workspace setup</h2>
+<table>
+  <tr><th style="width:12%">Commit</th><th>Milestone</th></tr>
+  <tr><td><code>86d810b</code></td><td>Q-Stock core: quantum-walk market graphs for volatility forecasting (R, Hadoop, Hive, Spark, CUDA)</td></tr>
+  <tr><td><code>396cce5</code></td><td>Live market tab: R live pipeline, hot/cold candle store, tick aggregator, live QSW graph</td></tr>
+  <tr><td><code>8add13b</code></td><td>React + three.js web UI on an R plumber API; final GPU MLP results; RQ5 closed</td></tr>
+  <tr><td><code>56dab81</code></td><td>Fix blank Research and Dial charts (recharts animation)</td></tr>
+  <tr><td><code>60591a6</code> → <code>9f9f3c7</code></td><td>Live deployment: Hugging Face bundle, Render Docker service, free-tier fixes (restarts, BLAS threads), Vercel live mode with snapshot fallback, stale-page recovery</td></tr>
+  <tr><td><code>0656737</code></td><td>Claude session setup, 8 project skills, architecture and design documents, docs reorganised</td></tr>
+  <tr><td><code>4099957</code></td><td>Live candle store on DuckDB + Parquet; charts read the store; Parquet price cache</td></tr>
+  <tr><td><code>3788ebd</code></td><td>TradingView-style chart workspace: <code>/api/bars</code>, R indicators, drawing tools</td></tr>
+  <tr><td><code>36871df</code></td><td>Render start-up fix for the image's older duckdb</td></tr>
+  <tr><td><code>b411144</code></td><td>Checkpoint 2026-10-25 (tag <code>checkpoint-2026-10-25</code>)</td></tr>
+  <tr><td><code>ba25e23</code></td><td>Cowork setup refresh: storage and chart skills, docs brought up to date</td></tr>
+</table>
+
+<h3>Claude Code / Cowork setup</h3>
+<p><code>CLAUDE.md</code> at the root gives every session the ground rules (R only, classical simulation only, faithful reporting, the 87 °C rule), the environment, commands and conventions. <code>.claude/skills/</code> holds ten reusable workflows; <code>scripts/28_package_skills.ps1</code> zips them for upload, and <code>docs/operations/COWORK_SETUP.md</code> describes the steps.</p>
+<table>
+  <tr><th style="width:34%">Skill</th><th>Covers</th></tr>
+  <tr><td><code>quantum-walk-simulation</code></td><td>DTQW/CTQW/QSW in R, features, physics invariants, GPU limits</td></tr>
+  <tr><td><code>leakage-safe-forecast-evaluation</code></td><td>Point-in-time features, embargoed walk-forward, DM/Holm/bootstrap/MCS, pre-registration</td></tr>
+  <tr><td><code>hadoop-hive-spark-pipeline</code></td><td>VM start-up and fixes, WebHDFS, MapReduce, Hive, sparklyr</td></tr>
+  <tr><td><code>duckdb-parquet-storage</code></td><td>DuckDB store, Parquet history and cache, migration, benchmarks, portable drivers</td></tr>
+  <tr><td><code>live-market-data-pipeline</code></td><td>Sessions, Yahoo polling, candle store, tick aggregator, live analytics</td></tr>
+  <tr><td><code>chart-workspace-bars-indicators</code></td><td><code>/api/bars</code>, roll-ups, R indicators, React chart workspace and drawings</td></tr>
+  <tr><td><code>r-plumber-react-dashboard</code></td><td>API patterns, React UI modes, Shiny</td></tr>
+  <tr><td><code>free-tier-r-deployment</code></td><td>Render + Vercel, free-tier fixes, release checklist</td></tr>
+  <tr><td><code>gpu-and-long-run-safety</code></td><td>torch/CUDA, overnight chains, thermal guard</td></tr>
+  <tr><td><code>research-results-audit</code></td><td>Doc-vs-CSV audits, novelty audit, hand-off notes</td></tr>
+</table>
+<p class="muted" style="margin-top:10pt">Further reading in the repository: <code>docs/architecture/ARCHITECTURE.md</code>, <code>docs/design/DESIGN.md</code>, <code>DUCKDB_MIGRATION.md</code>, <code>CHART_WORKSPACE.md</code>, <code>docs/operations/runbook.md</code>, <code>docs/results/results.md</code>, <code>paper/manuscript_draft.md</code>.</p>
+</div>
+
+</body>
+</html>
