@@ -172,3 +172,23 @@ Design and contracts are in `docs/design/TERMINAL_UI.md`, and the Kotak setup is
   2. Start the API and the UI.
   3. Optionally fill `.Renviron` for Kotak and check `/api/feeds`.
   4. Re-run `scripts/25_export_snapshot.R` before redeploying the snapshot.
+
+## Checkpoint 2026-11-18 (tag `checkpoint-2026-11-18`)
+
+Work paused here at the user's request. The 2026-11-18 update is committed and pushed as `eaeff8a` (281 files) via `scripts/33_deploy_update.ps1`.
+
+**Done on the laptop**
+- The Nabi account was created (`data/auth/users.json`, git-ignored).
+- Tests pass: 49 API checks; 70 testthat blocks / 441 expectations, 0 failed, now including the duckdb tests.
+- The snapshot was re-exported: 292 files, 12.6 MB in `web/public/data`.
+- The first snapshot run failed because a local API (`api/run_api.R 8000`) held the lock on `data/live/candles.duckdb`. DuckDB allows a single writer, so stop the local API before running `scripts/25_export_snapshot.R`. That API is still stopped.
+- No secret files were staged: `.Renviron` and `data/auth/` were checked, and `.Renviron.example` has empty values only.
+
+**Open items, in order**
+1. Check that the Vercel and Render rebuilds of `eaeff8a` succeeded, then test the live site's sign-in, Explain, News and assistant.
+2. Render → q-stock-api → Environment: set `QSTOCK_AUTH_USERS` (from `scripts/32_create_user.R Nabi --print-env`). Without it, sign-in is off on Render.
+3. Reset the Nabi password: the current one was exposed in a chat session. Re-run the script above and update the Render value.
+4. Still unverified: the real Kotak Neo login (`.Renviron`, `/api/feeds`) and live Yahoo news.
+5. Optional: install `getPass` so `32_create_user.R` hides the password as it is typed.
+6. Not committed: `web/.env.production` (trailing blank line only), `.claude/launch.json`, `presentation/`, `presentation_v2/`.
+7. The research side is unchanged; paper writing is still paused until the user asks.
