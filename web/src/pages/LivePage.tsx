@@ -9,11 +9,12 @@ import TradingWorkspace from "../components/chart/TradingWorkspace";
 
 type SortKey = "label" | "last" | "change" | "rv" | "spill" | "qself" | "fc";
 
-export default function LivePage({ market, setMarket, dark }: { market: Market; setMarket: (m: Market) => void; dark: boolean }) {
+export default function LivePage({ market, setMarket, dark, sel, setSel }: {
+  market: Market; setMarket: (m: Market) => void; dark: boolean; sel: Record<Market, string>; setSel: (s: Record<Market, string>) => void;
+}) {
   const SNAPSHOT = useShowingSnapshot();
   const [omega, setOmega] = useState(0.25);
   const [look, setLook] = useState(120);
-  const [sel, setSel] = useState<Record<Market, string>>({ NSE: "RELIANCE.NS", NASDAQ: "NVDA" });
   const [sort, setSort] = useState<{ k: SortKey; desc: boolean }>({ k: "rv", desc: true });
   const live = useLive(market);
   const graph = useGraph(market, omega, look);
@@ -81,7 +82,7 @@ export default function LivePage({ market, setMarket, dark }: { market: Market; 
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <Kpi label={q ? `${q.label} last` : "Last price"} sub={q ? q.name : undefined}>
+        <Kpi label={q ? `${q.label} last` : "Last price"} sub={q ? `${q.name} · feed ${q.feed === "kotak_neo" ? "Kotak Neo" : "Yahoo"}` : undefined}>
           <AnimatedNumber value={q?.last} format={(x) => price(x, market)} />
         </Kpi>
         <Kpi label="Change vs previous close"><Delta x={q?.change} /></Kpi>

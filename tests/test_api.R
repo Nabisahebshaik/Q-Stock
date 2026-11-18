@@ -23,7 +23,16 @@ srv <- callr::r_bg(function(root, port) {
     list(data = p[p$ticker %in% symbols & p$date >= max(p$date) - 400, ], errors = character())
   }
   mock_snapshot <- function(ticker) list(price = 100 + runif(1), time = as.numeric(Sys.time()), volume = round(as.numeric(Sys.time())))
-  options(qstock.root = root, qstock.live_fetcher = mock_intraday, qstock.live_daily_fetcher = mock_daily,
+  mock_news <- function(symbol, name, n = 12)
+    if (symbol == "TCS.NS") list(items = news_empty(), errors = c(yahoo = "HTTP 429")) else
+      list(items = data.frame(id = c("a", "b"), title = c(paste(name, "posts results"), paste(name, "posts results")), publisher = "Reuters",
+                              url = c("https://example.com/a", "https://example.com/b"), published = c(1763400000, 1763300000),
+                              related = symbol, source = "yahoo"), errors = character())
+  # one test account, passed the way a cloud container gets it (QSTOCK_AUTH_USERS)
+  Sys.setenv(QSTOCK_AUTH_USERS = jsonlite::toJSON(list(list(username = "Nabi", display_name = "Nabi", role = "analyst",
+                                                         hash = sodium::password_store("test-password-123"))), auto_unbox = TRUE))
+  Sys.unsetenv(c("KOTAK_ACCESS_TOKEN", "KOTAK_MOBILE", "KOTAK_UCC", "KOTAK_MPIN"))
+  options(qstock.news_fetcher = mock_news, qstock.root = root, qstock.live_fetcher = mock_intraday, qstock.live_daily_fetcher = mock_daily,
           qstock.snapshot_fetcher = mock_snapshot, qstock.live_db = ":memory:")
   plumber::pr_run(plumber::pr("api/plumber.R"), host = "127.0.0.1", port = port, docs = FALSE)
 }, args = list(root = root, port = port))
@@ -112,4 +121,33 @@ if (dir.exists("web/dist")) {
   check(httr::status_code(get("/assets/")) == 404, "directory path -> 404 (no hang)")
   check(httr::status_code(get("/api/status")) == 200, "API still responsive after the directory request")
 }
+# ---- explainable forecast, news, sign-in, assistant ----
+ex <- body(get("/api/explain/NSE/RELIANCE.NS"))$explanation
+check(nrow(ex$features) == 6 && abs(ex$check_sum) < 1e-9 && abs(sum(ex$features$contribution) - (ex$pred_lrv5 - ex$baseline_lrv5)) < 1e-9,
+      "explain: six exact contributions summing to forecast minus market average")
+check(isTRUE(all.equal(ex$vol5_ann, f$forecasts$vol5_ann[f$forecasts$ticker == "RELIANCE.NS"])), "explain agrees with /api/forecast")
+check(nrow(body(get("/api/explain/NSE/RELIANCE.NS"))$research_shap) > 0 && httr::status_code(get("/api/explain/NSE/AAPL")) == 400, "research SHAP rows served; wrong market -> 400")
+nw <- body(get("/api/news/NSE/RELIANCE.NS"))
+check(nrow(nw$items) == 1 && nw$items$publisher == "Reuters" && !nw$stale, "news: duplicate headline dropped")
+nt <- body(get("/api/news/NSE/TCS.NS"))
+check(length(nt$items) == 0 && nt$errors$yahoo == "HTTP 429", "news: failed feed reported, nothing invented")
+fd <- body(get("/api/feeds"))
+check(fd$kotak_neo == "not configured" && fd$prices$NSE == "yahoo", "feeds: Kotak off without credentials")
+
+post <- function(path, b, token = NULL) httr::POST(paste0(base, path), body = b, encode = "json", httr::timeout(60),
+                                                    if (!is.null(token)) httr::add_headers(Authorization = paste("Bearer", token)))
+check(isTRUE(body(get("/api/auth/config"))$enabled), "auth enabled when an account exists")
+check(httr::status_code(post("/api/auth/login", list(username = "nabi", password = "nope"))) == 401, "wrong password -> 401")
+lg <- body(post("/api/auth/login", list(username = "nabi", password = "test-password-123")))
+check(nchar(lg$token) == 64 && lg$user$display_name == "Nabi" && is.null(lg$user$hash), "login returns a token and Nabi's profile, no hash")
+me <- httr::GET(paste0(base, "/api/auth/me"), httr::add_headers(Authorization = paste("Bearer", lg$token)))
+check(httr::status_code(me) == 200 && body(me)$username == "Nabi" && httr::status_code(get("/api/auth/me")) == 401, "/api/auth/me needs the token")
+check(httr::status_code(post("/api/chat", list(message = "hi"))) == 401, "assistant requires sign-in")
+ch <- body(post("/api/chat", list(message = "why is Reliance's volatility forecast high?"), lg$token))
+check(ch$intent == "explain" && ch$ticker == "RELIANCE.NS" && grepl("exact for the linear model", ch$reply) && ch$user == "Nabi", "assistant explains a forecast")
+cq <- body(post("/api/chat", list(message = "price of TCS"), lg$token))
+check(cq$intent == "quote" && grepl("TCS", cq$reply) && "/api/live/NSE" %in% cq$sources, "assistant quotes from the live feed")
+check(httr::status_code(post("/api/chat", "not json", lg$token)) == 400, "bad chat body -> 400")
+invisible(post("/api/auth/logout", list(), lg$token))
+check(httr::status_code(post("/api/chat", list(message = "hi"), lg$token)) == 401, "logout ends the session")
 cat("API tests passed\n")

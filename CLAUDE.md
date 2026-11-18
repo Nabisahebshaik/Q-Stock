@@ -11,7 +11,9 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 - **Synthetic data only validates software.** No predictive claim rests on it.
 - **Report findings faithfully; never tune for significance.** The v2 ω grid {0, 0.1, 0.25, 0.5, 0.75, 0.9, 1}, targets and Holm families are pre-registered (`docs/research/preregistration_v2.md`). Anything else is labelled *exploratory*.
 - **Every number in docs must trace to a CSV** in `results/tables/`. After changing results, re-audit docs, README and `paper/manuscript_draft.md` against the CSVs.
-- **Live data never enters research datasets.** Live candles go only to `data/live/` (DuckDB + Parquet; SQLite rollback copy).
+- **Live data never enters research datasets.** Live candles go only to `data/live/` (DuckDB + Parquet; SQLite rollback copy). The same holds for news headlines and the optional Kotak Neo feed.
+- **Never show invented data.** No template headlines, placeholder prices or hardcoded "live" panels: if a feed fails, the UI says so (lesson from the Stock Trends review, `docs/design/TERMINAL_UI.md`).
+- **Secrets stay local.** Kotak keys go in the git-ignored `.Renviron` (template `.Renviron.example`); accounts in `data/auth/`. Never ask for or paste credentials in chat.
 - **Thermal rule for long GPU/CPU runs:** pause at 87 °C, resume at 50–65 °C (`scripts/thermal_guard.ps1`).
 - The user prefers quantum-centred work and gave a free hand for improvements; paper writing is paused until they ask.
 - Commit only when asked. Project lives in OneDrive: keep large outputs in git-ignored paths.
@@ -27,8 +29,9 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 
 | Task | Command |
 |---|---|
-| Unit tests (61 blocks / 357 expectations) | `Rscript tests/run_tests.R` |
-| API end-to-end (offline, mocked feed) | `Rscript tests/test_api.R` |
+| Unit tests (70 blocks) | `Rscript tests/run_tests.R` |
+| API end-to-end (offline, mocked feed; 49 checks) | `Rscript tests/test_api.R` |
+| Create / reset a sign-in account | `Rscript scripts/32_create_user.R Nabi` (password asked in the terminal; hash in git-ignored `data/auth/`) |
 | Shiny server tests | `Rscript tests/test_app.R` |
 | Web type check / lint | `cd web && npx tsc -b` / `npm run lint` |
 | API + built UI on :8000 | `cd web && npm ci && VITE_API_URL= npm run build` (plain `npm run build` targets the Render API via `.env.production`), then `Rscript api/run_api.R` |
@@ -52,6 +55,7 @@ Big Data research framework: classically simulated quantum walks (DTQW, CTQW, QS
 
 - R style: base R, `<-`, terse one-line helpers, comments explain *why*; functions in `snake_case`; config in `QS`.
 - When the API contract changes, update `api/plumber.R`, `web/src/lib/api.ts`, `scripts/25_export_snapshot.R` and `tests/test_api.R` together.
+- UI is the terminal theme (amber on black, square panels, mono): use `Card` (amber title bar), `.fkey`, `.chip`, `.term-input`; no rounded corners or gradients.
 - Long runs: write `=== step OK/FAIL` markers to the log and check R exit status explicitly in shell chains.
 - Update `docs/operations/HANDOFF.md` with a dated section at the end of significant work.
 

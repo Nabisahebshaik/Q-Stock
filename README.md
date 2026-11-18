@@ -24,12 +24,12 @@ Course project for SRM University–AP, CSE 465 Principles of Big Data Managemen
 ```
 R/            library: dtqw, ctqw, qsw, market_graph, qsw_features, features, data_adapter,
               sentiment_gdelt, walk_forward, evaluation, dataset, hadoop_bridge, live_market,
-              store_duckdb, bars, indicators, config
+              store_duckdb, bars, indicators, auth, explain, news_feed, kotak_neo, assistant, config
 app/          Shiny dashboard, including the Live market tab
-tests/        61 testthat blocks, 357 expectations (unitarity, Hermiticity, QSW limits, leakage,
+tests/        70 testthat blocks (unitarity, Hermiticity, QSW limits, leakage,
               embargo, DuckDB/Parquet store, bar roll-ups, indicators, tick aggregator, ...)
               + API end-to-end and dashboard server tests
-scripts/      01–31 numbered pipeline steps; overnight_*.sh orchestration; monitor_system.ps1
+scripts/      01–32 numbered pipeline steps; overnight_*.sh orchestration; monitor_system.ps1
 hadoop/       Java MapReduce job; VM service start-up and HDFS fix scripts
 hive/         HiveQL DDL and queries
 docs/         index (docs/README.md); architecture/, design/, research/ (RQs, pre-registration,
@@ -43,8 +43,13 @@ data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
 ## Web interface (React + three.js) and R API
 
 - **Live mode:** `Rscript api/run_api.R` serves the R API and the built UI at `http://127.0.0.1:8000`. To build the UI once: `cd web && npm ci && npm run build`.
+- **Look:** a market-terminal theme (amber on black, square panels, monospace) with a command line (`RELIANCE EXPL`, `NVDA N`, `ASK …`) and function keys F1–F6, F8.
+- **Sign-in:** create your account once with `Rscript scripts/32_create_user.R Nabi` (the password is asked for in the terminal and stored only as a hash in the git-ignored `data/auth/`). Guests get read-only access.
 - **Pages:**
   - Live market: 3D quantum market graph, candlesticks, risk table.
+  - Explain (XAI): exact per-input breakdown of each stock's graph-HAR volatility forecast, plus the research model's SHAP table.
+  - News: company headlines from Yahoo Finance (GDELT fallback), with publisher, time and link; nothing is invented when a feed fails.
+  - Assistant (F8, signed-in): answers from Q-Stock's own data and cites its sources; no buy/sell advice.
   - Quantum dial: historical QSW, sweeping ω.
   - Research: every headline result, read from `results/tables`.
   - Pipeline.
@@ -54,9 +59,10 @@ data/         raw/ (Yahoo, GDELT cache), curated/ (features), synthetic/
   2. Put `VITE_API_URL=https://<service>.onrender.com` in `web/.env.production` (or as a Vercel environment variable) and push. Vercel then builds the live UI.
   - Hugging Face Docker Spaces need a paid plan since mid-2026. `deploy/hf-space` and `scripts/27_build_hf_space.sh` are kept for anyone with PRO.
   - While the free Space is asleep or unreachable, the site falls back to the bundled snapshot with a notice, then switches to live data automatically.
+- **Optional Kotak Neo feed for NSE** (`docs/operations/KOTAK_NEO.md`): keys go in a git-ignored `.Renviron` (template `.Renviron.example`); Yahoo remains the fallback.
 - **Computation stays in R.** The UI only renders API responses.
 - **Tests:**
-  - `Rscript tests/test_api.R`: 20 end-to-end checks with a mocked feed.
+  - `Rscript tests/test_api.R`: 49 end-to-end checks with a mocked feed.
   - `cd web && npx tsc -b`: type check.
 
 ## Live market tab (Shiny)

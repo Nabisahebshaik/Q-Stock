@@ -3,6 +3,8 @@ export default {
   content: ["./index.html", "./src/**/*.{ts,tsx}"],
   darkMode: ["selector", '[data-theme="dark"]'],
   theme: {
+    // Terminal look: square corners everywhere except dots/pills that need a circle.
+    borderRadius: { none: "0", sm: "0", DEFAULT: "0", md: "0", lg: "0", xl: "0", "2xl": "0", "3xl": "0", full: "9999px" },
     extend: {
       colors: {
         bg: "rgb(var(--bg) / <alpha-value>)",
@@ -16,10 +18,11 @@ export default {
         up: "rgb(var(--up) / <alpha-value>)",
         down: "rgb(var(--down) / <alpha-value>)",
         warn: "rgb(var(--warn) / <alpha-value>)",
+        bar: "rgb(var(--bar) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "Segoe UI", "sans-serif"],
-        mono: ["JetBrains Mono", "ui-monospace", "Cascadia Code", "monospace"],
+        mono: ["JetBrains Mono", "ui-monospace", "Cascadia Code", "Consolas", "monospace"],
       },
       keyframes: {
         marquee: { "0%": { transform: "translateX(0)" }, "100%": { transform: "translateX(-50%)" } },

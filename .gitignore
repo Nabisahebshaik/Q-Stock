@@ -38,3 +38,7 @@ results/api_run.log
 # Assembled deployment bundles
 build/
 web/dist-vercel/
+
+# Local secrets: sign-in accounts (password hashes) and API keys (Kotak Neo)
+data/auth/
+.Renviron

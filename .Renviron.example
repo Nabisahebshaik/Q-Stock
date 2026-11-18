@@ -1,0 +1,11 @@
+# Copy to .Renviron in the project root (git-ignored) and fill in on your own machine only.
+# R reads it at start-up; restart the API after editing. Never commit or paste these values.
+
+# ---- Kotak Neo live feed for NSE stocks (optional; docs/operations/KOTAK_NEO.md) ----
+KOTAK_ACCESS_TOKEN=
+KOTAK_MOBILE=
+KOTAK_UCC=
+KOTAK_MPIN=
+# Optional: base32 secret of your authenticator registration, lets the API sign in by itself.
+# Leave empty to type the 6-digit code when api/run_api.R starts.
+KOTAK_TOTP_SECRET=

@@ -41,6 +41,9 @@ for (s in st) {
     # Chart workspace: the two views the snapshot UI offers, with the default indicator set
     save(sprintf("/api/bars/%s/%s?interval=1m&range=1D&ind=%s", mk, etk, bar_ind), sprintf("bars_%s_%s_1m.json", mk, tk))
     save(sprintf("/api/bars/%s/%s?interval=1d&range=1Y&ind=%s", mk, etk, bar_ind), sprintf("bars_%s_%s_1d.json", mk, tk))
+    # Explainable forecast and the news captured at snapshot time (labelled as a snapshot in the UI)
+    save(sprintf("/api/explain/%s/%s", mk, etk), sprintf("explain_%s_%s.json", mk, tk))
+    save(sprintf("/api/news/%s/%s", mk, etk), sprintf("news_%s_%s.json", mk, tk))
   }
   for (w in omegas) {
     save(sprintf("/api/graph/%s?omega=%.2f&look=120", mk, w), sprintf("graph_%s_%s.json", mk, tag(w)))
@@ -50,6 +53,7 @@ for (s in st) {
   message(format(Sys.time(), "%H:%M:%S"), " ", mk, " exported")
 }
 save("/api/results", "results.json")
+save("/api/feeds", "feeds.json")
 writeLines(jsonlite::toJSON(list(snapshot_at = as.numeric(Sys.time()),
                                  snapshot_iso = format(Sys.time(), "%Y-%m-%d %H:%M %Z"),
                                  omega_step = 0.05, look = 120L), auto_unbox = TRUE), file.path(out, "meta.json"))

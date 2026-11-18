@@ -6,10 +6,10 @@ export function Card({ title, right, children, className = "", bodyClass = "" }:
   title?: ReactNode; right?: ReactNode; children: ReactNode; className?: string; bodyClass?: string;
 }) {
   return (
-    <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: "easeOut" }}
+    <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}
                     className={`glass overflow-hidden ${className}`}>
       {(title || right) && (
-        <header className="flex items-center justify-between gap-3 border-b border-line/60 px-5 py-3">
+        <header className="panel-bar flex min-h-[30px] items-center justify-between gap-3 px-3 py-1">
           <h2 className="card-title">{title}</h2>
           <div className="flex items-center gap-2">{right}</div>
         </header>
@@ -36,10 +36,9 @@ export function Delta({ x, digits = 2 }: { x: number | null | undefined; digits?
 
 export function Kpi({ label, children, sub, accent }: { label: string; children: ReactNode; sub?: ReactNode; accent?: boolean }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass relative overflow-hidden px-5 py-4">
-      {accent && <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-quantum/20 blur-2xl" />}
+    <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={`glass relative overflow-hidden px-4 py-3 ${accent ? "border-l-2 border-l-accent" : ""}`}>
       <div className="card-title">{label}</div>
-      <div className="mt-1.5 text-[28px] font-semibold leading-tight tracking-tight">{children}</div>
+      <div className="mt-1 text-[26px] font-semibold leading-tight">{children}</div>
       {sub && <div className="mt-1 text-xs text-muted">{sub}</div>}
     </motion.div>
   );

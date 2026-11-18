@@ -387,5 +387,7 @@ ghar_live_forecast <- function(daily, model, market, now = Sys.time()) {
   last <- ave(as.numeric(d$date), d$ticker, FUN = max)
   d <- d[as.numeric(d$date) == last & d$date >= max(d$date) - 7, ]
   pred <- as.numeric(cbind(1, as.matrix(d[, GHAR_COLS])) %*% model$coef)
-  data.frame(ticker = d$ticker, as_of = d$date, pred_lrv5 = pred, vol5_ann = sqrt(exp(pred) * 252))
+  out <- data.frame(ticker = d$ticker, as_of = d$date, pred_lrv5 = pred, vol5_ann = sqrt(exp(pred) * 252))
+  attr(out, "features") <- d[, c("ticker", GHAR_COLS)]        # inputs, for the explanation (R/explain.R)
+  out
 }

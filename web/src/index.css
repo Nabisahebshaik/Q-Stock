@@ -3,61 +3,70 @@
 @tailwind utilities;
 
 /* Design tokens (RGB triplets so Tailwind can apply alpha). Dark is the default theme. */
+/* Terminal theme: black canvas, amber labels and accents, white figures, square panels with
+   amber title bars, monospace throughout. Dark is the default; "light" is a paper print view. */
 :root,
 :root[data-theme="dark"] {
-  --bg: 6 9 18;
-  --surface: 12 18 32;
-  --raised: 18 26 44;
-  --line: 34 46 72;
-  --ink: 232 237 247;
-  --muted: 140 153 178;
-  --accent: 76 201 240;
-  --quantum: 139 92 246;
-  --up: 34 197 140;
-  --down: 240 82 92;
-  --warn: 245 179 66;
+  --bg: 0 0 0;
+  --surface: 10 10 12;
+  --raised: 24 24 28;
+  --line: 58 52 40;
+  --ink: 236 236 236;
+  --muted: 196 150 72;
+  --accent: 255 160 26;
+  --quantum: 92 164 255;
+  --up: 34 214 110;
+  --down: 255 72 72;
+  --warn: 255 214 10;
+  --bar: 255 160 26;
+  --bar-ink: 0 0 0;
   color-scheme: dark;
 }
 :root[data-theme="light"] {
-  --bg: 245 247 251;
+  --bg: 246 244 238;
   --surface: 255 255 255;
-  --raised: 240 243 249;
-  --line: 222 227 237;
-  --ink: 16 22 38;
-  --muted: 92 104 128;
-  --accent: 2 132 199;
-  --quantum: 109 40 217;
-  --up: 5 150 105;
-  --down: 220 38 38;
-  --warn: 180 110 0;
+  --raised: 236 233 224;
+  --line: 200 192 172;
+  --ink: 18 18 18;
+  --muted: 120 88 30;
+  --accent: 190 100 0;
+  --quantum: 30 90 200;
+  --up: 0 140 70;
+  --down: 200 30 30;
+  --warn: 160 110 0;
+  --bar: 28 28 28;
+  --bar-ink: 255 170 40;
   color-scheme: light;
 }
 
 html, body, #root { height: 100%; }
 body {
-  @apply bg-bg text-ink font-sans antialiased;
-  background-image:
-    radial-gradient(1200px 600px at 85% -10%, rgb(var(--quantum) / 0.10), transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, rgb(var(--accent) / 0.08), transparent 60%);
-  background-attachment: fixed;
+  @apply bg-bg text-ink font-mono antialiased;
+  font-size: 13px;
+  letter-spacing: 0.01em;
 }
 
 @layer components {
-  .glass {
-    @apply rounded-2xl border border-line/70 bg-surface/70 backdrop-blur-xl;
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 20px 50px -30px rgb(0 0 0 / 0.6);
-  }
-  .card-title { @apply text-[13px] font-medium uppercase tracking-[0.08em] text-muted; }
+  .glass { @apply border border-line bg-surface; }
+  .card-title { @apply text-[12px] font-semibold uppercase tracking-[0.12em] text-muted; }
+  /* panel title bar: amber strip with black text (dark) / black strip with amber text (light) */
+  .panel-bar { background: rgb(var(--bar)); color: rgb(var(--bar-ink)); }
+  .panel-bar .card-title { color: rgb(var(--bar-ink)); }
+  .fkey { @apply inline-flex shrink-0 items-center gap-1.5 border border-line bg-raised px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-ink transition hover:border-accent hover:text-accent; }
+  .fkey-on { @apply border-accent bg-accent text-black hover:text-black; }
+  .fkey kbd { @apply bg-black/60 px-1 text-[10px] text-accent; }
+  .fkey-on kbd { @apply bg-black text-accent; }
+  .term-input { @apply w-full border border-line bg-black px-2 py-1.5 font-mono text-[13px] uppercase text-accent placeholder:normal-case placeholder:text-muted/70 focus:border-accent focus:outline-none; }
   .num { font-variant-numeric: tabular-nums; }
-  .chip { @apply inline-flex items-center gap-1.5 rounded-full border border-line/80 bg-raised/70 px-2.5 py-1 text-xs text-muted; }
-  .btn { @apply inline-flex items-center gap-2 rounded-xl border border-line bg-raised/80 px-3 py-1.5 text-sm text-ink transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60; }
-  .seg { @apply rounded-lg px-3 py-1.5 text-sm transition; }
-  .seg-on { @apply bg-accent/15 text-accent; }
+  .chip { @apply inline-flex items-center gap-1.5 border border-line bg-raised px-2 py-0.5 text-[11px] uppercase tracking-wide text-muted; }
+  .btn { @apply inline-flex items-center gap-2 border border-line bg-raised px-3 py-1.5 text-[12px] uppercase tracking-wide text-ink transition hover:border-accent hover:text-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent; }
+  .seg { @apply px-3 py-1 text-[12px] uppercase tracking-wide transition; }
+  .seg-on { @apply bg-accent text-black; }
   .seg-off { @apply text-muted hover:text-ink; }
 }
 
 /* Range input styled to the theme */
-input[type="range"].dial { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px;
+input[type="range"].dial { -webkit-appearance: none; appearance: none; height: 4px;
   background: linear-gradient(90deg, rgb(var(--quantum)), rgb(var(--accent))); outline: none; }
 input[type="range"].dial::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
   background: rgb(var(--ink)); border: 3px solid rgb(var(--bg)); box-shadow: 0 0 0 2px rgb(var(--accent)), 0 0 16px rgb(var(--accent) / 0.6); cursor: pointer; }
@@ -65,7 +74,17 @@ input[type="range"].dial::-moz-range-thumb { width: 14px; height: 14px; border-r
   border: 3px solid rgb(var(--bg)); box-shadow: 0 0 0 2px rgb(var(--accent)); cursor: pointer; }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: rgb(var(--line)); border-radius: 10px; border: 2px solid rgb(var(--bg)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--line)); border: 2px solid rgb(var(--bg)); }
+::selection { background: rgb(var(--accent)); color: #000; }
+
+/* charts: terminal font everywhere */
+.recharts-text, .recharts-label, .recharts-cartesian-axis-tick-value { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+/* chat / assistant markdown */
+.md p { margin: 0 0 0.4rem; }
+.md ul { margin: 0.2rem 0 0.4rem 1rem; list-style: square; }
+.md a { color: rgb(var(--quantum)); text-decoration: underline; }
+.md strong { color: rgb(var(--accent)); font-weight: 600; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee { animation: none !important; }

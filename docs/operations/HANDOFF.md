@@ -149,3 +149,26 @@ Work paused here at the user's request. Everything below is committed and deploy
 - New `docs/operations/COWORK_SETUP.md` (what Cowork loads, how to package and upload the skills).
 - `ARCHITECTURE.md`, `DESIGN.md` and `README.md` brought up to date with the DuckDB/Parquet store, `/api/bars`, `R/bars.R`, `R/indicators.R`, storage tiers and current test counts (61 blocks / 357 expectations, 34 API checks).
 - No code or results changed.
+
+## Terminal UI, sign-in, explainable forecast, news, assistant, Kotak Neo (2026-11-18)
+
+Design and contracts are in `docs/design/TERMINAL_UI.md`, and the Kotak setup is in `docs/operations/KOTAK_NEO.md`. The features were taken from a review of the "Stock Trends" college project, which is saved as a project doc; its fabricated panels were deliberately not copied.
+
+- **UI:** terminal theme with black and amber colours, square panels and monospace type. It adds a command line (`RELIANCE EXPL`, `NVDA N`, `ASK …`), F1–F6/F8 function keys, exchange clocks and a feed status bar. There are two new pages, Explain (XAI) and News, plus an assistant dock.
+- **Sign-in:** user accounts are created with `Rscript scripts/32_create_user.R Nabi`. They are stored as scrypt hashes in `data/auth/users.json`, which is git-ignored. Bearer sessions last 12 h, with a lock-out after 5 failures.
+- **New endpoints:**
+  - `GET /api/explain/<m>/<t>`, `GET /api/news/<m>/<t>`, `GET /api/feeds`
+  - `GET /api/auth/config`, `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`
+  - `POST /api/chat`
+  - CORS now allows POST and the Authorization header.
+- **Live feed:** `fetch_intraday_auto()` uses Kotak Neo for NSE when `KOTAK_*` is set in `.Renviron`, with a per-stock Yahoo fallback. `/api/live` quotes now carry `feed`. `ghar_live_forecast()` attaches its input features as an attribute, which does not change the payload.
+- **Not yet verified:**
+  - The real Kotak Neo login has not been run; the parsers are tested only against documented shapes.
+  - Live Yahoo news has not been fetched; the workspace that built this had no network access to Yahoo or GDELT.
+  - Nothing has been deployed to Render or Vercel. Render needs `QSTOCK_AUTH_USERS` set; without it, sign-in is off there.
+- **Tests:** 70 testthat blocks; the new file `test_features_v4.R` adds 9 blocks and 84 expectations. The duckdb tests were not run in the build workspace, which has no duckdb. There are 49 API checks, and `tsc -b`, lint (0 errors) and build all pass.
+- **Next on the laptop:**
+  1. Create the account: `Rscript scripts/32_create_user.R Nabi`.
+  2. Start the API and the UI.
+  3. Optionally fill `.Renviron` for Kotak and check `/api/feeds`.
+  4. Re-run `scripts/25_export_snapshot.R` before redeploying the snapshot.

@@ -18,3 +18,5 @@ results/screenshots
 results/*.log
 results/*.txt
 metastore_db
+data/auth
+.Renviron

@@ -6,7 +6,7 @@ export type Market = "NSE" | "NASDAQ";
 
 export interface Quote {
   ticker: string; label: string; name: string; last: number; change: number | null;
-  rv: number | null; volume: number; last_time: number;
+  rv: number | null; volume: number; last_time: number; feed?: "yahoo" | "kotak_neo";
 }
 export interface LiveData {
   market: Market; open: boolean; local_time: string; updated_at: number; stale: boolean; errors: string[];
@@ -120,3 +120,64 @@ export const useBars = (m: Market, t: string | null, interval: BarInterval, rang
     refetchInterval: every(interval === "5s" ? 2_000 : INTRADAY.includes(interval) ? 60_000 : 30 * 60_000),
     placeholderData: (p) => p,
   });
+
+// ---- explainable forecast, news, feeds (docs/design/TERMINAL_UI.md) ----
+export interface ExplainFeature {
+  feature: string; label: string; group: string; value: number; value_vol: number; mean: number; mean_vol: number;
+  coef: number; contribution: number; vol_factor: number;
+}
+export interface Explanation {
+  ticker: string; as_of: string; pred_lrv5: number; vol5_ann: number; baseline_lrv5: number; baseline_vol5_ann: number;
+  intercept: number; n_universe: number; check_sum: number; rank: number; summary: string;
+  features: ExplainFeature[]; groups: { group: string; contribution: number }[];
+}
+export interface ExplainData {
+  market: Market; ticker: string; label: string; name: string; available: boolean; explanation: Explanation | null;
+  model: { train_from: string; train_to: string; n: number; coef: Record<string, number> } | null;
+  research_shap: { regime: string; feature: string; mean_abs_shap: number; group: string; share_within_task: number }[] | null;
+}
+export interface NewsItem { id: string; title: string; publisher: string; url: string; published: number; related: string; source: "yahoo" | "gdelt" }
+export interface NewsData { market: Market; ticker: string; label: string; fetched_at: number | null; stale: boolean; errors: Record<string, string> | string[]; items: NewsItem[] }
+export interface FeedsData { prices: Record<Market, string>; kotak_neo: string; news: string; research: string }
+
+export const useExplain = (m: Market, t: string | null) =>
+  useQuery({ queryKey: ["explain", m, t], queryFn: () => load<ExplainData>(`/api/explain/${m}/${encodeURIComponent(t!)}`, `explain_${m}_${t}.json`),
+             enabled: !!t, staleTime: 30 * 60_000, placeholderData: (p) => p });
+export const useNews = (m: Market, t: string | null) =>
+  useQuery({ queryKey: ["news", m, t], queryFn: () => load<NewsData>(`/api/news/${m}/${encodeURIComponent(t!)}`, `news_${m}_${t}.json`),
+             enabled: !!t, refetchInterval: every(10 * 60_000), placeholderData: (p) => p });
+export const useFeeds = () => useQuery({ queryKey: ["feeds"], queryFn: () => load<FeedsData>("/api/feeds", "feeds.json"), staleTime: 5 * 60_000 });
+
+// ---- sign-in and assistant (live R API only; the static snapshot has neither) ----
+export interface User { username: string; display_name: string; role: string; expires_at?: number }
+export interface ChatReply { reply: string; sources: string[]; intent: string; ticker: string | null; market: Market; user: string; at: number }
+const TOKEN_KEY = "qstock-token";
+export const readToken = () => { try { return localStorage.getItem(TOKEN_KEY); } catch { return null; } };
+const writeToken = (t: string | null) => { try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch { /* storage unavailable */ } };
+
+async function send<T>(path: string, body: unknown, token?: string | null): Promise<T> {
+  const r = await fetch(`${API}${path}`, {
+    method: "POST", headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    body: JSON.stringify(body),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((j as { error?: string }).error ?? `HTTP ${r.status}`);
+  return j as T;
+}
+export async function authConfig(): Promise<{ enabled: boolean } | null> {
+  if (SNAPSHOT) return null;
+  try { return await get<{ enabled: boolean }>(`${API}/api/auth/config`); } catch { return null; }   // null = API unreachable
+}
+export async function login(username: string, password: string): Promise<User> {
+  const r = await send<{ token: string; user: User; expires_at: number }>("/api/auth/login", { username, password });
+  writeToken(r.token);
+  return { ...r.user, expires_at: r.expires_at };
+}
+export async function me(): Promise<User | null> {
+  const t = readToken(); if (!t || SNAPSHOT) return null;
+  const r = await fetch(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${t}` } }).catch(() => null);
+  if (!r || !r.ok) { if (r?.status === 401) writeToken(null); return null; }
+  return r.json() as Promise<User>;
+}
+export async function logout() { const t = readToken(); writeToken(null); if (t) await send("/api/auth/logout", {}, t).catch(() => null); }
+export const ask = (message: string, market: Market) => send<ChatReply>("/api/chat", { message, market }, readToken());

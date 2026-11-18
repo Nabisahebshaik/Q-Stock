@@ -21,12 +21,20 @@ local({ old <- setwd(ROOT); on.exit(setwd(old))
   }), globalenv())
 })
 RW <- lapply(split(PRICES, PRICES$market), returns_wide)
-FETCH <- getOption("qstock.live_fetcher", fetch_intraday_many)
+FETCH <- getOption("qstock.live_fetcher", fetch_intraday_auto)   # Kotak Neo for NSE when configured, else Yahoo
+FETCH_NEWS <- getOption("qstock.news_fetcher", fetch_news)
 FETCH_DAILY <- getOption("qstock.live_daily_fetcher", fetch_daily_many)
 STORE <- candle_store_open(getOption("qstock.live_db", file.path(ROOT, if (store_backend() == "duckdb") LIVE$db_path else LIVE$sqlite_path)))
 PARQUET <- file.path(ROOT, LIVE$parquet_dir)
 CACHE <- new.env()
 TAUS <- QS$walk_time * seq_len(10) / 10
+AUTH_STORE <- auth_store(auth_read_users(file.path(ROOT, AUTH$users_path)))
+KOTAK_LOGIN <- if (kotak_configured()) {
+  # Sign in once at start-up: TOTP from the stored secret, or the code typed into run_api.R.
+  code <- getOption("qstock.kotak_totp", NULL)
+  r <- tryCatch({ kotak_login(code); "connected" }, error = function(e) conditionMessage(e))
+  message("Kotak Neo: ", r); r
+} else "not configured"
 tab <- function(f) { p <- file.path(ROOT, "results", "tables", f); if (file.exists(p)) read.csv(p, check.names = FALSE) else NULL }
 check_market <- function(market) {
   if (!market %in% names(QS$universe))
@@ -52,9 +60,18 @@ live_state <- function(mk, max_age = 55) {
   out <- list(at = epoch(Sys.time()), bars = rbind(s$final, s$active), n_active = nrow(s$active), active = s$active,
               meta = lapply(r$data, attr, "meta"), errors = r$errors, stale = FALSE, range = rng,
               fetch_sec = as.numeric(difftime(Sys.time(), t0, units = "secs")),
-              store = candle_upsert(STORE, s$final, 60, "yahoo_poll"), walks = new.env())
+              store = upsert_by_source(s$final, r$source), sources = r$source, walks = new.env())
   CACHE[[mk]] <- out
   out
+}
+
+# Finalised candles go to the store tagged with the feed each ticker came from.
+upsert_by_source <- function(final, src) {
+  if (!NROW(final)) return(candle_upsert(STORE, final, 60, "yahoo_poll"))
+  feed <- if (is.null(src)) rep("yahoo", nrow(final)) else unname(src[final$ticker])
+  feed[is.na(feed)] <- "yahoo"
+  parts <- split(final, feed)
+  Reduce(`+`, Map(function(x, f) candle_upsert(STORE, x, 60, paste0(f, "_poll")), parts, names(parts)))
 }
 
 # Chart bars: finalised candles from the store plus the forming bar held in memory.
@@ -203,6 +220,26 @@ bars_payload <- function(mk, ticker, interval, range, ind) {
        bars = bd[keep, , drop = FALSE], indicators = ind_out)
 }
 
+# /api/live payload (also read by the assistant)
+live_payload <- function(mk) {
+  s <- live_state(mk); st <- market_status(mk)
+  base <- list(market = mk, open = st$open, local_time = st$local_time, updated_at = s$at,
+               stale = isTRUE(s$stale), errors = as.list(s$errors))
+  if (is.null(s$bars)) return(c(base, list(quotes = list())))
+  cur <- pick_session(s$bars, mk); ch <- day_change(s$bars, s$meta, mk); rv <- intraday_rv(cur, mk)
+  q <- do.call(rbind, lapply(split(cur, cur$ticker), function(x) {
+    x <- x[order(x$bucket), ]; tk <- x$ticker[1]
+    data.frame(ticker = tk, label = short(tk), name = unname(QS$universe[[mk]][tk]), last = tail(x$close, 1),
+               change = unname(ch[tk]), rv = unname(rv[tk]), volume = sum(x$volume, na.rm = TRUE),
+               last_time = epoch(tail(x$ts, 1)), feed = if (is.null(s$sources) || is.na(s$sources[tk])) "yahoo" else unname(s$sources[tk]))
+  })); rownames(q) <- NULL
+  spark <- lapply(split(cur, cur$ticker), function(x) round(tail(x$close[order(x$bucket)], 90), 4))
+  n <- candle_stats(STORE, 60, PARQUET)
+  c(base, list(newest_bar_age = epoch(Sys.time()) - max(epoch(s$bars$ts)), session_day = format(max(local_day(cur$bucket, mk))),
+               fetch_sec = s$fetch_sec, range = s$range, quotes = q, spark = spark,
+               store = list(candles = n$n, tickers = n$t, written = s$store[["written"]], rejected = s$store[["rejected"]])))
+}
+
 graph_payload <- function(g, P, extra = NULL) {
   idx <- which(g$adj == 1 & upper.tri(g$adj), arr.ind = TRUE)
   list(nodes = c(list(id = g$tick, label = short(g$tick)), extra),
@@ -229,24 +266,7 @@ function() {
 #* @param market NSE or NASDAQ
 #* @get /api/live/<market>
 #* @serializer unboxedJSON list(na = "null", digits = NA)
-function(market) {
-  mk <- check_market(market); s <- live_state(mk); st <- market_status(mk)
-  base <- list(market = mk, open = st$open, local_time = st$local_time, updated_at = s$at,
-               stale = isTRUE(s$stale), errors = as.list(s$errors))
-  if (is.null(s$bars)) return(c(base, list(quotes = list())))
-  cur <- pick_session(s$bars, mk); ch <- day_change(s$bars, s$meta, mk); rv <- intraday_rv(cur, mk)
-  q <- do.call(rbind, lapply(split(cur, cur$ticker), function(x) {
-    x <- x[order(x$bucket), ]; tk <- x$ticker[1]
-    data.frame(ticker = tk, label = short(tk), name = unname(QS$universe[[mk]][tk]), last = tail(x$close, 1),
-               change = unname(ch[tk]), rv = unname(rv[tk]), volume = sum(x$volume, na.rm = TRUE),
-               last_time = epoch(tail(x$ts, 1)))
-  })); rownames(q) <- NULL
-  spark <- lapply(split(cur, cur$ticker), function(x) round(tail(x$close[order(x$bucket)], 90), 4))
-  n <- candle_stats(STORE, 60, PARQUET)
-  c(base, list(newest_bar_age = epoch(Sys.time()) - max(epoch(s$bars$ts)), session_day = format(max(local_day(cur$bucket, mk))),
-               fetch_sec = s$fetch_sec, range = s$range, quotes = q, spark = spark,
-               store = list(candles = n$n, tickers = n$t, written = s$store[["written"]], rejected = s$store[["rejected"]])))
-}
+function(market) live_payload(check_market(market))
 
 #* One-minute candles of the latest session(s) from the candle store (time shifted to exchange-local clock time)
 #* @param market NSE or NASDAQ
@@ -371,6 +391,117 @@ function() {
        mr_groups = { m <- tab("mr_monthly_stats.csv"); if (is.null(m)) NA else nrow(m) })
 }
 
+# ---- explainable forecast, news, sign-in and the assistant ----
+
+explain_state <- function(mk, ticker) {
+  f <- forecast_state(mk); m <- GHAR_LIVE[[mk]]
+  if (is.null(f) || is.null(m)) return(NULL)
+  explain_forecast(f, m$coef, ticker)
+}
+
+news_state <- function(mk, ticker, max_age = 600) {
+  key <- paste0("news_", ticker); c0 <- CACHE[[key]]
+  if (!is.null(c0) && epoch(Sys.time()) - c0$at < max_age) return(c0$n)
+  n <- tryCatch(FETCH_NEWS(ticker, unname(QS$universe[[mk]][ticker])), error = function(e) list(items = news_empty(), errors = c(all = conditionMessage(e))))
+  n$items <- news_clean(n$items)
+  if (!nrow(n$items) && !is.null(c0) && nrow(c0$n$items)) { c0$n$errors <- n$errors; c0$n$stale <- TRUE; return(c0$n) }
+  n$stale <- FALSE; n$fetched_at <- epoch(Sys.time())
+  CACHE[[key]] <- list(at = epoch(Sys.time()), n = n)
+  n
+}
+
+json_body <- function(req) {
+  b <- tryCatch(jsonlite::fromJSON(req$postBody %||% "", simplifyVector = TRUE), error = function(e) NULL)
+  if (!is.list(b)) bad_request("request body must be a JSON object")
+  b
+}
+need_user <- function(req, res) {
+  if (!auth_enabled(AUTH_STORE)) return(list(username = "local", display_name = "Local user", role = "analyst"))
+  u <- auth_user(AUTH_STORE, auth_token_of(req))
+  if (is.null(u)) { res$status <- 401; return(NULL) }
+  u
+}
+
+#* Explainable volatility forecast: exact per-feature decomposition of one stock's graph-HAR forecast
+#* @param market NSE or NASDAQ
+#* @param ticker Yahoo symbol
+#* @get /api/explain/<market>/<ticker>
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function(market, ticker) {
+  mk <- check_market(market); check_ticker(mk, ticker)
+  e <- explain_state(mk, ticker)
+  m <- GHAR_LIVE[[mk]]
+  rs <- tab("explainability_shap.csv")
+  list(market = mk, ticker = ticker, label = short(ticker), name = unname(QS$universe[[mk]][ticker]),
+       available = !is.null(e), explanation = e,
+       model = if (is.null(m)) NULL else list(train_from = format(m$train_from), train_to = format(m$train_to), n = m$n,
+                                              coef = as.list(stats::setNames(as.numeric(m$coef), c("intercept", GHAR_COLS)))),
+       research_shap = if (is.null(rs)) NULL else rs[rs$market == mk & rs$task == "T1_volatility", ])
+}
+
+#* Latest news headlines of one stock (Yahoo Finance; GDELT when Yahoo returns nothing; 10-minute cache)
+#* @param market NSE or NASDAQ
+#* @param ticker Yahoo symbol
+#* @get /api/news/<market>/<ticker>
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function(market, ticker) {
+  mk <- check_market(market); check_ticker(mk, ticker)
+  n <- news_state(mk, ticker)
+  list(market = mk, ticker = ticker, label = short(ticker), fetched_at = n$fetched_at %||% NA, stale = isTRUE(n$stale),
+       errors = as.list(n$errors), items = n$items)
+}
+
+#* Data feeds in use (live prices and news)
+#* @get /api/feeds
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function() {
+  list(prices = list(NSE = if (identical(KOTAK_LOGIN, "connected")) "kotak_neo (Yahoo fallback)" else "yahoo", NASDAQ = "yahoo"),
+       kotak_neo = KOTAK_LOGIN, news = "yahoo (GDELT fallback)", research = "daily Yahoo prices frozen at QS$end_date")
+}
+
+#* Whether sign-in is enabled on this server
+#* @get /api/auth/config
+#* @serializer unboxedJSON
+function() list(enabled = auth_enabled(AUTH_STORE), session_hours = AUTH$session_hours)
+
+#* Sign in; body {"username": "...", "password": "..."}; returns a bearer token
+#* @post /api/auth/login
+#* @serializer unboxedJSON
+function(req, res) {
+  b <- json_body(req)
+  if (!auth_enabled(AUTH_STORE)) { res$status <- 404; return(list(error = "sign-in is not enabled on this server")) }
+  r <- auth_login(AUTH_STORE, b$username, b$password)
+  if (!r$ok) { res$status <- r$status; return(list(error = r$error)) }
+  r[c("token", "expires_at", "user")]
+}
+
+#* The signed-in user
+#* @get /api/auth/me
+#* @serializer unboxedJSON
+function(req, res) {
+  u <- auth_user(AUTH_STORE, auth_token_of(req))
+  if (is.null(u)) { res$status <- 401; return(list(error = "not signed in")) }
+  u
+}
+
+#* Sign out (ends the session token)
+#* @post /api/auth/logout
+#* @serializer unboxedJSON
+function(req) { auth_logout(AUTH_STORE, auth_token_of(req)); list(ok = TRUE) }
+
+#* Ask the Q-Stock assistant (signed-in users); body {"message": "...", "market": "NSE"}
+#* @post /api/chat
+#* @serializer unboxedJSON list(na = "null", digits = NA)
+function(req, res) {
+  u <- need_user(req, res); if (is.null(u)) return(list(error = "sign in to use the assistant"))
+  b <- json_body(req)
+  hint <- if (identical(b$market, "NASDAQ")) "NASDAQ" else "NSE"
+  ctx <- list(live = live_payload,
+              forecast = forecast_state, explain = explain_state, news = news_state, table = tab)
+  r <- assistant_reply(b$message, ctx, hint)
+  c(r, list(user = u$display_name, at = epoch(Sys.time())))
+}
+
 #* @plumber
 function(pr) {
   # Server-Timing header: compute time of every request (visible in browser dev tools / curl -I).
@@ -389,10 +520,11 @@ function(pr) {
     res$status <- if (inherits(err, "qs_bad_request")) 400 else 500
     list(error = conditionMessage(err))
   })
-  # Read-only GET API: allow a UI hosted elsewhere (e.g. Vercel, VITE_API_URL) to call it.
+  # GET API plus sign-in/chat POSTs (bearer tokens, no cookies): allow a UI hosted elsewhere (e.g. Vercel, VITE_API_URL) to call it.
   pr <- plumber::pr_filter(pr, "cors", function(req, res) {
     res$setHeader("Access-Control-Allow-Origin", "*")
-    res$setHeader("Access-Control-Allow-Methods", "GET, OPTIONS")
+    res$setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+    res$setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
     if (identical(req$REQUEST_METHOD, "OPTIONS")) { res$status <- 204; return(list()) }
     plumber::forward()
   })
