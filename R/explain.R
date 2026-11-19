@@ -48,7 +48,7 @@ explain_text <- function(ticker, pred, base, feats, grp) {
   g <- grp[order(-abs(grp$contribution)), ][1, ]
   sprintf(paste0("%s: forecast 5-day volatility %s (annualised) vs %s for the average stock of its market today, ",
                  "%s the average. The largest single driver is %s (%s the forecast by a factor %.2f). ",
-                 "By group, %s account for most of the gap."),
+                 "By group, the %s inputs account for most of the gap."),
           short_label(ticker), pct(ann_vol(pred)), pct(ann_vol(base)), dir, tolower(top$label),
           if (top$contribution >= 0) "raising" else "lowering", top$vol_factor, g$group)
 }

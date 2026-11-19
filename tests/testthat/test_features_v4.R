@@ -138,3 +138,21 @@ test_that("assistant replies are grounded and say when data are missing", {
   if (file.exists("results/tables/v2_hypothesis_tests.csv"))
     expect_match(assistant_reply("did the quantum features beat the baseline?", ctx)$reply, "NASDAQ, MSE loss")
 })
+
+test_that("news: name search keeps only headlines about the company", {
+  it <- data.frame(id = 1:4, title = c("Reliance Jio adds users", "Sensex closes higher", "RELIANCE shares slip", "Oil prices fall"),
+                   publisher = "x", url = "u", published = 1:4, related = c("", "", "", "RELIANCE.NS"), source = "yahoo", stringsAsFactors = FALSE)
+  k <- news_about(it, "RELIANCE.NS", "Reliance Industries")
+  expect_equal(k$id, c(1L, 3L, 4L))
+  expect_equal(nrow(news_about(it, "TCS.NS", "Tata Consultancy Services")), 0)
+  orig <- http_text; on.exit(assign("http_text", orig, globalenv()))
+  assign("http_text", function(url, timeout = 15) {
+    if (grepl("q=RELIANCE.NS", url, fixed = TRUE)) return('{"news": []}')
+    if (grepl("q=Reliance", url, fixed = TRUE)) return(jsonlite::toJSON(list(news = list(
+      list(uuid = "a", title = "Reliance Retail expands", publisher = "Mint", link = "https://x/a", providerPublishTime = 10),
+      list(uuid = "b", title = "Nifty ends flat", publisher = "ET", link = "https://x/b", providerPublishTime = 9))), auto_unbox = TRUE))
+    stop("unexpected url")
+  }, globalenv())
+  r <- fetch_news("RELIANCE.NS", "Reliance Industries")
+  expect_equal(r$items$id, "a"); expect_equal(length(r$errors), 0)
+})

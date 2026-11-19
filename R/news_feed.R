@@ -50,15 +50,34 @@ http_text <- function(url, timeout = 15) {
   rawToChar(r$content)
 }
 
-# Default fetcher: Yahoo first, GDELT if Yahoo fails or is empty. Returns list(items, errors).
+# Default fetcher: Yahoo by symbol; Yahoo by company name when the symbol has no news (common
+# for NSE ".NS" symbols), keeping only headlines that name the company; GDELT last.
+# Returns list(items, errors).
 fetch_news <- function(symbol, name, n = 12) {
   errs <- character()
-  y <- tryCatch(parse_yahoo_news(http_text(yahoo_news_url(symbol, n)), symbol),
-                error = function(e) { errs[["yahoo"]] <<- conditionMessage(e); news_empty() })
+  try_src <- function(src, expr) tryCatch(expr, error = function(e) { errs[[src]] <<- conditionMessage(e); news_empty() })
+  y <- try_src("yahoo", parse_yahoo_news(http_text(yahoo_news_url(symbol, n)), symbol))
   if (nrow(y)) return(list(items = y, errors = errs))
-  g <- tryCatch(parse_gdelt_artlist(http_text(gdelt_artlist_url(sentiment_query(symbol, name), n = n)), symbol),
-                error = function(e) { errs[["gdelt"]] <<- conditionMessage(e); news_empty() })
+  if (!is.null(name) && !is.na(name) && nzchar(name)) {
+    q <- sub(" (Ltd|Limited|Inc|Corp|Corporation|Industries Ltd)\\.?$", "", name)
+    yn <- try_src("yahoo_name", parse_yahoo_news(http_text(yahoo_news_url(q, n)), symbol))
+    yn <- news_about(yn, symbol, name)
+    if (nrow(yn)) return(list(items = yn, errors = errs))
+  }
+  g <- try_src("gdelt", parse_gdelt_artlist(http_text(gdelt_artlist_url(sentiment_query(symbol, name), n = n), timeout = 30), symbol))
   list(items = g, errors = errs)
+}
+
+# Keeps headlines that are about the company: the title names it (symbol or a distinctive
+# word of its name) or Yahoo tags the article with the symbol.
+news_about <- function(items, symbol, name) {
+  if (!nrow(items)) return(items)
+  label <- sub("\\.NS$", "", symbol)
+  words <- tolower(strsplit(gsub("[^A-Za-z& ]", " ", name), " +")[[1]])
+  words <- words[nchar(words) > 3 & !words %in% c("ltd", "limited", "india", "industries", "bank", "services", "corporation", "company", "the")]
+  pat <- paste0("\\b(", paste(c(tolower(label), words), collapse = "|"), ")\\b")
+  keep <- grepl(pat, tolower(items$title), perl = TRUE) | grepl(symbol, items$related, fixed = TRUE)
+  items[keep, ]
 }
 
 # Newest first, duplicates (same title) dropped, at most n.
